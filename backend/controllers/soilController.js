@@ -1,9 +1,10 @@
 const FormData   = require('form-data');
 const fs         = require('fs');
+const path       = require('path');
 const mlClient   = require('../utils/mlClient');
 const SoilReport = require('../models/SoilReport');
 
-const analyzeSoil = async (req, res) => {
+const analyzeSoil = async (req, res, next) => {
     try {
         if (!req.file) return res.status(400).json({ message: 'No image uploaded' });
 
@@ -12,7 +13,6 @@ const analyzeSoil = async (req, res) => {
 
         const result = await mlClient.predictSoil(formData);
 
-        // Save report to DB
         const report = await SoilReport.create({
             user:       req.user._id,
             soil_type:  result.soil_type,
@@ -20,7 +20,7 @@ const analyzeSoil = async (req, res) => {
             location:   { state: req.user.state, district: req.user.district }
         });
 
-        // Delete temp file
+        // Delete temp file after upload
         fs.unlinkSync(req.file.path);
 
         res.json({
@@ -29,16 +29,27 @@ const analyzeSoil = async (req, res) => {
             report_id:  report._id
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        // Clean up file if error occurs
+        if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        next(error);
     }
 };
 
-const getSoilHistory = async (req, res) => {
+const getSoilHistory = async (req, res, next) => {
     try {
-        const reports = await SoilReport.find({ user: req.user._id }).sort('-createdAt').limit(10);
-        res.json(reports);
+        const page  = parseInt(req.query.page)  || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip  = (page - 1) * limit;
+
+        const total   = await SoilReport.countDocuments({ user: req.user._id });
+        const reports = await SoilReport.find({ user: req.user._id })
+            .sort('-createdAt')
+            .skip(skip)
+            .limit(limit);
+
+        res.json({ total, page, pages: Math.ceil(total / limit), reports });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        next(error);
     }
 };
 
