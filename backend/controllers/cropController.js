@@ -1,32 +1,55 @@
+const { validationResult } = require('express-validator');
 const mlClient   = require('../utils/mlClient');
 const CropReport = require('../models/CropReport');
 
-const recommendCrop = async (req, res) => {
-    try {
-        const { soil_type, temperature, humidity, rainfall } = req.body;
-        if (!soil_type || !temperature || !humidity || !rainfall)
-            return res.status(400).json({ message: 'All fields required: soil_type, temperature, humidity, rainfall' });
+// UP-relevant crops whitelist
+const UP_CROPS = [
+    'wheat', 'rice', 'maize', 'sugarcane', 'potato', 'tomato',
+    'onion', 'mustard', 'chickpea', 'pea', 'lentil', 'soybean',
+    'cotton', 'barley', 'millet', 'sorghum', 'groundnut', 'sunflower'
+];
 
+const recommendCrop = async (req, res, next) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+        const { soil_type, temperature, humidity, rainfall } = req.body;
         const result = await mlClient.predictCrop({ soil_type, temperature, humidity, rainfall });
+
+        // Filter to UP-relevant crops only
+        const filtered = result.crops.filter(c => UP_CROPS.includes(c.crop.toLowerCase()));
+
+        // Only apply filter if we have at least 3 UP-relevant crops, otherwise return all
+        const finalCrops = filtered.length >= 3 ? filtered : result.crops;
 
         await CropReport.create({
             user: req.user._id,
             soil_type, temperature, humidity, rainfall,
-            crops: result.crops
+            crops: finalCrops
         });
 
-        res.json(result);
+        res.json({ crops: finalCrops });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        next(error);
     }
 };
 
-const getCropHistory = async (req, res) => {
+const getCropHistory = async (req, res, next) => {
     try {
-        const reports = await CropReport.find({ user: req.user._id }).sort('-createdAt').limit(10);
-        res.json(reports);
+        const page  = parseInt(req.query.page)  || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip  = (page - 1) * limit;
+
+        const total   = await CropReport.countDocuments({ user: req.user._id });
+        const reports = await CropReport.find({ user: req.user._id })
+            .sort('-createdAt')
+            .skip(skip)
+            .limit(limit);
+
+        res.json({ total, page, pages: Math.ceil(total / limit), reports });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        next(error);
     }
 };
 
