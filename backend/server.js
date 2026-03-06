@@ -5,6 +5,7 @@ const helmet    = require('helmet');
 const morgan    = require('morgan');
 const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
+const marketRoutes = require("./routes/market");
 
 dotenv.config();
 connectDB();
@@ -30,6 +31,7 @@ app.use('/api/', limiter);
 
 // Only auth for now
 app.use('/api/auth', require('./routes/auth'));
+app.use("/api/market", marketRoutes);
 
 app.get('/', (req, res) => res.json({ status: 'AgriSense Backend Running' }));
 

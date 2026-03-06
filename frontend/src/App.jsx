@@ -6,6 +6,9 @@ import VerifyOTP from "./pages/VerifyOTP";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
+import Market from "./pages/Market";
+
+
 
 function App() {
   return (
@@ -21,7 +24,11 @@ function App() {
               <Dashboard />
             </ProtectedRoute>
           } />
+           <Route path="/dashboard/market" element={
+        <ProtectedRoute><Market /></ProtectedRoute>
+         } />
         </Routes>
+       
       </BrowserRouter>
     </AuthProvider>
   );
