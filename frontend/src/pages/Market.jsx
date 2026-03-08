@@ -45,8 +45,8 @@ const Market = () => {
   // ── Tab ──
   const [activeTab, setActiveTab] = useState("mandi");
 
-  // ── Shared: Districts ──
-  const [districts,       setDistricts]       = useState([]);
+  // ── Tab 1 only: Districts ──                          ✅ FIX 1: separated from shared
+  const [mandiDistricts,  setMandiDistricts]  = useState([]);
   const [districtLoading, setDistrictLoading] = useState(false);
   const [districtError,   setDistrictError]   = useState("");
 
@@ -56,13 +56,12 @@ const Market = () => {
   const [mandiLoading, setMandiLoading] = useState(false);
   const [mandiError,   setMandiError]   = useState("");
 
-  // ── Tab 2: Live Prices ──
-  const [liveCrop,     setLiveCrop]     = useState("");
-  const [liveState,    setLiveState]    = useState("");
-  const [liveDistrict, setLiveDistrict] = useState("");
-  const [liveData,     setLiveData]     = useState(null);
-  const [liveLoading,  setLiveLoading]  = useState(false);
-  const [liveError,    setLiveError]    = useState("");
+  // ── Tab 2: Live Prices ──                             ✅ FIX 2: removed liveDistrict
+  const [liveCrop,    setLiveCrop]    = useState("");
+  const [liveState,   setLiveState]   = useState("");
+  const [liveData,    setLiveData]    = useState(null);
+  const [liveLoading, setLiveLoading] = useState(false);
+  const [liveError,   setLiveError]   = useState("");
 
   // ── Tab 3: Prediction ──
   const [predForm,    setPredForm]    = useState({ crop: "", state: "", season: "", year: new Date().getFullYear() });
@@ -71,21 +70,19 @@ const Market = () => {
   const [predError,   setPredError]   = useState("");
 
   // ─────────────────────────────────────
-  // SHARED — Fetch districts from API
-  // Called whenever state dropdown changes
+  // TAB 1 ONLY — Fetch districts
   // ─────────────────────────────────────
-  const fetchDistricts = async (selectedState) => {
+  const fetchDistricts = async (selectedState) => {       // ✅ FIX 3: uses mandiDistricts state
     if (!selectedState) return;
     setDistrictLoading(true);
-    setDistricts([]);
+    setMandiDistricts([]);
     setDistrictError("");
     try {
       const { data } = await API.get("/market/districts", {
         params: { state: selectedState },
       });
-      setDistricts(data.districts);
+      setMandiDistricts(data.districts);
     } catch (err) {
-      console.error("District error:", err.response?.data || err.message);
       setDistrictError(err.response?.data?.message || "Failed to load districts");
     } finally {
       setDistrictLoading(false);
@@ -116,7 +113,7 @@ const Market = () => {
   };
 
   // ─────────────────────────────────────
-  // TAB 2 — Live Prices Fetch
+  // TAB 2 — Live Prices                  ✅ FIX 4: crop+state only, no district
   // ─────────────────────────────────────
   const handleLiveFetch = async (e) => {
     e.preventDefault();
@@ -125,7 +122,7 @@ const Market = () => {
     setLiveData(null);
     try {
       const { data } = await API.get("/market/live-prices", {
-        params: { commodity: liveCrop, state: liveState, district: liveDistrict },
+        params: { crop: liveCrop, state: liveState },   // ✅ crop not commodity, no district
       });
       setLiveData(data);
     } catch (err) {
@@ -288,7 +285,7 @@ const Market = () => {
                     value={mandiForm.state}
                     onChange={(e) => {
                       setMandiForm({ ...mandiForm, state: e.target.value, district: "" });
-                      fetchDistricts(e.target.value);
+                      fetchDistricts(e.target.value);       // ✅ only Tab 1 calls this
                     }}
                     required
                     className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-gray-50"
@@ -318,7 +315,7 @@ const Market = () => {
                     <option value="">
                       {districtLoading ? "Loading districts..." : "Select district"}
                     </option>
-                    {districts.map((d) => (
+                    {mandiDistricts.map((d) => (        // ✅ FIX: mandiDistricts not districts
                       <option key={d} value={d}>{d}</option>
                     ))}
                   </select>
@@ -340,7 +337,6 @@ const Market = () => {
             {/* ── Results ── */}
             <div className="flex flex-col gap-4">
 
-              {/* Empty state */}
               {!mandiResults && !mandiLoading && (
                 <div className="w-full bg-gradient-to-br from-amber-50 to-orange-100 border-2 border-dashed border-amber-200 rounded-3xl p-8 flex flex-col items-center justify-center text-center min-h-[420px]">
                   <div className="text-6xl mb-4">🏪</div>
@@ -351,7 +347,6 @@ const Market = () => {
                 </div>
               )}
 
-              {/* Loading */}
               {mandiLoading && (
                 <div className="w-full bg-white border border-gray-100 rounded-3xl p-8 flex flex-col items-center justify-center min-h-[420px] shadow-sm">
                   <div className="w-16 h-16 border-4 border-amber-200 border-t-amber-500 rounded-full animate-spin mb-6" />
@@ -360,11 +355,9 @@ const Market = () => {
                 </div>
               )}
 
-              {/* Results */}
               {mandiResults && !mandiLoading && (
                 <div className="flex flex-col gap-4">
 
-                  {/* Summary bar */}
                   <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl px-5 py-3 text-white flex items-center justify-between">
                     <span className="font-semibold text-sm">
                       🌾 {mandiResults.crop} · {mandiResults.quantity} qtl · {mandiResults.district}, {mandiResults.state}
@@ -374,14 +367,12 @@ const Market = () => {
                     </span>
                   </div>
 
-                  {/* Mandi Cards */}
                   {mandiResults.mandis.map((m, i) => (
                     <div
                       key={i}
                       className={`bg-white rounded-2xl p-5 shadow-sm border transition-all duration-200 hover:shadow-md
                         ${m.isBest ? "border-amber-300 ring-2 ring-amber-200" : "border-gray-100"}`}
                     >
-                      {/* Card Header */}
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-white text-sm
@@ -408,7 +399,6 @@ const Market = () => {
                         </div>
                       </div>
 
-                      {/* Revenue Grid */}
                       <div className="grid grid-cols-3 gap-2 text-center">
                         <div className="bg-blue-50 rounded-xl py-2.5">
                           <p className="text-xs text-gray-400">Price/qtl</p>
@@ -456,7 +446,7 @@ const Market = () => {
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
               <h2 className="text-xl font-bold text-gray-800 mb-1">📋 Live Mandi Prices</h2>
               <p className="text-gray-400 text-sm mb-6">
-                Real-time prices from Agmarknet (data.gov.in)
+                Today's prices from TodayPriceRates {/* ✅ FIX 5: correct source */}
               </p>
 
               {liveError && (
@@ -465,6 +455,7 @@ const Market = () => {
                 </div>
               )}
 
+              {/* ✅ FIX 6: Only crop + state — NO district */}
               <form onSubmit={handleLiveFetch} className="flex flex-col gap-5">
 
                 {/* Crop */}
@@ -488,11 +479,7 @@ const Market = () => {
                   <label className="text-sm font-semibold text-gray-700 mb-1.5 block">📍 State</label>
                   <select
                     value={liveState}
-                    onChange={(e) => {
-                      setLiveState(e.target.value);
-                      setLiveDistrict("");
-                      fetchDistricts(e.target.value);
-                    }}
+                    onChange={(e) => setLiveState(e.target.value)}  // ✅ no fetchDistricts here
                     required
                     className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-gray-50"
                   >
@@ -501,33 +488,6 @@ const Market = () => {
                       <option key={s} value={s}>{s}</option>
                     ))}
                   </select>
-                </div>
-
-                {/* District */}
-                <div>
-                  <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
-                    🏘️ District
-                    {districtLoading && (
-                      <span className="text-xs text-orange-500 ml-2 font-normal">Loading...</span>
-                    )}
-                  </label>
-                  <select
-                    value={liveDistrict}
-                    onChange={(e) => setLiveDistrict(e.target.value)}
-                    required
-                    disabled={!liveState || districtLoading}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-gray-50 disabled:opacity-50"
-                  >
-                    <option value="">
-                      {districtLoading ? "Loading districts..." : "Select district"}
-                    </option>
-                    {districts.map((d) => (
-                      <option key={d} value={d}>{d}</option>
-                    ))}
-                  </select>
-                  {districtError && (
-                    <p className="text-xs text-red-500 mt-1.5">⚠️ {districtError}</p>
-                  )}
                 </div>
 
                 <button
@@ -543,24 +503,21 @@ const Market = () => {
             {/* ── Results ── */}
             <div className="flex flex-col gap-4 overflow-y-auto max-h-[600px]">
 
-              {/* Empty state */}
               {!liveData && !liveLoading && (
                 <div className="w-full bg-gradient-to-br from-orange-50 to-amber-100 border-2 border-dashed border-orange-200 rounded-3xl p-8 flex flex-col items-center justify-center text-center min-h-[400px]">
                   <div className="text-6xl mb-4">📋</div>
                   <h3 className="text-lg font-bold text-gray-700">Live Prices Will Appear Here</h3>
-                  <p className="text-gray-400 text-sm mt-2">Select crop + state + district</p>
+                  <p className="text-gray-400 text-sm mt-2">Select crop + state</p> {/* ✅ FIX 7 */}
                 </div>
               )}
 
-              {/* Loading */}
               {liveLoading && (
                 <div className="w-full bg-white rounded-3xl p-8 flex flex-col items-center justify-center min-h-[400px]">
                   <div className="w-16 h-16 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mb-6" />
-                  <p className="text-gray-600 font-semibold">Fetching from Agmarknet...</p>
+                  <p className="text-gray-600 font-semibold">Fetching today's prices...</p> {/* ✅ FIX 8 */}
                 </div>
               )}
 
-              {/* Results */}
               {liveData && !liveLoading && (
                 <div className="flex flex-col gap-3">
 
@@ -580,7 +537,7 @@ const Market = () => {
                     </div>
                   </div>
 
-                  {/* Market Cards */}
+                  {/* ✅ FIX 9: correct fields from scraper response */}
                   {liveData.markets.map((m, i) => (
                     <div
                       key={i}
@@ -588,12 +545,21 @@ const Market = () => {
                     >
                       <div className="flex items-center justify-between mb-2">
                         <div>
-                          <p className="font-bold text-gray-800 text-sm">{m.market}</p>
-                          <p className="text-xs text-gray-400">{m.district} · {m.date}</p>
+                          <p className="font-bold text-gray-800 text-sm">{m.commodity}</p>  {/* ✅ was m.market */}
+                          <p className="text-xs text-gray-400">{m.state} · {m.date}</p>     {/* ✅ was m.district */}
                         </div>
-                        <span className="text-xs bg-green-100 text-green-700 font-semibold px-2 py-1 rounded-full">
-                          🟢 Live
-                        </span>
+                        <div className="flex flex-col items-end gap-1">
+                          <span className="text-xs bg-blue-100 text-blue-700 font-semibold px-2 py-1 rounded-full">
+                            🔵 Today
+                          </span>
+                          {/* ✅ FIX 10: show trend badge */}
+                          {m.trend && m.priceChange && (
+                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full
+                              ${m.trend === "down" ? "bg-green-50 text-green-600" : "bg-red-50 text-red-500"}`}>
+                              {m.trend === "down" ? "▼" : "▲"} {m.priceChange}%
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <div className="grid grid-cols-3 gap-2 text-center">
                         <div className="bg-red-50 rounded-xl py-1.5">
@@ -645,7 +611,6 @@ const Market = () => {
 
               <form onSubmit={handlePredict} className="flex flex-col gap-5">
 
-                {/* Crop */}
                 <div>
                   <label className="text-sm font-semibold text-gray-700 mb-1.5 block">🌾 Crop</label>
                   <select
@@ -661,7 +626,6 @@ const Market = () => {
                   </select>
                 </div>
 
-                {/* State */}
                 <div>
                   <label className="text-sm font-semibold text-gray-700 mb-1.5 block">📍 State</label>
                   <select
@@ -677,7 +641,6 @@ const Market = () => {
                   </select>
                 </div>
 
-                {/* Season + Year */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-semibold text-gray-700 mb-1.5 block">🗓️ Season</label>
@@ -720,7 +683,6 @@ const Market = () => {
             {/* ── Result ── */}
             <div className="flex items-start">
 
-              {/* Empty state */}
               {!prediction && !predLoading && (
                 <div className="w-full bg-gradient-to-br from-emerald-50 to-green-100 border-2 border-dashed border-emerald-200 rounded-3xl p-8 flex flex-col items-center justify-center text-center min-h-[420px]">
                   <div className="text-6xl mb-4">📊</div>
@@ -731,7 +693,6 @@ const Market = () => {
                 </div>
               )}
 
-              {/* Loading */}
               {predLoading && (
                 <div className="w-full bg-white border border-gray-100 rounded-3xl p-8 flex flex-col items-center justify-center min-h-[420px] shadow-sm">
                   <div className="w-16 h-16 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mb-6" />
@@ -739,11 +700,9 @@ const Market = () => {
                 </div>
               )}
 
-              {/* Result Card */}
               {prediction && !predLoading && (
                 <div className="w-full bg-white rounded-3xl p-8 shadow-sm border border-gray-100 space-y-6">
 
-                  {/* Header */}
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-green-600 rounded-2xl flex items-center justify-center text-2xl shadow">
                       {CROPS.find((c) => c.name === predForm.crop)?.icon || "🌾"}
@@ -759,7 +718,6 @@ const Market = () => {
                     </span>
                   </div>
 
-                  {/* Price */}
                   <div className="bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-2xl p-5 text-center">
                     <p className="text-sm text-gray-500 mb-1">Predicted Modal Price</p>
                     <p className="text-5xl font-extrabold text-emerald-600">
@@ -770,7 +728,6 @@ const Market = () => {
                     </p>
                   </div>
 
-                  {/* Confidence + Range */}
                   {prediction.confidence && (
                     <div className="grid grid-cols-2 gap-4">
                       <div className="bg-blue-50 rounded-2xl p-4 text-center">
@@ -786,7 +743,6 @@ const Market = () => {
                     </div>
                   )}
 
-                  {/* Advice */}
                   {prediction.advice && (
                     <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4">
                       <p className="text-xs font-semibold text-yellow-700 mb-1">💡 Market Advice</p>
@@ -806,9 +762,9 @@ const Market = () => {
           </div>
         )}
 
-        {/* Footer */}
+        {/* ✅ FIX 11: correct footer */}
         <p className="text-center text-xs text-gray-400 pb-4">
-          🌾 AgriSense · Data from Agmarknet (data.gov.in) · © {new Date().getFullYear()}
+          🌾 AgriSense · Mandi data: Agmarknet · Live prices: TodayPriceRates · © {new Date().getFullYear()}
         </p>
 
       </main>

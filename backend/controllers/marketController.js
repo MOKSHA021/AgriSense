@@ -1,23 +1,15 @@
 const axios = require("axios");
 const { MANDI_DATA, TRANSPORT_COST } = require("../data/mandiData");
+const { scrapeVegetablePrices } =require("../services/scraper")
 
 // ─────────────────────────────────────
-// HELPER — fetch records from data.gov.in
-// env vars read at call time (not module load time)
+// HELPER — fetch from data.gov.in
 // ─────────────────────────────────────
 const fetchFromAPI = async (filters = {}, limit = 20) => {
   const DATA_GOV_URL = `https://api.data.gov.in/resource/${process.env.DATA_GOV_RESOURCE_ID}`;
   const API_KEY      = process.env.DATA_GOV_API_KEY;
 
-  console.log("URL:", DATA_GOV_URL);
-  console.log("KEY:", API_KEY ? "✅ loaded" : "❌ MISSING");
-
-  const params = {
-    "api-key": API_KEY,
-    format:    "json",
-    limit,
-  };
-
+  const params = { "api-key": API_KEY, format: "json", limit };
   Object.entries(filters).forEach(([key, val]) => {
     params[`filters[${key}]`] = val;
   });
@@ -27,7 +19,7 @@ const fetchFromAPI = async (filters = {}, limit = 20) => {
 };
 
 // ─────────────────────────────────────
-// HELPER — normalize field names
+// HELPER — normalize data.gov.in fields
 // ─────────────────────────────────────
 const cleanRecord = (r) => ({
   state:      r.State,
@@ -44,131 +36,112 @@ const cleanRecord = (r) => ({
 
 // ─────────────────────────────────────
 // CONTROLLER 1 — GET /api/market/districts
-// Called when user picks a state in Market.jsx
-// Returns all unique districts for that state
 // ─────────────────────────────────────
 const getDistricts = async (req, res) => {
   const { state } = req.query;
-
-  if (!state) {
-    return res.status(400).json({ message: "state is required" });
-  }
+  if (!state) return res.status(400).json({ message: "state is required" });
 
   try {
-    const records = await fetchFromAPI({ State: state }, 1000);
-
-    console.log(`[Districts] State: ${state} | Records: ${records.length}`);
-
-    if (!records.length) {
+    const records   = await fetchFromAPI({ State: state }, 1000);
+    if (!records.length)
       return res.status(404).json({ message: `No data found for state: ${state}` });
-    }
 
     const districts = [...new Set(records.map((r) => r.District))]
       .filter(Boolean)
       .sort();
 
-    console.log(`[Districts] Found ${districts.length} districts:`, districts);
-
     res.json({ districts, state });
-
   } catch (err) {
-    console.error("[Districts] Error:", err.message);
+    console.error("[Districts]", err.message);
     res.status(500).json({ message: "Failed to fetch districts" });
   }
 };
 
 // ─────────────────────────────────────
 // CONTROLLER 2 — GET /api/market/live-prices
-// Tab 2: real prices for crop+state+district
+// Uses todaypricerates.com scraper
+// Only needs: crop + state
 // ─────────────────────────────────────
 const getLivePrices = async (req, res) => {
-  const { commodity, state, district } = req.query;
+  const { crop, state } = req.query;
 
-  if (!commodity || !state || !district) {
-    return res.status(400).json({
-      message: "commodity, state and district are required"
-    });
-  }
+  if (!crop || !state)
+    return res.status(400).json({ message: "crop and state are required" });
 
   try {
-    const records = await fetchFromAPI(
-      { State: state, District: district, Commodity: commodity },
-      20
-    );
+    const scraped = await scrapeVegetablePrices(state, crop);
 
-    if (!records.length) {
-      return res.status(404).json({
-        message: `No data found for ${commodity} in ${district}, ${state}`
-      });
-    }
+    if (!scraped.length)
+      return res.status(404).json({ message: `No price found for ${crop} in ${state}` });
 
-    const cleaned  = records.map(cleanRecord);
-    const prices   = cleaned.map((r) => r.modalPrice).filter((p) => p > 0);
+    // ── Reshape to match frontend expectations ──
+    const prices   = scraped.map((r) => r.modalPrice).filter(Boolean);
     const avgModal = Math.round(prices.reduce((a, b) => a + b, 0) / prices.length);
 
     res.json({
-      markets:  cleaned,
-      avgModal,
-      minPrice: Math.min(...prices),
-      maxPrice: Math.max(...prices),
-      commodity, state, district,
+      markets:  scraped,           // array of price objects
+      avgModal,                    // avg modal price
+      minPrice: Math.min(...scraped.map((r) => r.minPrice)),
+      maxPrice: Math.max(...scraped.map((r) => r.maxPrice)),
+      crop,
+      state,
+      source: "todaypricerates",
     });
 
   } catch (err) {
-    console.error("[LivePrices] Error:", err.message);
-    res.status(500).json({ message: "Failed to fetch live prices" });
+    console.error("[LivePrices]", err.message);
+    res.status(500).json({ message: "Scraping failed. Try again." });
   }
 };
 
 // ─────────────────────────────────────
 // CONTROLLER 3 — POST /api/market/best-mandis
-// Tab 1: ranked mandis with revenue calc
 // ─────────────────────────────────────
 const getBestMandis = async (req, res) => {
   const { crop, quantity, state, district } = req.body;
 
-  if (!crop || !quantity || !state || !district) {
-    return res.status(400).json({
-      message: "crop, quantity, state and district are required"
-    });
-  }
+  if (!crop || !quantity || !state || !district)
+    return res.status(400).json({ message: "crop, quantity, state and district are required" });
 
   try {
     const records = await fetchFromAPI(
-      { State: state, District: district, Commodity: crop },
-      20
+      { State: state, District: district, Commodity: crop }, 100
     );
 
     let mandis = [];
 
     if (records.length > 0) {
-      // ── Real API path ──
-      mandis = records
+      records.sort((a, b) => {
+        const toDate = (str) => { const [d,m,y] = str.split("/"); return new Date(`${y}-${m}-${d}`); };
+        return toDate(b.Arrival_Date) - toDate(a.Arrival_Date);
+      });
+
+      const seenMarkets   = new Set();
+      const latestRecords = records.filter((r) => {
+        if (seenMarkets.has(r.Market)) return false;
+        seenMarkets.add(r.Market);
+        return true;
+      });
+
+      mandis = latestRecords
         .map(cleanRecord)
         .filter((r) => r.modalPrice > 0)
         .map((r) => {
-          const distanceTier  = "medium";
-          const transportCost = TRANSPORT_COST[distanceTier] * quantity;
+          const transportCost = TRANSPORT_COST["medium"] * quantity;
           const grossRevenue  = r.modalPrice * quantity;
           const netRevenue    = grossRevenue - transportCost;
           return {
-            name:         r.market,
-            district:     r.district,
-            variety:      r.variety,
-            grade:        r.grade,
-            date:         r.date,
-            distanceTier,
+            name: r.market, district: r.district,
+            variety: r.variety, grade: r.grade,
+            date: r.date, distanceTier: "medium",
             pricePerUnit: r.modalPrice,
-            grossRevenue,
-            transportCost,
-            netRevenue,
-            isRealData:   true,
+            grossRevenue, transportCost, netRevenue,
+            isRealData: true,
           };
         })
         .sort((a, b) => b.netRevenue - a.netRevenue);
 
     } else {
-      // ── Fallback: mock data if API returns nothing ──
       const mockMandis = MANDI_DATA[state] || [];
       mandis = mockMandis
         .filter((m) => m.prices[crop])
@@ -178,28 +151,73 @@ const getBestMandis = async (req, res) => {
           const grossRevenue  = pricePerUnit * quantity;
           const netRevenue    = grossRevenue - transportCost;
           return {
-            name:         m.name,
-            district:     m.district,
+            name: m.name, district: m.district,
             distanceTier: m.distanceTier,
             pricePerUnit, grossRevenue, transportCost, netRevenue,
-            isRealData:   false,
+            isRealData: false,
           };
         })
         .sort((a, b) => b.netRevenue - a.netRevenue);
     }
 
-    if (!mandis.length) {
+    if (!mandis.length)
       return res.status(404).json({ message: "No mandi data found" });
-    }
 
     mandis[0].isBest = true;
-
     res.json({ mandis, crop, quantity, state, district });
 
   } catch (err) {
-    console.error("[BestMandis] Error:", err.message);
+    console.error("[BestMandis]", err.message);
     res.status(500).json({ message: "Failed to fetch mandi data" });
   }
 };
 
-module.exports = { getDistricts, getLivePrices, getBestMandis };
+// ─────────────────────────────────────
+// CONTROLLER 4 — POST /api/market/predict
+// ─────────────────────────────────────
+const predictPrice = async (req, res) => {
+  const { crop, state, season, year } = req.body;
+
+  if (!crop || !state || !season || !year)
+    return res.status(400).json({ message: "crop, state, season and year are required" });
+
+  try {
+    const records = await fetchFromAPI({ State: state, Commodity: crop }, 100);
+    if (!records.length)
+      return res.status(404).json({ message: `No historical data for ${crop} in ${state}` });
+
+    const cleaned = records.map(cleanRecord);
+    const prices  = cleaned.map((r) => r.modalPrice).filter((p) => p > 0);
+    if (!prices.length)
+      return res.status(404).json({ message: "No valid prices found" });
+
+    const avg    = Math.round(prices.reduce((a, b) => a + b, 0) / prices.length);
+    const stdDev = Math.round(Math.sqrt(
+      prices.reduce((sum, p) => sum + Math.pow(p - avg, 2), 0) / prices.length
+    ));
+
+    const seasonMultiplier = { Kharif: 1.05, Rabi: 0.97, Zaid: 1.02 };
+    const inflationMult    = Math.pow(1.02, Number(year) - 2024);
+    const predicted_price  = Math.round(avg * (seasonMultiplier[season] || 1.0) * inflationMult);
+
+    res.json({
+      predicted_price,
+      min_price:   Math.round(predicted_price - stdDev),
+      max_price:   Math.round(predicted_price + stdDev),
+      confidence:  Math.min(95, Math.round(100 - (stdDev / avg) * 100)),
+      advice: {
+        Kharif: `Kharif season sees higher ${crop} demand. Sell in Oct–Nov for peak rates.`,
+        Rabi:   `Rabi brings moderate prices. Early March sales yield better returns.`,
+        Zaid:   `Zaid is a short season — ${crop} prices can be volatile. Monitor weekly.`,
+      }[season] || `Based on ${prices.length} historical records from ${state}.`,
+      data_points: prices.length,
+      crop, state, season, year,
+    });
+
+  } catch (err) {
+    console.error("[Predict]", err.message);
+    res.status(500).json({ message: "Prediction failed. Try again." });
+  }
+};
+
+module.exports = { getDistricts, getLivePrices, getBestMandis, predictPrice };
