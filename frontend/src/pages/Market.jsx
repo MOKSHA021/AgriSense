@@ -16,23 +16,18 @@ const CROPS = [
   { name: "Mustard",   icon: "🌻", unit: "quintal" },
 ];
 
-const MOCK_PRICES = {
-  Wheat:     { min: 2100, max: 2350, modal: 2200 },
-  Rice:      { min: 2800, max: 3100, modal: 2950 },
-  Tomato:    { min: 18,   max: 35,   modal: 25   },
-  Onion:     { min: 12,   max: 28,   modal: 18   },
-  Potato:    { min: 10,   max: 22,   modal: 15   },
-  Maize:     { min: 1750, max: 2050, modal: 1900 },
-  Soybean:   { min: 3800, max: 4400, modal: 4100 },
-  Cotton:    { min: 5800, max: 6500, modal: 6200 },
-  Sugarcane: { min: 280,  max: 320,  modal: 300  },
-  Mustard:   { min: 4800, max: 5400, modal: 5100 },
-};
-
 const STATES = [
-  "Uttar Pradesh", "Punjab", "Haryana", "Maharashtra",
-  "Madhya Pradesh", "Rajasthan", "Bihar", "Karnataka",
-];
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar",
+  "Chhattisgarh", "Goa", "Gujarat", "Haryana",
+  "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala",
+  "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya",
+  "Mizoram", "Nagaland", "Odisha", "Punjab",
+  "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana",
+  "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
+  "Andaman and Nicobar", "Chandigarh", "Dadra and Nagar Haveli",
+  "Daman and Diu", "Delhi", "Jammu and Kashmir",
+  "Ladakh", "Lakshadweep", "Puducherry",
+].sort();
 
 const SEASONS = ["Kharif", "Rabi", "Zaid"];
 
@@ -47,25 +42,59 @@ const NAV_LINKS = [
 const Market = () => {
   const navigate = useNavigate();
 
-  // Tab state
-  const [activeTab, setActiveTab] = useState("mandi");   // "mandi" | "live" | "predict"
+  // ── Tab ──
+  const [activeTab, setActiveTab] = useState("mandi");
 
-  // ── Tab 1: Best Mandi Finder ──
-  const [mandiForm, setMandiForm]       = useState({ crop: "", quantity: "", state: "" });
+  // ── Shared: Districts ──
+  const [districts,       setDistricts]       = useState([]);
+  const [districtLoading, setDistrictLoading] = useState(false);
+  const [districtError,   setDistrictError]   = useState("");
+
+  // ── Tab 1: Best Mandi ──
+  const [mandiForm,    setMandiForm]    = useState({ crop: "", quantity: "", state: "", district: "" });
   const [mandiResults, setMandiResults] = useState(null);
   const [mandiLoading, setMandiLoading] = useState(false);
-  const [mandiError, setMandiError]     = useState("");
+  const [mandiError,   setMandiError]   = useState("");
 
   // ── Tab 2: Live Prices ──
-  const [searchQuery, setSearchQuery] = useState("");
+  const [liveCrop,     setLiveCrop]     = useState("");
+  const [liveState,    setLiveState]    = useState("");
+  const [liveDistrict, setLiveDistrict] = useState("");
+  const [liveData,     setLiveData]     = useState(null);
+  const [liveLoading,  setLiveLoading]  = useState(false);
+  const [liveError,    setLiveError]    = useState("");
 
-  // ── Tab 3: Price Prediction ──
-  const [predForm, setPredForm]       = useState({ crop: "", state: "", season: "", year: new Date().getFullYear() });
-  const [prediction, setPrediction]   = useState(null);
+  // ── Tab 3: Prediction ──
+  const [predForm,    setPredForm]    = useState({ crop: "", state: "", season: "", year: new Date().getFullYear() });
+  const [prediction,  setPrediction]  = useState(null);
   const [predLoading, setPredLoading] = useState(false);
-  const [predError, setPredError]     = useState("");
+  const [predError,   setPredError]   = useState("");
 
-  // ── Handlers ──
+  // ─────────────────────────────────────
+  // SHARED — Fetch districts from API
+  // Called whenever state dropdown changes
+  // ─────────────────────────────────────
+  const fetchDistricts = async (selectedState) => {
+    if (!selectedState) return;
+    setDistrictLoading(true);
+    setDistricts([]);
+    setDistrictError("");
+    try {
+      const { data } = await API.get("/market/districts", {
+        params: { state: selectedState },
+      });
+      setDistricts(data.districts);
+    } catch (err) {
+      console.error("District error:", err.response?.data || err.message);
+      setDistrictError(err.response?.data?.message || "Failed to load districts");
+    } finally {
+      setDistrictLoading(false);
+    }
+  };
+
+  // ─────────────────────────────────────
+  // TAB 1 — Best Mandi Search
+  // ─────────────────────────────────────
   const handleMandiSearch = async (e) => {
     e.preventDefault();
     setMandiLoading(true);
@@ -76,6 +105,7 @@ const Market = () => {
         crop:     mandiForm.crop,
         quantity: Number(mandiForm.quantity),
         state:    mandiForm.state,
+        district: mandiForm.district,
       });
       setMandiResults(data);
     } catch (err) {
@@ -85,6 +115,29 @@ const Market = () => {
     }
   };
 
+  // ─────────────────────────────────────
+  // TAB 2 — Live Prices Fetch
+  // ─────────────────────────────────────
+  const handleLiveFetch = async (e) => {
+    e.preventDefault();
+    setLiveLoading(true);
+    setLiveError("");
+    setLiveData(null);
+    try {
+      const { data } = await API.get("/market/live-prices", {
+        params: { commodity: liveCrop, state: liveState, district: liveDistrict },
+      });
+      setLiveData(data);
+    } catch (err) {
+      setLiveError(err.response?.data?.message || "Failed to fetch prices");
+    } finally {
+      setLiveLoading(false);
+    }
+  };
+
+  // ─────────────────────────────────────
+  // TAB 3 — Price Prediction
+  // ─────────────────────────────────────
   const handlePredict = async (e) => {
     e.preventDefault();
     setPredLoading(true);
@@ -100,24 +153,11 @@ const Market = () => {
     }
   };
 
-  const trendColor = (min, max) => {
-    const pct = ((max - min) / min) * 100;
-    if (pct > 20) return "text-red-500";
-    if (pct > 10) return "text-amber-500";
-    return "text-emerald-500";
-  };
-
-  const filteredCrops = CROPS.filter((c) =>
-    c.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   // ── Render ──
   return (
     <div className="min-h-screen bg-[#f4f7f4]">
 
-      {/* ════════════════════════════
-          NAVBAR
-      ════════════════════════════ */}
+      {/* ════════════ NAVBAR ════════════ */}
       <nav className="bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 py-3 flex items-center justify-between sticky top-0 z-50 shadow-sm">
         <div
           className="flex items-center gap-2 cursor-pointer"
@@ -153,9 +193,7 @@ const Market = () => {
         </button>
       </nav>
 
-      {/* ════════════════════════════
-          PAGE CONTENT
-      ════════════════════════════ */}
+      {/* ════════════ MAIN ════════════ */}
       <main className="max-w-6xl mx-auto px-4 py-10 space-y-8">
 
         {/* Hero Banner */}
@@ -166,16 +204,16 @@ const Market = () => {
             <p className="text-amber-100 text-sm font-medium mb-1">📊 Mandi Intelligence</p>
             <h1 className="text-3xl font-extrabold tracking-tight">Market Prices</h1>
             <p className="text-amber-100 text-sm mt-2 max-w-lg">
-              Find the best mandi for your crop, browse live prices, or predict future rates with AI.
+              Find the best mandi, browse live prices, or predict future rates with AI.
             </p>
           </div>
         </div>
 
-        {/* Tabs */}
+        {/* Tab Switcher */}
         <div className="flex gap-2 bg-white rounded-2xl p-1.5 shadow-sm border border-gray-100 w-fit">
           {[
-            { id: "mandi",   label: "🏆 Best Mandi",      active: "bg-amber-500" },
-            { id: "live",    label: "📋 Live Prices",      active: "bg-orange-500" },
+            { id: "mandi",   label: "🏆 Best Mandi",      active: "bg-amber-500"   },
+            { id: "live",    label: "📋 Live Prices",      active: "bg-orange-500"  },
             { id: "predict", label: "🤖 Price Prediction", active: "bg-emerald-600" },
           ].map((tab) => (
             <button
@@ -192,17 +230,17 @@ const Market = () => {
           ))}
         </div>
 
-        {/* ════════════════════════════
+        {/* ════════════════════════════════
             TAB 1 — BEST MANDI FINDER
-        ════════════════════════════ */}
+        ════════════════════════════════ */}
         {activeTab === "mandi" && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-            {/* Form */}
+            {/* ── Form ── */}
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
               <h2 className="text-xl font-bold text-gray-800 mb-1">🏆 Find Best Mandi</h2>
               <p className="text-gray-400 text-sm mb-6">
-                Enter your crop, quantity and state to find the most profitable mandi.
+                Get ranked mandis with net revenue after transport costs.
               </p>
 
               {mandiError && (
@@ -245,10 +283,13 @@ const Market = () => {
 
                 {/* State */}
                 <div>
-                  <label className="text-sm font-semibold text-gray-700 mb-1.5 block">📍 Your State</label>
+                  <label className="text-sm font-semibold text-gray-700 mb-1.5 block">📍 State</label>
                   <select
                     value={mandiForm.state}
-                    onChange={(e) => setMandiForm({ ...mandiForm, state: e.target.value })}
+                    onChange={(e) => {
+                      setMandiForm({ ...mandiForm, state: e.target.value, district: "" });
+                      fetchDistricts(e.target.value);
+                    }}
                     required
                     className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-gray-50"
                   >
@@ -257,6 +298,33 @@ const Market = () => {
                       <option key={s} value={s}>{s}</option>
                     ))}
                   </select>
+                </div>
+
+                {/* District */}
+                <div>
+                  <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
+                    🏘️ District
+                    {districtLoading && (
+                      <span className="text-xs text-amber-500 ml-2 font-normal">Loading...</span>
+                    )}
+                  </label>
+                  <select
+                    value={mandiForm.district}
+                    onChange={(e) => setMandiForm({ ...mandiForm, district: e.target.value })}
+                    required
+                    disabled={!mandiForm.state || districtLoading}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-gray-50 disabled:opacity-50"
+                  >
+                    <option value="">
+                      {districtLoading ? "Loading districts..." : "Select district"}
+                    </option>
+                    {districts.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                  {districtError && (
+                    <p className="text-xs text-red-500 mt-1.5">⚠️ {districtError}</p>
+                  )}
                 </div>
 
                 <button
@@ -269,7 +337,7 @@ const Market = () => {
               </form>
             </div>
 
-            {/* Results */}
+            {/* ── Results ── */}
             <div className="flex flex-col gap-4">
 
               {/* Empty state */}
@@ -278,7 +346,7 @@ const Market = () => {
                   <div className="text-6xl mb-4">🏪</div>
                   <h3 className="text-lg font-bold text-gray-700">Best Mandis Will Appear Here</h3>
                   <p className="text-gray-400 text-sm mt-2 max-w-xs">
-                    Fill the form to see ranked mandis with estimated revenue after transport costs.
+                    Fill the form to see ranked mandis with estimated net revenue.
                   </p>
                 </div>
               )}
@@ -299,7 +367,7 @@ const Market = () => {
                   {/* Summary bar */}
                   <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl px-5 py-3 text-white flex items-center justify-between">
                     <span className="font-semibold text-sm">
-                      🌾 {mandiResults.crop} · {mandiResults.quantity} qtl · {mandiResults.state}
+                      🌾 {mandiResults.crop} · {mandiResults.quantity} qtl · {mandiResults.district}, {mandiResults.state}
                     </span>
                     <span className="text-amber-100 text-xs">
                       {mandiResults.mandis.length} mandis found
@@ -309,11 +377,11 @@ const Market = () => {
                   {/* Mandi Cards */}
                   {mandiResults.mandis.map((m, i) => (
                     <div
-                      key={m.name}
+                      key={i}
                       className={`bg-white rounded-2xl p-5 shadow-sm border transition-all duration-200 hover:shadow-md
                         ${m.isBest ? "border-amber-300 ring-2 ring-amber-200" : "border-gray-100"}`}
                     >
-                      {/* Header */}
+                      {/* Card Header */}
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-white text-sm
@@ -322,14 +390,22 @@ const Market = () => {
                           </div>
                           <div>
                             <h3 className="font-bold text-gray-800">{m.name}</h3>
-                            <p className="text-xs text-gray-400">{m.district} · {m.distanceTier} distance</p>
+                            <p className="text-xs text-gray-400">
+                              {m.district}{m.date && ` · ${m.date}`}
+                            </p>
                           </div>
                         </div>
-                        {m.isBest && (
-                          <span className="text-xs font-bold bg-amber-100 text-amber-700 px-3 py-1 rounded-full">
-                            🏆 BEST DEAL
+                        <div className="flex flex-col items-end gap-1">
+                          {m.isBest && (
+                            <span className="text-xs font-bold bg-amber-100 text-amber-700 px-3 py-1 rounded-full">
+                              🏆 BEST DEAL
+                            </span>
+                          )}
+                          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full
+                            ${m.isRealData ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
+                            {m.isRealData ? "🟢 Live" : "🟡 Mock"}
                           </span>
-                        )}
+                        </div>
                       </div>
 
                       {/* Revenue Grid */}
@@ -350,10 +426,9 @@ const Market = () => {
                         </div>
                       </div>
 
-                      {/* Gross Revenue */}
                       <div className="mt-2 text-center">
                         <p className="text-xs text-gray-400">
-                          Gross Revenue: <span className="text-gray-600 font-semibold">₹{m.grossRevenue.toLocaleString()}</span>
+                          Gross: <span className="text-gray-600 font-semibold">₹{m.grossRevenue.toLocaleString()}</span>
                         </p>
                       </div>
                     </div>
@@ -371,97 +446,195 @@ const Market = () => {
           </div>
         )}
 
-        {/* ════════════════════════════
+        {/* ════════════════════════════════
             TAB 2 — LIVE PRICES
-        ════════════════════════════ */}
+        ════════════════════════════════ */}
         {activeTab === "live" && (
-          <div className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-            {/* Search */}
-            <div className="relative max-w-sm">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
-              <input
-                type="text"
-                placeholder="Search crop..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 shadow-sm"
-              />
-            </div>
+            {/* ── Form ── */}
+            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+              <h2 className="text-xl font-bold text-gray-800 mb-1">📋 Live Mandi Prices</h2>
+              <p className="text-gray-400 text-sm mb-6">
+                Real-time prices from Agmarknet (data.gov.in)
+              </p>
 
-            {/* Price Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {filteredCrops.map((crop) => {
-                const p = MOCK_PRICES[crop.name];
-                return (
-                  <div
-                    key={crop.name}
-                    className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+              {liveError && (
+                <div className="bg-red-50 text-red-500 text-sm px-4 py-3 rounded-2xl mb-4 border border-red-100">
+                  ⚠️ {liveError}
+                </div>
+              )}
+
+              <form onSubmit={handleLiveFetch} className="flex flex-col gap-5">
+
+                {/* Crop */}
+                <div>
+                  <label className="text-sm font-semibold text-gray-700 mb-1.5 block">🌾 Crop</label>
+                  <select
+                    value={liveCrop}
+                    onChange={(e) => setLiveCrop(e.target.value)}
+                    required
+                    className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-gray-50"
                   >
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-11 h-11 bg-amber-50 rounded-2xl flex items-center justify-center text-2xl">
-                          {crop.icon}
-                        </div>
-                        <div>
-                          <h3 className="font-bold text-gray-800">{crop.name}</h3>
-                          <p className="text-xs text-gray-400">per {crop.unit}</p>
-                        </div>
-                      </div>
-                      <span className={`text-xs font-bold px-2 py-1 rounded-full bg-gray-50 ${trendColor(p.min, p.max)}`}>
-                        {((p.max - p.min) / p.min * 100).toFixed(0)}% spread
-                      </span>
-                    </div>
+                    <option value="">Select crop</option>
+                    {CROPS.map((c) => (
+                      <option key={c.name} value={c.name}>{c.icon} {c.name}</option>
+                    ))}
+                  </select>
+                </div>
 
-                    <div className="grid grid-cols-3 gap-2 text-center">
-                      <div className="bg-red-50 rounded-xl py-2">
-                        <p className="text-xs text-gray-400">Min</p>
-                        <p className="font-bold text-red-500 text-sm">₹{p.min}</p>
-                      </div>
-                      <div className="bg-emerald-50 rounded-xl py-2 border-2 border-emerald-200">
-                        <p className="text-xs text-gray-400">Modal</p>
-                        <p className="font-bold text-emerald-600 text-sm">₹{p.modal}</p>
-                      </div>
-                      <div className="bg-blue-50 rounded-xl py-2">
-                        <p className="text-xs text-gray-400">Max</p>
-                        <p className="font-bold text-blue-500 text-sm">₹{p.max}</p>
-                      </div>
-                    </div>
+                {/* State */}
+                <div>
+                  <label className="text-sm font-semibold text-gray-700 mb-1.5 block">📍 State</label>
+                  <select
+                    value={liveState}
+                    onChange={(e) => {
+                      setLiveState(e.target.value);
+                      setLiveDistrict("");
+                      fetchDistricts(e.target.value);
+                    }}
+                    required
+                    className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-gray-50"
+                  >
+                    <option value="">Select state</option>
+                    {STATES.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
 
-                    <button
-                      onClick={() => {
-                        setPredForm((f) => ({ ...f, crop: crop.name }));
-                        setActiveTab("predict");
-                      }}
-                      className="mt-4 w-full py-2 text-xs font-semibold text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-xl transition"
-                    >
-                      🤖 Predict future price →
-                    </button>
-                  </div>
-                );
-              })}
+                {/* District */}
+                <div>
+                  <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
+                    🏘️ District
+                    {districtLoading && (
+                      <span className="text-xs text-orange-500 ml-2 font-normal">Loading...</span>
+                    )}
+                  </label>
+                  <select
+                    value={liveDistrict}
+                    onChange={(e) => setLiveDistrict(e.target.value)}
+                    required
+                    disabled={!liveState || districtLoading}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-gray-50 disabled:opacity-50"
+                  >
+                    <option value="">
+                      {districtLoading ? "Loading districts..." : "Select district"}
+                    </option>
+                    {districts.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                  {districtError && (
+                    <p className="text-xs text-red-500 mt-1.5">⚠️ {districtError}</p>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={liveLoading}
+                  className="w-full py-3.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold rounded-2xl hover:from-orange-600 hover:to-amber-600 disabled:opacity-50 shadow-md transition-all duration-200"
+                >
+                  {liveLoading ? "⏳ Fetching..." : "📋 Get Live Prices →"}
+                </button>
+              </form>
             </div>
 
-            {filteredCrops.length === 0 && (
-              <div className="text-center py-16 text-gray-400">
-                <div className="text-5xl mb-3">🌾</div>
-                <p className="font-medium">No crops found for "{searchQuery}"</p>
-              </div>
-            )}
+            {/* ── Results ── */}
+            <div className="flex flex-col gap-4 overflow-y-auto max-h-[600px]">
+
+              {/* Empty state */}
+              {!liveData && !liveLoading && (
+                <div className="w-full bg-gradient-to-br from-orange-50 to-amber-100 border-2 border-dashed border-orange-200 rounded-3xl p-8 flex flex-col items-center justify-center text-center min-h-[400px]">
+                  <div className="text-6xl mb-4">📋</div>
+                  <h3 className="text-lg font-bold text-gray-700">Live Prices Will Appear Here</h3>
+                  <p className="text-gray-400 text-sm mt-2">Select crop + state + district</p>
+                </div>
+              )}
+
+              {/* Loading */}
+              {liveLoading && (
+                <div className="w-full bg-white rounded-3xl p-8 flex flex-col items-center justify-center min-h-[400px]">
+                  <div className="w-16 h-16 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mb-6" />
+                  <p className="text-gray-600 font-semibold">Fetching from Agmarknet...</p>
+                </div>
+              )}
+
+              {/* Results */}
+              {liveData && !liveLoading && (
+                <div className="flex flex-col gap-3">
+
+                  {/* Summary */}
+                  <div className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl px-5 py-3 text-white grid grid-cols-3 text-center">
+                    <div>
+                      <p className="text-xs text-orange-100">Avg Modal</p>
+                      <p className="font-bold">₹{liveData.avgModal}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-orange-100">Min</p>
+                      <p className="font-bold">₹{liveData.minPrice}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-orange-100">Max</p>
+                      <p className="font-bold">₹{liveData.maxPrice}</p>
+                    </div>
+                  </div>
+
+                  {/* Market Cards */}
+                  {liveData.markets.map((m, i) => (
+                    <div
+                      key={i}
+                      className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <p className="font-bold text-gray-800 text-sm">{m.market}</p>
+                          <p className="text-xs text-gray-400">{m.district} · {m.date}</p>
+                        </div>
+                        <span className="text-xs bg-green-100 text-green-700 font-semibold px-2 py-1 rounded-full">
+                          🟢 Live
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div className="bg-red-50 rounded-xl py-1.5">
+                          <p className="text-xs text-gray-400">Min</p>
+                          <p className="font-bold text-red-500 text-sm">₹{m.minPrice}</p>
+                        </div>
+                        <div className="bg-emerald-50 rounded-xl py-1.5 border-2 border-emerald-200">
+                          <p className="text-xs text-gray-400">Modal</p>
+                          <p className="font-bold text-emerald-600 text-sm">₹{m.modalPrice}</p>
+                        </div>
+                        <div className="bg-blue-50 rounded-xl py-1.5">
+                          <p className="text-xs text-gray-400">Max</p>
+                          <p className="font-bold text-blue-500 text-sm">₹{m.maxPrice}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  <button
+                    onClick={() => setLiveData(null)}
+                    className="w-full py-2.5 text-sm font-semibold text-gray-500 bg-gray-50 hover:bg-gray-100 rounded-2xl transition"
+                  >
+                    🔄 Search Again
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
-        {/* ════════════════════════════
+        {/* ════════════════════════════════
             TAB 3 — PRICE PREDICTION
-        ════════════════════════════ */}
+        ════════════════════════════════ */}
         {activeTab === "predict" && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-            {/* Form */}
+            {/* ── Form ── */}
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
               <h2 className="text-xl font-bold text-gray-800 mb-1">🤖 AI Price Prediction</h2>
               <p className="text-gray-400 text-sm mb-6">
-                Our ML model predicts the best price to sell your crop.
+                ML model predicts the best price to sell your crop.
               </p>
 
               {predError && (
@@ -472,22 +645,23 @@ const Market = () => {
 
               <form onSubmit={handlePredict} className="flex flex-col gap-5">
 
+                {/* Crop */}
                 <div>
                   <label className="text-sm font-semibold text-gray-700 mb-1.5 block">🌾 Crop</label>
                   <select
-                    name="crop"
                     value={predForm.crop}
                     onChange={(e) => setPredForm({ ...predForm, crop: e.target.value })}
                     required
                     className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 bg-gray-50"
                   >
-                    <option value="">Select a crop</option>
+                    <option value="">Select crop</option>
                     {CROPS.map((c) => (
                       <option key={c.name} value={c.name}>{c.icon} {c.name}</option>
                     ))}
                   </select>
                 </div>
 
+                {/* State */}
                 <div>
                   <label className="text-sm font-semibold text-gray-700 mb-1.5 block">📍 State</label>
                   <select
@@ -503,6 +677,7 @@ const Market = () => {
                   </select>
                 </div>
 
+                {/* Season + Year */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-semibold text-gray-700 mb-1.5 block">🗓️ Season</label>
@@ -542,41 +717,49 @@ const Market = () => {
               </form>
             </div>
 
-            {/* Result */}
+            {/* ── Result ── */}
             <div className="flex items-start">
+
+              {/* Empty state */}
               {!prediction && !predLoading && (
                 <div className="w-full bg-gradient-to-br from-emerald-50 to-green-100 border-2 border-dashed border-emerald-200 rounded-3xl p-8 flex flex-col items-center justify-center text-center min-h-[420px]">
                   <div className="text-6xl mb-4">📊</div>
                   <h3 className="text-lg font-bold text-gray-700">Prediction Will Appear Here</h3>
                   <p className="text-gray-400 text-sm mt-2 max-w-xs">
-                    Fill the form to get an AI-powered market price forecast.
+                    Fill the form to get an AI-powered price forecast.
                   </p>
                 </div>
               )}
 
+              {/* Loading */}
               {predLoading && (
                 <div className="w-full bg-white border border-gray-100 rounded-3xl p-8 flex flex-col items-center justify-center min-h-[420px] shadow-sm">
                   <div className="w-16 h-16 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mb-6" />
-                  <p className="text-gray-600 font-semibold">Crunching market data...</p>
-                  <p className="text-gray-400 text-sm mt-1">ML model is working</p>
+                  <p className="text-gray-600 font-semibold">ML model is working...</p>
                 </div>
               )}
 
+              {/* Result Card */}
               {prediction && !predLoading && (
                 <div className="w-full bg-white rounded-3xl p-8 shadow-sm border border-gray-100 space-y-6">
+
+                  {/* Header */}
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-green-600 rounded-2xl flex items-center justify-center text-2xl shadow">
                       {CROPS.find((c) => c.name === predForm.crop)?.icon || "🌾"}
                     </div>
                     <div>
                       <h3 className="font-bold text-gray-800 text-lg">{predForm.crop}</h3>
-                      <p className="text-gray-400 text-xs">{predForm.state} · {predForm.season} {predForm.year}</p>
+                      <p className="text-gray-400 text-xs">
+                        {predForm.state} · {predForm.season} {predForm.year}
+                      </p>
                     </div>
                     <span className="ml-auto text-xs bg-emerald-100 text-emerald-700 font-semibold px-3 py-1 rounded-full">
                       AI Predicted
                     </span>
                   </div>
 
+                  {/* Price */}
                   <div className="bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-2xl p-5 text-center">
                     <p className="text-sm text-gray-500 mb-1">Predicted Modal Price</p>
                     <p className="text-5xl font-extrabold text-emerald-600">
@@ -587,6 +770,7 @@ const Market = () => {
                     </p>
                   </div>
 
+                  {/* Confidence + Range */}
                   {prediction.confidence && (
                     <div className="grid grid-cols-2 gap-4">
                       <div className="bg-blue-50 rounded-2xl p-4 text-center">
@@ -602,6 +786,7 @@ const Market = () => {
                     </div>
                   )}
 
+                  {/* Advice */}
                   {prediction.advice && (
                     <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4">
                       <p className="text-xs font-semibold text-yellow-700 mb-1">💡 Market Advice</p>
@@ -623,7 +808,7 @@ const Market = () => {
 
         {/* Footer */}
         <p className="text-center text-xs text-gray-400 pb-4">
-          🌾 AgriSense · Market data is indicative · © {new Date().getFullYear()}
+          🌾 AgriSense · Data from Agmarknet (data.gov.in) · © {new Date().getFullYear()}
         </p>
 
       </main>
