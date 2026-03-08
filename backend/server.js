@@ -7,6 +7,8 @@ const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 const marketRoutes = require("./routes/market");
 
+
+
 dotenv.config();
 connectDB();
 
