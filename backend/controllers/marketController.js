@@ -98,7 +98,7 @@ const getLivePrices = async (req, res) => {
 // CONTROLLER 3 — POST /api/market/best-mandis
 // ─────────────────────────────────────
 const getBestMandis = async (req, res) => {
-  const { crop, quantity, state, district } = req.body;
+  const { crop, quantity, state, district } = req.body; // ← no farmerLat/Lng needed
 
   if (!crop || !quantity || !state || !district)
     return res.status(400).json({ message: "crop, quantity, state and district are required" });
@@ -112,11 +112,11 @@ const getBestMandis = async (req, res) => {
 
     if (records.length > 0) {
       records.sort((a, b) => {
-        const toDate = (str) => { const [d,m,y] = str.split("/"); return new Date(`${y}-${m}-${d}`); };
+        const toDate = (str) => { const [d, m, y] = str.split("/"); return new Date(`${y}-${m}-${d}`); };
         return toDate(b.Arrival_Date) - toDate(a.Arrival_Date);
       });
 
-      const seenMarkets   = new Set();
+      const seenMarkets = new Set();
       const latestRecords = records.filter((r) => {
         if (seenMarkets.has(r.Market)) return false;
         seenMarkets.add(r.Market);
@@ -126,44 +126,37 @@ const getBestMandis = async (req, res) => {
       mandis = latestRecords
         .map(cleanRecord)
         .filter((r) => r.modalPrice > 0)
-        .map((r) => {
-          const transportCost = TRANSPORT_COST["medium"] * quantity;
-          const grossRevenue  = r.modalPrice * quantity;
-          const netRevenue    = grossRevenue - transportCost;
-          return {
-            name: r.market, district: r.district,
-            variety: r.variety, grade: r.grade,
-            date: r.date, distanceTier: "medium",
-            pricePerUnit: r.modalPrice,
-            grossRevenue, transportCost, netRevenue,
-            isRealData: true,
-          };
-        })
-        .sort((a, b) => b.netRevenue - a.netRevenue);
+        .map((r) => ({
+          name:         r.market,
+          district:     r.district,
+          variety:      r.variety,
+          grade:        r.grade,
+          date:         r.date,
+          lat:          null,   // frontend will geocode via Nominatim
+          lng:          null,
+          pricePerUnit: r.modalPrice,
+          isRealData:   true,
+        }))
+        .sort((a, b) => b.pricePerUnit - a.pricePerUnit); // sort by price for now
 
     } else {
       const mockMandis = MANDI_DATA[state] || [];
       mandis = mockMandis
         .filter((m) => m.prices[crop])
-        .map((m) => {
-          const pricePerUnit  = m.prices[crop];
-          const transportCost = TRANSPORT_COST[m.distanceTier] * quantity;
-          const grossRevenue  = pricePerUnit * quantity;
-          const netRevenue    = grossRevenue - transportCost;
-          return {
-            name: m.name, district: m.district,
-            distanceTier: m.distanceTier,
-            pricePerUnit, grossRevenue, transportCost, netRevenue,
-            isRealData: false,
-          };
-        })
-        .sort((a, b) => b.netRevenue - a.netRevenue);
+        .map((m) => ({
+          name:         m.name,
+          district:     m.district,
+          lat:          m.lat || null,
+          lng:          m.lng || null,
+          pricePerUnit: m.prices[crop],
+          isRealData:   false,
+        }))
+        .sort((a, b) => b.pricePerUnit - a.pricePerUnit);
     }
 
     if (!mandis.length)
       return res.status(404).json({ message: "No mandi data found" });
 
-    mandis[0].isBest = true;
     res.json({ mandis, crop, quantity, state, district });
 
   } catch (err) {
@@ -171,6 +164,7 @@ const getBestMandis = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch mandi data" });
   }
 };
+
 
 // ─────────────────────────────────────
 // CONTROLLER 4 — POST /api/market/predict

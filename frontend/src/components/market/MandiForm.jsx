@@ -7,16 +7,14 @@ const MandiForm = ({
   mandiError, mandiLoading,
   farmerLocation, farmerAddress,
   clickMode, setClickMode,
-  onFarmerSearch,
-  onMandiSearch,        // mandi location search (for manual pin)
-  onSubmit,
-  fetchDistricts,
+  onFarmerSearch, onMandiSearch,
+  onSubmit, fetchDistricts,
 }) => {
   return (
     <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
       <h2 className="text-xl font-bold text-gray-800 mb-1">🏆 Find Best Mandi</h2>
       <p className="text-gray-400 text-sm mb-6">
-        Ranked mandis with net revenue after real road transport costs.
+        Ranked mandis with real road transport costs.
       </p>
 
       {/* Farmer Location */}
@@ -27,7 +25,9 @@ const MandiForm = ({
             type="button"
             onClick={() => setClickMode(clickMode === "farmer" ? null : "farmer")}
             className={`text-xs px-3 py-1 rounded-full transition ${
-              clickMode === "farmer" ? "bg-blue-700 text-white" : "bg-blue-500 text-white hover:bg-blue-600"
+              clickMode === "farmer"
+                ? "bg-blue-700 text-white"
+                : "bg-blue-500 text-white hover:bg-blue-600"
             }`}
           >
             {clickMode === "farmer" ? "🖱️ Click Map..." : "📍 Click to Pin"}
@@ -50,7 +50,9 @@ const MandiForm = ({
             type="button"
             onClick={() => setClickMode(clickMode === "mandi" ? null : "mandi")}
             className={`text-xs px-3 py-1 rounded-full transition ${
-              clickMode === "mandi" ? "bg-red-700 text-white" : "bg-red-400 text-white hover:bg-red-500"
+              clickMode === "mandi"
+                ? "bg-red-700 text-white"
+                : "bg-red-400 text-white hover:bg-red-500"
             }`}
           >
             {clickMode === "mandi" ? "🖱️ Click Map..." : "📍 Click to Pin"}
@@ -58,7 +60,7 @@ const MandiForm = ({
         </div>
         <LocationSearchBox
           placeholder="Search mandi / market name..."
-          onSelect={onMandiSearch}
+          onSelect={(coords) => onMandiSearch(coords)}
         />
       </div>
 
@@ -79,7 +81,9 @@ const MandiForm = ({
             className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-gray-50"
           >
             <option value="">Select crop</option>
-            {CROPS.map((c) => <option key={c.name} value={c.name}>{c.icon} {c.name}</option>)}
+            {CROPS.map((c) => (
+              <option key={c.name} value={c.name}>{c.icon} {c.name}</option>
+            ))}
           </select>
         </div>
 
@@ -87,7 +91,9 @@ const MandiForm = ({
         <div>
           <label className="text-sm font-semibold text-gray-700 mb-1.5 block">⚖️ Quantity (quintals)</label>
           <input
-            type="number" min="1" placeholder="e.g. 50"
+            type="number"
+            min="1"
+            placeholder="e.g. 50"
             value={mandiForm.quantity}
             onChange={(e) => setMandiForm({ ...mandiForm, quantity: e.target.value })}
             required
@@ -108,7 +114,9 @@ const MandiForm = ({
             className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-gray-50"
           >
             <option value="">Select state</option>
-            {STATES.map((s) => <option key={s} value={s}>{s}</option>)}
+            {STATES.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
           </select>
         </div>
 
@@ -116,7 +124,9 @@ const MandiForm = ({
         <div>
           <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
             🏘️ District
-            {districtLoading && <span className="text-xs text-amber-500 ml-2 font-normal">Loading...</span>}
+            {districtLoading && (
+              <span className="text-xs text-amber-500 ml-2 font-normal">Loading...</span>
+            )}
           </label>
           <select
             value={mandiForm.district}
@@ -125,10 +135,16 @@ const MandiForm = ({
             disabled={!mandiForm.state || districtLoading}
             className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-gray-50 disabled:opacity-50"
           >
-            <option value="">{districtLoading ? "Loading..." : "Select district"}</option>
-            {mandiDistricts.map((d) => <option key={d} value={d}>{d}</option>)}
+            <option value="">
+              {districtLoading ? "Loading districts..." : "Select district"}
+            </option>
+            {mandiDistricts.map((d) => (
+              <option key={d} value={d}>{d}</option>
+            ))}
           </select>
-          {districtError && <p className="text-xs text-red-500 mt-1.5">⚠️ {districtError}</p>}
+          {districtError && (
+            <p className="text-xs text-red-500 mt-1.5">⚠️ {districtError}</p>
+          )}
         </div>
 
         <button
