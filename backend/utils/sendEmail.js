@@ -11,7 +11,7 @@ const brevo = require("@getbrevo/brevo");
 
   const email = new brevo.SendSmtpEmail();
   email.subject     = "Your AgriSense OTP";
-email.sender = { name: "AgriSense", email: "yaminireddy2023@gmail.com" };
+email.sender = { name: "AgriSense", email: process.env.BREVO_SENDER_EMAIL };
   email.to          = [{ email: toEmail, name: toName }];
   email.htmlContent = `
     <div style="font-family:Arial;max-width:400px;margin:auto;padding:20px;border:1px solid #e0e0e0;border-radius:10px">
@@ -23,7 +23,12 @@ email.sender = { name: "AgriSense", email: "yaminireddy2023@gmail.com" };
     </div>
   `;
 
-  await apiInstance.sendTransacEmail(email);
+  try {
+    await apiInstance.sendTransacEmail(email);
+  } catch (err) {
+    console.error("❌ Brevo API Error:", JSON.stringify(err?.body || err?.response?.body || err, null, 2));
+    throw err;
+  }
 };
 
 module.exports = sendOTPEmail;

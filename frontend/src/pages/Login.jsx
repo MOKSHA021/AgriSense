@@ -1,11 +1,12 @@
 import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { Wheat } from "lucide-react";
 import API from "../services/api";
 import { AuthContext } from "../context/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext); // 🧠 grab login() from global state
+  const { login } = useContext(AuthContext);
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
@@ -19,14 +20,9 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
-
     try {
       const { data } = await API.post("/auth/login", form);
-
-      // 🧠 data contains { token, user } from backend
-      // We pass it to AuthContext which saves to localStorage
       login(data);
-
       navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Invalid email or password");
@@ -36,28 +32,24 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white flex items-center justify-center px-4">
-      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="bg-white rounded-lg border border-gray-200 p-8 w-full max-w-sm">
 
-        {/* Header */}
         <div className="text-center mb-6">
-          <span className="text-4xl">🌾</span>
-          <h2 className="text-2xl font-bold text-green-800 mt-2">
-            Welcome Back
-          </h2>
-          <p className="text-gray-500 text-sm mt-1">
-            Login to your AgriSense account
-          </p>
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Wheat className="w-5 h-5 text-green-700" />
+            <span className="text-lg font-bold text-gray-800">AgriSense</span>
+          </div>
+          <h2 className="text-xl font-bold text-gray-900">Welcome back</h2>
+          <p className="text-gray-400 text-sm mt-1">Sign in to your account</p>
         </div>
 
-        {/* Error */}
         {error && (
-          <div className="bg-red-50 text-red-600 text-sm px-4 py-2 rounded-lg mb-4">
+          <div className="bg-red-50 text-red-600 text-sm px-4 py-2.5 rounded-lg mb-4 border border-red-100">
             {error}
           </div>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label className="text-sm font-medium text-gray-700">Email</label>
@@ -66,9 +58,9 @@ const Login = () => {
               name="email"
               value={form.email}
               onChange={handleChange}
-              placeholder="ramesh@example.com"
+              placeholder="you@example.com"
               required
-              className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full mt-1.5 px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition"
             />
           </div>
 
@@ -81,34 +73,25 @@ const Login = () => {
               onChange={handleChange}
               placeholder="Enter your password"
               required
-              className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full mt-1.5 px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition"
             />
-          </div>
-
-          {/* 🧠 Forgot password — just UI for now, wire later */}
-          <div className="text-right">
-            <Link to="/forgot-password" className="text-sm text-green-700 hover:underline">
-              Forgot Password?
-            </Link>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-green-700 text-white font-semibold rounded-lg hover:bg-green-800 disabled:opacity-50"
+            className="w-full py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 disabled:opacity-50 transition mt-1"
           >
-            {loading ? "Logging in..." : "Login →"}
+            {loading ? "Signing in..." : "Sign in"}
           </button>
         </form>
 
-        {/* Redirect to Register */}
-        <p className="text-center text-sm text-gray-500 mt-4">
-          Don't have an account?{" "}
-          <Link to="/register" className="text-green-700 font-medium hover:underline">
+        <p className="text-center text-sm text-gray-400 mt-6">
+          Don&apos;t have an account?{" "}
+          <Link to="/register" className="text-gray-900 font-medium hover:underline">
             Register
           </Link>
         </p>
-
       </div>
     </div>
   );

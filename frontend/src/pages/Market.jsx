@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
+import Navbar from "../components/Navbar";
 import MandiForm from "../components/market/MandiForm";
 import MandiCard from "../components/market/MandiCard";
 import MandiMap from "../components/market/MandiMap";
 import LivePrices from "../components/market/LivePrices.jsx";
 import PricePrediction from "../components/market/PricePrediction";
-import { NAV_LINKS } from "../components/market/constants";
 
 // ── Geocode mandi name → lat/lng via Nominatim ──
 const geocodeMandi = async (mandiName, district, state) => {
@@ -158,58 +158,17 @@ const Market = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#f4f7f4]">
+    <div className="min-h-screen bg-white">
+      <Navbar />
 
-      {/* ════════ NAVBAR ════════ */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 py-3 flex items-center justify-between sticky top-0 z-50 shadow-sm">
-        <div
-          className="flex items-center gap-2 cursor-pointer"
-          onClick={() => navigate("/dashboard")}
-        >
-          <div className="w-9 h-9 bg-gradient-to-br from-green-500 to-emerald-700 rounded-xl flex items-center justify-center shadow">
-            <span className="text-lg">🌾</span>
-          </div>
-          <span className="text-lg font-extrabold text-green-800 tracking-tight">AgriSense</span>
-        </div>
-
-        <div className="hidden md:flex items-center gap-1 text-sm font-medium">
-          {NAV_LINKS.map((l) => (
-            <button
-              key={l.path}
-              onClick={() => navigate(l.path)}
-              className={`px-4 py-2 rounded-xl transition-all duration-200 ${
-                l.path === "/dashboard/market"
-                  ? "bg-amber-100 text-amber-800 font-semibold"
-                  : "text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-              }`}
-            >
-              {l.label}
-            </button>
-          ))}
-        </div>
-
-        <button
-          onClick={() => navigate("/dashboard")}
-          className="text-sm px-4 py-2 bg-gray-50 text-gray-500 rounded-xl hover:bg-gray-100 border border-gray-200 transition"
-        >
-          ← Back
-        </button>
-      </nav>
-
-      {/* ════════ MAIN ════════ */}
       <main className="max-w-6xl mx-auto px-4 py-10 space-y-8">
 
-        {/* Hero Banner */}
-        <div className="relative bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-400 rounded-3xl p-8 text-white shadow-xl overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3 blur-2xl" />
-          <div className="absolute bottom-0 left-1/4 w-48 h-48 bg-black/10 rounded-full translate-y-1/2 blur-2xl" />
-          <div className="relative z-10">
-            <p className="text-amber-100 text-sm font-medium mb-1">📊 Mandi Intelligence</p>
-            <h1 className="text-3xl font-extrabold tracking-tight">Market Prices</h1>
-            <p className="text-amber-100 text-sm mt-2 max-w-lg">
-              Find the best mandi, browse live prices, or predict future rates with AI.
-            </p>
-          </div>
+        {/* Page Header */}
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Market Prices</h1>
+          <p className="text-gray-400 text-sm mt-1">
+            Find the best mandi, browse live prices, or predict future rates.
+          </p>
         </div>
 
         {/* Tab Switcher */}
