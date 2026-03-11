@@ -11,16 +11,16 @@ const MandiForm = ({
   onSubmit, fetchDistricts,
 }) => {
   return (
-    <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-      <h2 className="text-xl font-bold text-gray-800 mb-1">🏆 Find Best Mandi</h2>
-      <p className="text-gray-400 text-sm mb-6">
+    <div className="bg-black/40 backdrop-blur-md rounded-3xl p-8 shadow-lg border border-white/10">
+      <h2 className="text-xl font-bold text-white mb-1">🏆 Find Best Mandi</h2>
+      <p className="text-white/50 text-sm mb-6">
         Ranked mandis with real road transport costs.
       </p>
 
       {/* Farmer Location */}
-      <div className="mb-4 p-4 bg-blue-50 border border-blue-100 rounded-2xl space-y-3">
+      <div className="mb-4 p-4 bg-blue-500/10 border border-blue-500/20 rounded-2xl space-y-3">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-semibold text-gray-700">🚜 Farmer Location</label>
+          <label className="text-sm font-semibold text-white/70">🚜 Farmer Location</label>
           <button
             type="button"
             onClick={() => setClickMode(clickMode === "farmer" ? null : "farmer")}
@@ -37,15 +37,15 @@ const MandiForm = ({
           placeholder="Search village / town..."
           onSelect={onFarmerSearch}
         />
-        <p className="text-xs text-gray-500 truncate">
+        <p className="text-xs text-white/50 truncate">
           📌 {farmerAddress || `${farmerLocation[0].toFixed(4)}, ${farmerLocation[1].toFixed(4)}`}
         </p>
       </div>
 
       {/* Manual Mandi Location */}
-      <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl space-y-3">
+      <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl space-y-3">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-semibold text-gray-700">🏪 Pin Mandi Manually</label>
+          <label className="text-sm font-semibold text-white/70">🏪 Pin Mandi Manually</label>
           <button
             type="button"
             onClick={() => setClickMode(clickMode === "mandi" ? null : "mandi")}
@@ -65,7 +65,7 @@ const MandiForm = ({
       </div>
 
       {mandiError && (
-        <div className="bg-red-50 text-red-500 text-sm px-4 py-3 rounded-2xl mb-4 border border-red-100">
+        <div className="bg-red-500/20 text-red-300 text-sm px-4 py-3 rounded-2xl mb-4 border border-red-500/30">
           ⚠️ {mandiError}
         </div>
       )}
@@ -73,12 +73,12 @@ const MandiForm = ({
       <form onSubmit={onSubmit} className="flex flex-col gap-5">
         {/* Crop */}
         <div>
-          <label className="text-sm font-semibold text-gray-700 mb-1.5 block">🌾 Crop</label>
+          <label className="text-sm font-semibold text-white/70 mb-1.5 block">🌾 Crop</label>
           <select
             value={mandiForm.crop}
             onChange={(e) => setMandiForm({ ...mandiForm, crop: e.target.value })}
             required
-            className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-gray-50"
+            className="w-full px-4 py-3 border border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white/10"
           >
             <option value="">Select crop</option>
             {CROPS.map((c) => (
@@ -89,7 +89,7 @@ const MandiForm = ({
 
         {/* Quantity */}
         <div>
-          <label className="text-sm font-semibold text-gray-700 mb-1.5 block">⚖️ Quantity (quintals)</label>
+          <label className="text-sm font-semibold text-white/70 mb-1.5 block">⚖️ Quantity (quintals)</label>
           <input
             type="number"
             min="1"
@@ -97,13 +97,13 @@ const MandiForm = ({
             value={mandiForm.quantity}
             onChange={(e) => setMandiForm({ ...mandiForm, quantity: e.target.value })}
             required
-            className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-gray-50"
+            className="w-full px-4 py-3 border border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white/10"
           />
         </div>
 
         {/* State */}
         <div>
-          <label className="text-sm font-semibold text-gray-700 mb-1.5 block">📍 State</label>
+          <label className="text-sm font-semibold text-white/70 mb-1.5 block">📍 State</label>
           <select
             value={mandiForm.state}
             onChange={(e) => {
@@ -111,7 +111,7 @@ const MandiForm = ({
               fetchDistricts(e.target.value);
             }}
             required
-            className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-gray-50"
+            className="w-full px-4 py-3 border border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white/10"
           >
             <option value="">Select state</option>
             {STATES.map((s) => (
@@ -122,7 +122,7 @@ const MandiForm = ({
 
         {/* District */}
         <div>
-          <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
+          <label className="text-sm font-semibold text-white/70 mb-1.5 block">
             🏘️ District
             {districtLoading && (
               <span className="text-xs text-amber-500 ml-2 font-normal">Loading...</span>
@@ -133,7 +133,7 @@ const MandiForm = ({
             onChange={(e) => setMandiForm({ ...mandiForm, district: e.target.value })}
             required
             disabled={!mandiForm.state || districtLoading}
-            className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-gray-50 disabled:opacity-50"
+            className="w-full px-4 py-3 border border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white/10 disabled:opacity-50"
           >
             <option value="">
               {districtLoading ? "Loading districts..." : "Select district"}

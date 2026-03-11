@@ -158,25 +158,34 @@ const Market = () => {
   );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen relative">
+      <div className="fixed inset-0 z-0">
+        <img
+          src="https://images.unsplash.com/photo-1595841696677-6489ff3f8cd1?w=1920&q=80"
+          alt=""
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/50" />
+      </div>
+      <div className="relative z-10">
       <Navbar />
 
       <main className="max-w-6xl mx-auto px-4 py-10 space-y-8">
 
         {/* Page Header */}
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Market Prices</h1>
-          <p className="text-gray-400 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-white drop-shadow">Market Prices</h1>
+          <p className="text-white/70 text-sm mt-1">
             Find the best mandi, browse live prices, or predict future rates.
           </p>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex gap-2 bg-white rounded-2xl p-1.5 shadow-sm border border-gray-100 w-fit">
+        <div className="flex gap-2 bg-black/40 backdrop-blur-md rounded-2xl p-1.5 shadow-sm border border-white/10 w-fit">
           {[
-            { id: "mandi",   label: "🏆 Best Mandi",      active: "bg-amber-500"   },
-            { id: "live",    label: "📋 Live Prices",      active: "bg-orange-500"  },
-            { id: "predict", label: "🤖 Price Prediction", active: "bg-emerald-600" },
+            { id: "mandi",   label: "🏆 Best Mandi",      active: "bg-green-600"   },
+            { id: "live",    label: "📋 Live Prices",      active: "bg-green-600"  },
+            { id: "predict", label: "🤖 Price Prediction", active: "bg-green-600" },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -184,7 +193,7 @@ const Market = () => {
               className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
                 activeTab === tab.id
                   ? `${tab.active} text-white shadow-md`
-                  : "text-gray-500 hover:text-gray-700"
+                  : "text-white/50 hover:text-white/70 border border-white/20"
               }`}
             >
               {tab.label}
@@ -229,17 +238,17 @@ const Market = () => {
               {mandiLoading && (
                 <div className="flex flex-col gap-4">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="bg-white rounded-2xl p-5 border border-gray-100 animate-pulse">
+                    <div key={i} className="bg-black/40 backdrop-blur-md rounded-2xl p-5 border border-white/10 animate-pulse">
                       <div className="flex gap-3 mb-4">
-                        <div className="w-9 h-9 bg-gray-200 rounded-xl" />
+                        <div className="w-9 h-9 bg-white/10 rounded-xl" />
                         <div className="flex-1 space-y-2">
-                          <div className="h-4 bg-gray-200 rounded w-1/2" />
-                          <div className="h-3 bg-gray-100 rounded w-1/3" />
+                          <div className="h-4 bg-white/10 rounded w-1/2" />
+                          <div className="h-3 bg-white/5 rounded w-1/3" />
                         </div>
                       </div>
                       <div className="grid grid-cols-3 gap-2">
                         {[1, 2, 3].map((j) => (
-                          <div key={j} className="h-12 bg-gray-100 rounded-xl" />
+                          <div key={j} className="h-12 bg-white/5 rounded-xl" />
                         ))}
                       </div>
                     </div>
@@ -277,7 +286,7 @@ const Market = () => {
               {/* Map */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-semibold text-gray-700">🗺️ Map</label>
+                  <label className="text-sm font-semibold text-white/70">🗺️ Map</label>
                   {clickMode && (
                     <span className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full animate-pulse">
                       🖱️ Click map to set {clickMode === "farmer" ? "farm" : "mandi"} location
@@ -301,48 +310,48 @@ const Market = () => {
 
                 {/* Route Info Card */}
                 {routeInfo && (
-                  <div className="mt-3 p-4 bg-amber-50 border border-amber-200 rounded-2xl">
-                    <h4 className="text-sm font-bold text-amber-800 mb-3">🛣️ Route Summary</h4>
+                  <div className="mt-3 p-4 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl">
+                    <h4 className="text-sm font-bold text-amber-400 mb-3">🛣️ Route Summary</h4>
 
                     <div className="grid grid-cols-3 gap-3 text-center mb-3">
-                      <div className="bg-white rounded-xl p-2 shadow-sm">
-                        <p className="text-xs text-gray-400">Distance</p>
-                        <p className="font-bold text-blue-600">{routeInfo.distanceKm} km</p>
+                      <div className="bg-white/10 rounded-xl p-2">
+                        <p className="text-xs text-white/40">Distance</p>
+                        <p className="font-bold text-blue-400">{routeInfo.distanceKm} km</p>
                       </div>
-                      <div className="bg-white rounded-xl p-2 shadow-sm">
-                        <p className="text-xs text-gray-400">Est. Time</p>
-                        <p className="font-bold text-emerald-600">~{routeInfo.durationMin} min</p>
+                      <div className="bg-white/10 rounded-xl p-2">
+                        <p className="text-xs text-white/40">Est. Time</p>
+                        <p className="font-bold text-emerald-400">~{routeInfo.durationMin} min</p>
                       </div>
-                      <div className="bg-white rounded-xl p-2 shadow-sm">
-                        <p className="text-xs text-gray-400">Total Cost</p>
-                        <p className="font-bold text-red-500">
+                      <div className="bg-white/10 rounded-xl p-2">
+                        <p className="text-xs text-white/40">Total Cost</p>
+                        <p className="font-bold text-red-400">
                           ₹{routeInfo.totalCost?.toLocaleString()}
                         </p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                      <div className="bg-orange-50 rounded-xl py-2">
-                        <p className="text-gray-400">Fuel</p>
-                        <p className="font-semibold text-orange-600">
+                      <div className="bg-orange-500/10 rounded-xl py-2">
+                        <p className="text-white/40">Fuel</p>
+                        <p className="font-semibold text-orange-400">
                           ₹{routeInfo.breakdown?.fuelCost?.toLocaleString()}
                         </p>
                       </div>
-                      <div className="bg-purple-50 rounded-xl py-2">
-                        <p className="text-gray-400">Toll</p>
-                        <p className="font-semibold text-purple-600">
+                      <div className="bg-purple-500/10 rounded-xl py-2">
+                        <p className="text-white/40">Toll</p>
+                        <p className="font-semibold text-purple-400">
                           ₹{routeInfo.breakdown?.tollCost?.toLocaleString()}
                         </p>
                       </div>
-                      <div className="bg-gray-50 rounded-xl py-2">
-                        <p className="text-gray-400">Loading</p>
-                        <p className="font-semibold text-gray-600">
+                      <div className="bg-white/5 rounded-xl py-2">
+                        <p className="text-white/40">Loading</p>
+                        <p className="font-semibold text-white/60">
                           ₹{routeInfo.breakdown?.loadingCost?.toLocaleString()}
                         </p>
                       </div>
                     </div>
 
-                    <p className="text-xs text-gray-400 text-center mt-2">
+                    <p className="text-xs text-white/40 text-center mt-2">
                       🚛 {routeInfo.truckType} truck · based on real road distance
                     </p>
                   </div>
@@ -350,8 +359,8 @@ const Market = () => {
 
                 {/* Selected mandi label */}
                 {selectedMandi && (
-                  <div className="mt-2 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-center">
-                    <p className="text-sm font-semibold text-emerald-800">
+                  <div className="mt-2 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-center">
+                    <p className="text-sm font-semibold text-emerald-400">
                       ✅ Selected: <span className="font-bold">{selectedMandi.name}</span>
                     </p>
                   </div>
@@ -367,10 +376,11 @@ const Market = () => {
         {/* ════════ TAB 3 — PRICE PREDICTION ════════ */}
         {activeTab === "predict" && <PricePrediction />}
 
-        <p className="text-center text-xs text-gray-400 pb-4">
+        <p className="text-center text-xs text-white/40 pb-4">
           🌾 AgriSense · Mandi data: Agmarknet · © {new Date().getFullYear()}
         </p>
       </main>
+      </div>
     </div>
   );
 };

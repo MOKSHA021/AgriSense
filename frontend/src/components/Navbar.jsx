@@ -9,7 +9,6 @@ import {
   CloudSun,
   TrendingUp,
   ShieldAlert,
-  Bug,
   Wallet,
   ShoppingCart,
   Menu,
@@ -24,7 +23,6 @@ const navLinks = [
   { label: "Weather", path: "/dashboard/weather", icon: CloudSun },
   { label: "Market", path: "/dashboard/market", icon: TrendingUp },
   { label: "Risk", path: "/dashboard/risk", icon: ShieldAlert },
-  { label: "Pests", path: "/dashboard/pests", icon: Bug },
   { label: "Expenses", path: "/dashboard/expenses", icon: Wallet },
   { label: "Inputs", path: "/dashboard/inputs", icon: ShoppingCart },
 ];
@@ -43,12 +41,12 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white">
+    <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/40 backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
         {/* Logo */}
         <NavLink
           to="/dashboard"
-          className="flex items-center gap-1.5 text-lg font-semibold text-gray-900"
+          className="flex items-center gap-1.5 text-lg font-semibold text-white"
         >
           <Wheat className="h-5 w-5 text-green-600" />
           AgriSense
@@ -64,8 +62,8 @@ const Navbar = () => {
               className={({ isActive }) =>
                 `flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                   isActive
-                    ? "bg-gray-100 text-gray-900"
-                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                    ? "bg-white/10 text-white"
+                    : "text-white/50 hover:bg-white/10 hover:text-white"
                 }`
               }
             >
@@ -79,15 +77,15 @@ const Navbar = () => {
         <div className="flex items-center gap-3">
           {/* User info — desktop */}
           <div className="hidden items-center gap-2 md:flex">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-sm font-medium text-gray-700">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-sm font-medium text-white">
               {initials}
             </div>
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-white/70">
               {userName}
             </span>
             <button
               onClick={handleLogout}
-              className="ml-1 flex items-center gap-1 rounded-md px-2 py-1.5 text-sm text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+              className="ml-1 flex items-center gap-1 rounded-md px-2 py-1.5 text-sm text-white/50 transition-colors hover:bg-white/10 hover:text-white"
             >
               <LogOut className="h-4 w-4" />
             </button>
@@ -96,7 +94,7 @@ const Navbar = () => {
           {/* Mobile hamburger */}
           <button
             onClick={() => setMenuOpen((prev) => !prev)}
-            className="rounded-md p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 md:hidden"
+            className="rounded-md p-1.5 text-white/50 hover:bg-white/10 hover:text-white md:hidden"
           >
             {menuOpen ? (
               <X className="h-5 w-5" />
@@ -109,7 +107,7 @@ const Navbar = () => {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="border-t border-gray-100 bg-white px-4 pb-4 pt-2 md:hidden">
+        <div className="border-t border-white/10 bg-black/40 backdrop-blur-md px-4 pb-4 pt-2 md:hidden">
           <div className="flex flex-col gap-1">
             {navLinks.map(({ label, path, icon: Icon }) => (
               <NavLink
@@ -120,8 +118,8 @@ const Navbar = () => {
                 className={({ isActive }) =>
                   `flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                     isActive
-                      ? "bg-gray-100 text-gray-900"
-                      : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                      ? "bg-white/10 text-white"
+                      : "text-white/50 hover:bg-white/10 hover:text-white"
                   }`
                 }
               >
@@ -130,18 +128,18 @@ const Navbar = () => {
               </NavLink>
             ))}
           </div>
-          <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
+          <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-3">
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-sm font-medium text-gray-700">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-sm font-medium text-white">
                 {initials}
               </div>
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-white/70">
                 {userName}
               </span>
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+              className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-white/50 transition-colors hover:bg-white/10 hover:text-white"
             >
               <LogOut className="h-4 w-4" />
               Logout

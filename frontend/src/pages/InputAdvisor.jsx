@@ -145,23 +145,32 @@ const InputAdvisor = () => {
     : 0;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen relative">
+      <div className="fixed inset-0 z-0">
+        <img
+          src="https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=1920&q=80"
+          alt=""
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/50" />
+      </div>
+      <div className="relative z-10">
       <Navbar />
 
       <div className="mx-auto max-w-3xl px-4 py-10">
         {/* Header */}
         <div className="mb-8 flex items-center gap-2">
-          <ShoppingCart className="h-6 w-6 text-green-600" />
-          <h1 className="text-2xl font-semibold text-gray-900">
+          <ShoppingCart className="h-6 w-6 text-green-400" />
+          <h1 className="text-2xl font-semibold text-white drop-shadow">
             Input Shopping Advisor
           </h1>
         </div>
 
         {/* Form */}
-        <div className="mb-8 rounded-lg border border-gray-200 p-6">
+        <div className="mb-8 rounded-lg border border-white/10 bg-black/40 backdrop-blur-md p-6">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">
+              <label className="mb-1.5 block text-sm font-medium text-white/70">
                 Select Crop
               </label>
               <select
@@ -170,7 +179,7 @@ const InputAdvisor = () => {
                   setCrop(e.target.value);
                   setResults(null);
                 }}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                className="w-full rounded-md border border-white/10 bg-white/10 px-3 py-2 text-sm text-white focus:border-green-400 focus:outline-none focus:ring-1 focus:ring-green-400"
               >
                 <option value="">-- Choose a crop --</option>
                 {CROPS.map((c) => (
@@ -182,7 +191,7 @@ const InputAdvisor = () => {
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">
+              <label className="mb-1.5 block text-sm font-medium text-white/70">
                 Area (acres)
               </label>
               <input
@@ -195,7 +204,7 @@ const InputAdvisor = () => {
                   setResults(null);
                 }}
                 placeholder="e.g. 5"
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                className="w-full rounded-md border border-white/10 bg-white/10 px-3 py-2 text-sm text-white focus:border-green-400 focus:outline-none focus:ring-1 focus:ring-green-400"
               />
             </div>
           </div>
@@ -213,20 +222,20 @@ const InputAdvisor = () => {
         {/* Results */}
         {results && (
           <div className="space-y-6">
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-white drop-shadow">
               Input Requirements for {crop} — {area} acre{Number(area) !== 1 ? "s" : ""}
             </h2>
 
             {results.map((item) => (
               <div
                 key={item.name}
-                className="rounded-lg border border-gray-200 p-5"
+                className="rounded-lg border border-white/10 bg-black/40 backdrop-blur-md p-5"
               >
                 {/* Input header */}
                 <div className="mb-4 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Package className="h-5 w-5 text-gray-600" />
-                    <span className="text-base font-semibold text-gray-900">
+                    <Package className="h-5 w-5 text-white/60" />
+                    <span className="text-base font-semibold text-white">
                       {item.name}
                     </span>
                   </div>
@@ -244,14 +253,14 @@ const InputAdvisor = () => {
                         key={seller.name}
                         className={`flex items-center justify-between rounded-md border px-4 py-3 text-sm ${
                           isBest
-                            ? "border-green-300 bg-green-50"
-                            : "border-gray-100 bg-gray-50"
+                            ? "border-green-500/30 bg-green-500/20"
+                            : "border-white/10 bg-white/10"
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          <Store className="h-4 w-4 text-gray-500" />
+                          <Store className="h-4 w-4 text-white/50" />
                           <div>
-                            <p className="font-medium text-gray-900">
+                            <p className="font-medium text-white">
                               {seller.name}
                               {isBest && (
                                 <span className="ml-2 text-xs font-semibold text-green-600">
@@ -259,7 +268,7 @@ const InputAdvisor = () => {
                                 </span>
                               )}
                             </p>
-                            <p className="flex items-center gap-1 text-xs text-gray-500">
+                            <p className="flex items-center gap-1 text-xs text-white/50">
                               <MapPin className="h-3 w-3" />
                               {seller.distance}
                             </p>
@@ -267,7 +276,7 @@ const InputAdvisor = () => {
                         </div>
 
                         <div className="flex items-center gap-4">
-                          <span className="flex items-center gap-0.5 font-medium text-gray-900">
+                          <span className="flex items-center gap-0.5 font-medium text-white">
                             <IndianRupee className="h-3.5 w-3.5" />
                             {seller.price}/{item.unit === "buds" ? "bud" : "kg"}
                           </span>
@@ -288,11 +297,11 @@ const InputAdvisor = () => {
             ))}
 
             {/* Total cost */}
-            <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-6 py-4">
-              <span className="text-base font-semibold text-gray-900">
+            <div className="flex items-center justify-between rounded-lg border border-white/10 bg-black/40 backdrop-blur-md px-6 py-4">
+              <span className="text-base font-semibold text-white">
                 Total Estimated Input Cost
               </span>
-              <span className="flex items-center gap-1 text-lg font-bold text-green-700">
+              <span className="flex items-center gap-1 text-lg font-bold text-green-400">
                 <IndianRupee className="h-5 w-5" />
                 {totalCost.toLocaleString(undefined, {
                   minimumFractionDigits: 2,
@@ -302,6 +311,7 @@ const InputAdvisor = () => {
             </div>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

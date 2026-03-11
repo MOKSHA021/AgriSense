@@ -14,8 +14,6 @@ import {
   Clock,
 } from "lucide-react";
 
-const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
-const BASE = "https://api.openweathermap.org/data/2.5";
 
 const SEASONS = ["Kharif", "Rabi", "Zaid"];
 
@@ -210,9 +208,9 @@ const getSafeCrops = (risks) => {
 
 const levelBadge = (level) => {
   const styles = {
-    HIGH: "bg-red-100 text-red-700",
-    MEDIUM: "bg-amber-100 text-amber-700",
-    LOW: "bg-green-100 text-green-700",
+    HIGH: "bg-red-500/30 text-red-300",
+    MEDIUM: "bg-amber-500/30 text-amber-300",
+    LOW: "bg-green-500/30 text-green-300",
   };
   return (
     <span
@@ -225,9 +223,9 @@ const levelBadge = (level) => {
 
 const levelCardBg = (level) => {
   const map = {
-    HIGH: "bg-red-50 border-red-200",
-    MEDIUM: "bg-amber-50 border-amber-200",
-    LOW: "bg-green-50 border-green-200",
+    HIGH: "bg-red-500/20 border-red-500/30",
+    MEDIUM: "bg-amber-500/20 border-amber-500/30",
+    LOW: "bg-green-500/20 border-green-500/30",
   };
   return map[level];
 };
@@ -246,23 +244,69 @@ const RiskAssessment = () => {
     setError("");
     setRisks(null);
     try {
-      const [curRes, foreRes] = await Promise.all([
-        fetch(`${BASE}/weather?${query}&units=metric&appid=${API_KEY}`),
-        fetch(`${BASE}/forecast?${query}&units=metric&appid=${API_KEY}`),
-      ]);
-      if (!curRes.ok || !foreRes.ok)
-        throw new Error("City not found. Please check the name and try again.");
-      const curData = await curRes.json();
-      const foreData = await foreRes.json();
-      setCityName(curData.name);
-      setCityInput(curData.name);
-      setRisks(computeRisks(curData, foreData.list));
+      let lat, lon, resolvedName;
+      if (query.startsWith("lat=")) {
+        const parts = Object.fromEntries(query.split("&").map((p) => p.split("=")));
+        lat = parts.lat;
+        lon = parts.lon;
+        const geoRes = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`,
+          { headers: { "User-Agent": "AgriSense/1.0" } }
+        );
+        const geo = await geoRes.json();
+        resolvedName = geo.address?.city || geo.address?.town || geo.address?.village || geo.address?.county || "Your Location";
+      } else {
+        const cityName = decodeURIComponent(query.split("=")[1]);
+        const geoRes = await fetch(
+          `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=1&language=en`
+        );
+        const geoData = await geoRes.json();
+        if (!geoData.results?.length) throw new Error("City not found. Please check the name and try again.");
+        lat = geoData.results[0].latitude;
+        lon = geoData.results[0].longitude;
+        resolvedName = geoData.results[0].name;
+      }
+
+      const weatherRes = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m&hourly=precipitation&timezone=auto&forecast_days=5`
+      );
+      if (!weatherRes.ok) throw new Error("Failed to fetch weather data");
+      const data = await weatherRes.json();
+
+      const current = {
+        main: {
+          temp: data.current.temperature_2m,
+          humidity: data.current.relative_humidity_2m,
+        },
+      };
+      const forecast = (data.hourly?.precipitation || []).map((p) => ({
+        rain: { "3h": p },
+      }));
+
+      setCityName(resolvedName);
+      setCityInput(resolvedName);
+      setRisks(computeRisks(current, forecast));
     } catch (err) {
       setError(err.message || "Could not fetch weather data");
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    setDetecting(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setDetecting(false);
+        fetchAndAssess(`lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
+      },
+      () => {
+        setDetecting(false);
+      }
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleAssess = (e) => {
     e.preventDefault();
@@ -297,19 +341,28 @@ const RiskAssessment = () => {
   const showDelayedSowing = highCount >= 2;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen relative">
+      <div className="fixed inset-0 z-0">
+        <img
+          src="https://images.unsplash.com/photo-1499529112087-3cb3b73cec95?w=1920&q=80"
+          alt=""
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/50" />
+      </div>
+      <div className="relative z-10">
       <Navbar />
 
       <main className="max-w-3xl mx-auto px-4 py-10">
         {/* Page Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-1">
-            <ShieldAlert className="w-8 h-8 text-gray-700" />
-            <h1 className="text-2xl font-bold text-gray-900">
+            <ShieldAlert className="w-8 h-8 text-white" />
+            <h1 className="text-2xl font-bold text-white drop-shadow">
               Risk Assessment
             </h1>
           </div>
-          <p className="text-sm text-gray-500 ml-11">
+          <p className="text-sm text-white/70 ml-11">
             Analyze weather and seasonal data to identify farming risks and get
             crop safety recommendations.
           </p>
@@ -319,20 +372,20 @@ const RiskAssessment = () => {
         <form onSubmit={handleAssess} className="space-y-4 mb-8">
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
               <input
                 type="text"
                 value={cityInput}
                 onChange={(e) => setCityInput(e.target.value)}
                 placeholder="Enter city name..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-400"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-white/10 bg-black/40 backdrop-blur-md text-sm text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 shadow-lg"
               />
             </div>
             <button
               type="button"
               onClick={handleAutoDetect}
               disabled={detecting}
-              className="flex items-center gap-1.5 px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-2.5 border border-white/20 rounded-lg text-sm text-white/60 hover:bg-white/10 disabled:opacity-50"
             >
               {detecting ? (
                 <Loader className="w-4 h-4 animate-spin" />
@@ -344,7 +397,7 @@ const RiskAssessment = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <label className="text-sm font-medium text-gray-700">Season</label>
+            <label className="text-sm font-medium text-white/70">Season</label>
             <div className="flex gap-2">
               {SEASONS.map((s) => (
                 <button
@@ -353,8 +406,8 @@ const RiskAssessment = () => {
                   onClick={() => setSeason(s)}
                   className={`px-4 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
                     season === s
-                      ? "bg-gray-900 text-white border-gray-900"
-                      : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+                      ? "bg-green-600 text-white border-green-600"
+                      : "bg-white/10 text-white/60 border-white/20 hover:bg-white/20"
                   }`}
                 >
                   {s}
@@ -366,7 +419,7 @@ const RiskAssessment = () => {
           <button
             type="submit"
             disabled={loading || !cityInput.trim()}
-            className="w-full py-2.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-2.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
@@ -391,10 +444,10 @@ const RiskAssessment = () => {
         {risks && (
           <div className="space-y-8">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-1">
+              <h2 className="text-lg font-semibold text-white drop-shadow mb-1">
                 Risk Analysis for {cityName}
               </h2>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-white/70 mb-4">
                 Season: {season}
               </p>
 
@@ -409,18 +462,18 @@ const RiskAssessment = () => {
                     >
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
-                          <Icon className="w-5 h-5 text-gray-700" />
-                          <span className="text-sm font-semibold text-gray-900">
+                          <Icon className="w-5 h-5 text-white/70" />
+                          <span className="text-sm font-semibold text-white">
                             {risk.name}
                           </span>
                         </div>
                         {levelBadge(risk.level)}
                       </div>
-                      <p className="text-sm text-gray-700 mb-2">
+                      <p className="text-sm text-white/70 mb-2">
                         {risk.description}
                       </p>
-                      <p className="text-xs text-gray-500">
-                        <span className="font-medium text-gray-600">
+                      <p className="text-xs text-white/50">
+                        <span className="font-medium text-white/60">
                           Action:
                         </span>{" "}
                         {risk.action}
@@ -433,13 +486,13 @@ const RiskAssessment = () => {
 
             {/* Delayed Sowing Recommendation */}
             {showDelayedSowing && (
-              <div className="flex items-start gap-3 border border-amber-200 rounded-lg p-4 bg-amber-50">
-                <Clock className="w-5 h-5 shrink-0 mt-0.5 text-amber-600" />
+              <div className="flex items-start gap-3 border border-amber-500/30 rounded-lg p-4 bg-amber-500/20">
+                <Clock className="w-5 h-5 shrink-0 mt-0.5 text-amber-400" />
                 <div>
-                  <p className="text-sm font-medium text-amber-800">
+                  <p className="text-sm font-medium text-amber-300">
                     Delayed Sowing Recommended
                   </p>
-                  <p className="text-sm text-amber-700 mt-0.5">
+                  <p className="text-sm text-amber-400 mt-0.5">
                     Multiple high-risk conditions detected. Consider delaying
                     sowing by 1-2 weeks until conditions improve. Monitor
                     weather forecasts regularly before proceeding.
@@ -450,21 +503,21 @@ const RiskAssessment = () => {
 
             {/* Safe Crops */}
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              <h2 className="text-lg font-semibold text-white drop-shadow mb-4">
                 Safe Crops for Current Conditions
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {safeCrops.map((crop) => (
                   <div
                     key={crop.name}
-                    className="flex items-start gap-3 border border-gray-200 rounded-lg p-4"
+                    className="flex items-start gap-3 bg-black/40 backdrop-blur-md border border-white/10 rounded-xl p-4 shadow-lg"
                   >
                     <Sprout className="w-5 h-5 shrink-0 mt-0.5 text-green-600" />
                     <div>
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-sm font-medium text-white">
                         {crop.name}
                       </p>
-                      <p className="text-xs text-gray-500 mt-0.5">
+                      <p className="text-xs text-white/50 mt-0.5">
                         {crop.reason}
                       </p>
                     </div>
@@ -475,6 +528,7 @@ const RiskAssessment = () => {
           </div>
         )}
       </main>
+      </div>
     </div>
   );
 };

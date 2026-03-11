@@ -30,28 +30,36 @@ const LandingPage = () => {
       </nav>
 
       {/* Hero */}
-      <section className="min-h-screen flex flex-col justify-center items-center text-center px-6 pt-20">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-medium rounded-full mb-8">
+      <section className="min-h-screen relative flex flex-col justify-center items-center text-center px-6 pt-20 overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img
+            src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80"
+            alt="Agricultural field"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/40" />
+        </div>
+        <div className="relative z-10 inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/20 backdrop-blur-sm text-white text-xs font-medium rounded-full mb-8">
           <Sprout className="w-3.5 h-3.5" />
           Smart farming for Indian agriculture
         </div>
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-5 leading-tight max-w-2xl tracking-tight">
+        <h1 className="relative z-10 text-4xl md:text-5xl font-bold text-white mb-5 leading-tight max-w-2xl tracking-tight drop-shadow-lg">
           Know your soil. Pick the right crop. Sell at the best price.
         </h1>
-        <p className="text-gray-500 text-lg mb-10 max-w-xl leading-relaxed">
+        <p className="relative z-10 text-white/80 text-lg mb-10 max-w-xl leading-relaxed">
           AgriSense combines soil analysis, weather intelligence, and market data
           to help farmers make better decisions.
         </p>
-        <div className="flex gap-4">
+        <div className="relative z-10 flex gap-4">
           <button
             onClick={() => navigate("/register")}
-            className="inline-flex items-center gap-2 px-7 py-3 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition"
+            className="inline-flex items-center gap-2 px-7 py-3 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition shadow-lg"
           >
             Start for Free <ArrowRight className="w-4 h-4" />
           </button>
           <button
             onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })}
-            className="px-7 py-3 border border-gray-300 text-gray-600 text-sm font-semibold rounded-lg hover:bg-gray-50 transition"
+            className="px-7 py-3 border border-white/30 text-white text-sm font-semibold rounded-lg hover:bg-white/10 backdrop-blur-sm transition"
           >
             Learn More
           </button>

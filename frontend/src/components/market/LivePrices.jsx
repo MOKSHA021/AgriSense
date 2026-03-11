@@ -33,24 +33,24 @@ const LivePrices = () => {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
       {/* ════ Left: Form ════ */}
-      <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-        <h2 className="text-xl font-bold text-gray-800 mb-1">📋 Live Market Prices</h2>
-        <p className="text-gray-400 text-sm mb-6">Today's prices from mandis across India.</p>
+      <div className="bg-black/40 backdrop-blur-md rounded-3xl p-8 shadow-lg border border-white/10">
+        <h2 className="text-xl font-bold text-white mb-1">📋 Live Market Prices</h2>
+        <p className="text-white/50 text-sm mb-6">Today's prices from mandis across India.</p>
 
         {liveError && (
-          <div className="bg-red-50 text-red-500 text-sm px-4 py-3 rounded-2xl mb-4 border border-red-100">
+          <div className="bg-red-500/20 text-red-300 text-sm px-4 py-3 rounded-2xl mb-4 border border-red-500/30">
             ⚠️ {liveError}
           </div>
         )}
 
         <form onSubmit={handleLiveFetch} className="flex flex-col gap-5">
           <div>
-            <label className="text-sm font-semibold text-gray-700 mb-1.5 block">🌾 Crop</label>
+            <label className="text-sm font-semibold text-white/70 mb-1.5 block">🌾 Crop</label>
             <select
               value={liveCrop}
               onChange={(e) => setLiveCrop(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-gray-50"
+              className="w-full px-4 py-3 border border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white/10"
             >
               <option value="">Select crop</option>
               {CROPS.map((c) => (
@@ -60,12 +60,12 @@ const LivePrices = () => {
           </div>
 
           <div>
-            <label className="text-sm font-semibold text-gray-700 mb-1.5 block">📍 State</label>
+            <label className="text-sm font-semibold text-white/70 mb-1.5 block">📍 State</label>
             <select
               value={liveState}
               onChange={(e) => setLiveState(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-gray-50"
+              className="w-full px-4 py-3 border border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white/10"
             >
               <option value="">Select state</option>
               {STATES.map((s) => (
@@ -88,10 +88,10 @@ const LivePrices = () => {
       <div className="flex flex-col gap-4">
 
         {liveLoading && (
-          <div className="bg-white rounded-3xl p-8 border border-gray-100 flex items-center justify-center min-h-[300px]">
+          <div className="bg-black/40 backdrop-blur-md rounded-3xl p-8 border border-white/10 flex items-center justify-center min-h-[300px]">
             <div className="text-center space-y-3">
               <p className="text-3xl animate-bounce">📊</p>
-              <p className="text-gray-400 text-sm animate-pulse">Fetching live prices...</p>
+              <p className="text-white/40 text-sm animate-pulse">Fetching live prices...</p>
             </div>
           </div>
         )}
@@ -110,20 +110,20 @@ const LivePrices = () => {
 
             {/* Summary Stats — exactly matches backend fields */}
             <div className="grid grid-cols-3 gap-3 text-center">
-              <div className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100">
-                <p className="text-xs text-gray-400 mb-1">Avg Modal</p>
+              <div className="bg-black/40 backdrop-blur-md rounded-2xl p-3 shadow-sm border border-white/10">
+                <p className="text-xs text-white/40 mb-1">Avg Modal</p>
                 <p className="font-bold text-blue-600 text-lg">
                   ₹{liveData.avgModal?.toLocaleString() ?? "—"}
                 </p>
               </div>
-              <div className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100">
-                <p className="text-xs text-gray-400 mb-1">Lowest</p>
+              <div className="bg-black/40 backdrop-blur-md rounded-2xl p-3 shadow-sm border border-white/10">
+                <p className="text-xs text-white/40 mb-1">Lowest</p>
                 <p className="font-bold text-red-500 text-lg">
                   ₹{liveData.minPrice?.toLocaleString() ?? "—"}
                 </p>
               </div>
-              <div className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100">
-                <p className="text-xs text-gray-400 mb-1">Highest</p>
+              <div className="bg-black/40 backdrop-blur-md rounded-2xl p-3 shadow-sm border border-white/10">
+                <p className="text-xs text-white/40 mb-1">Highest</p>
                 <p className="font-bold text-green-600 text-lg">
                   ₹{liveData.maxPrice?.toLocaleString() ?? "—"}
                 </p>
@@ -132,12 +132,12 @@ const LivePrices = () => {
 
             {/* Zero markets */}
             {liveData.markets?.length === 0 && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-6 text-center">
+              <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-2xl p-6 text-center">
                 <p className="text-2xl mb-2">🔍</p>
-                <p className="text-yellow-700 font-semibold text-sm">
+                <p className="text-yellow-300 font-semibold text-sm">
                   No price data found for {liveData.crop} in {liveData.state}
                 </p>
-                <p className="text-yellow-600 text-xs mt-1">
+                <p className="text-yellow-400 text-xs mt-1">
                   Try a different crop or state combination.
                 </p>
               </div>
@@ -148,14 +148,14 @@ const LivePrices = () => {
               {liveData.markets?.map((r, i) => (
                 <div
                   key={i}
-                  className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition"
+                  className="bg-black/40 backdrop-blur-md rounded-2xl p-4 shadow-sm border border-white/10 hover:shadow-lg transition"
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <h3 className="font-bold text-gray-800">
+                      <h3 className="font-bold text-white">
                         {r.mandi || r.market || r.Market || `Market ${i + 1}`}
                       </h3>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-white/40">
                         {r.commodity || liveData.crop}
                         {r.unit && ` · per ${r.unit}`}
                       </p>
@@ -166,22 +166,22 @@ const LivePrices = () => {
                   </div>
 
                   <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="bg-red-50 rounded-xl py-2.5">
-                      <p className="text-xs text-gray-400">Min</p>
-                      <p className="font-bold text-red-500 text-sm">
+                    <div className="bg-red-500/20 rounded-xl py-2.5">
+                      <p className="text-xs text-white/40">Min</p>
+                      <p className="font-bold text-red-300 text-sm">
                         ₹{r.minPrice?.toLocaleString() ?? "—"}
                       </p>
                     </div>
                     {/* mandiPrice = modal price from scraper */}
-                    <div className="bg-blue-50 rounded-xl py-2.5">
-                      <p className="text-xs text-gray-400">Modal</p>
-                      <p className="font-bold text-blue-600 text-sm">
+                    <div className="bg-blue-500/20 rounded-xl py-2.5">
+                      <p className="text-xs text-white/40">Modal</p>
+                      <p className="font-bold text-blue-300 text-sm">
                         ₹{(r.mandiPrice ?? r.modalPrice)?.toLocaleString() ?? "—"}
                       </p>
                     </div>
-                    <div className="bg-green-50 rounded-xl py-2.5">
-                      <p className="text-xs text-gray-400">Max</p>
-                      <p className="font-bold text-green-600 text-sm">
+                    <div className="bg-green-500/20 rounded-xl py-2.5">
+                      <p className="text-xs text-white/40">Max</p>
+                      <p className="font-bold text-green-300 text-sm">
                         ₹{r.maxPrice?.toLocaleString() ?? "—"}
                       </p>
                     </div>
@@ -193,11 +193,11 @@ const LivePrices = () => {
         )}
 
         {!liveData && !liveLoading && (
-          <div className="bg-white rounded-3xl p-8 border border-gray-100 flex items-center justify-center min-h-[300px]">
+          <div className="bg-black/40 backdrop-blur-md rounded-3xl p-8 border border-white/10 flex items-center justify-center min-h-[300px]">
             <div className="text-center space-y-2">
               <p className="text-4xl">📋</p>
-              <p className="text-gray-500 font-semibold text-sm">No data yet</p>
-              <p className="text-gray-400 text-xs">Select a crop and state to see live prices</p>
+              <p className="text-white/50 font-semibold text-sm">No data yet</p>
+              <p className="text-white/40 text-xs">Select a crop and state to see live prices</p>
             </div>
           </div>
         )}

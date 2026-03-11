@@ -100,48 +100,57 @@ const ExpenseTracker = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen relative">
+      <div className="fixed inset-0 z-0">
+        <img
+          src="https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?w=1920&q=80"
+          alt=""
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/50" />
+      </div>
+      <div className="relative z-10">
       <Navbar />
       <div className="mx-auto max-w-4xl px-4 py-10">
         {/* Page title */}
         <div className="mb-8 flex items-center gap-2">
-          <Wallet className="h-6 w-6 text-gray-900" />
-          <h1 className="text-xl font-semibold text-gray-900">
+          <Wallet className="h-6 w-6 text-white" />
+          <h1 className="text-xl font-semibold text-white drop-shadow">
             Expense Tracker
           </h1>
         </div>
 
         {/* Summary cards */}
         <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <div className="rounded-lg border border-gray-200 p-4">
-            <p className="mb-1 text-xs font-medium text-gray-500">
+          <div className="rounded-xl bg-black/40 backdrop-blur-md border border-white/10 p-4">
+            <p className="mb-1 text-xs font-medium text-white/50">
               Total Spent
             </p>
-            <div className="flex items-center gap-1 text-lg font-semibold text-gray-900">
+            <div className="flex items-center gap-1 text-lg font-semibold text-white">
               <IndianRupee className="h-4 w-4" />
               {totalSpent.toLocaleString("en-IN")}
             </div>
           </div>
-          <div className="rounded-lg border border-gray-200 p-4">
-            <p className="mb-1 text-xs font-medium text-gray-500">
+          <div className="rounded-xl bg-black/40 backdrop-blur-md border border-white/10 p-4">
+            <p className="mb-1 text-xs font-medium text-white/50">
               Predicted Revenue
             </p>
-            <div className="flex items-center gap-1 text-lg font-semibold text-gray-900">
+            <div className="flex items-center gap-1 text-lg font-semibold text-white">
               <TrendingUp className="h-4 w-4" />
               {PREDICTED_REVENUE.toLocaleString("en-IN")}
             </div>
           </div>
-          <div className="rounded-lg border border-gray-200 p-4">
-            <p className="mb-1 text-xs font-medium text-gray-500">
+          <div className="rounded-xl bg-black/40 backdrop-blur-md border border-white/10 p-4">
+            <p className="mb-1 text-xs font-medium text-white/50">
               Estimated Profit
             </p>
-            <div className="flex items-center gap-1 text-lg font-semibold text-gray-900">
+            <div className="flex items-center gap-1 text-lg font-semibold text-white">
               <IndianRupee className="h-4 w-4" />
               {estimatedProfit.toLocaleString("en-IN")}
             </div>
           </div>
-          <div className="rounded-lg border border-gray-200 p-4">
-            <p className="mb-1 text-xs font-medium text-gray-500">Status</p>
+          <div className="rounded-xl bg-black/40 backdrop-blur-md border border-white/10 p-4">
+            <p className="mb-1 text-xs font-medium text-white/50">Status</p>
             <span
               className={`inline-block rounded-full px-2.5 py-0.5 text-sm font-medium ${statusColor}`}
             >
@@ -153,21 +162,21 @@ const ExpenseTracker = () => {
         {/* Add expense form */}
         <form
           onSubmit={handleAdd}
-          className="mb-8 rounded-lg border border-gray-200 p-4"
+          className="mb-8 rounded-lg border border-white/10 bg-black/40 backdrop-blur-md p-4"
         >
-          <h2 className="mb-4 flex items-center gap-1.5 text-sm font-semibold text-gray-900">
+          <h2 className="mb-4 flex items-center gap-1.5 text-sm font-semibold text-white">
             <Plus className="h-4 w-4" />
             Add Expense
           </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-              <label className="mb-1 block text-xs font-medium text-gray-500">
+              <label className="mb-1 block text-xs font-medium text-white/50">
                 Category
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-400"
+                className="w-full rounded-md border border-white/10 bg-white/10 px-3 py-2 text-sm text-white outline-none focus:border-green-400"
               >
                 {CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
@@ -177,7 +186,7 @@ const ExpenseTracker = () => {
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-gray-500">
+              <label className="mb-1 block text-xs font-medium text-white/50">
                 Amount
               </label>
               <input
@@ -188,11 +197,11 @@ const ExpenseTracker = () => {
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 required
-                className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-400"
+                className="w-full rounded-md border border-white/10 bg-white/10 px-3 py-2 text-sm text-white outline-none focus:border-green-400"
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-gray-500">
+              <label className="mb-1 block text-xs font-medium text-white/50">
                 Date
               </label>
               <input
@@ -200,11 +209,11 @@ const ExpenseTracker = () => {
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 required
-                className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-400"
+                className="w-full rounded-md border border-white/10 bg-white/10 px-3 py-2 text-sm text-white outline-none focus:border-green-400"
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-gray-500">
+              <label className="mb-1 block text-xs font-medium text-white/50">
                 Notes
               </label>
               <input
@@ -212,13 +221,13 @@ const ExpenseTracker = () => {
                 placeholder="Optional"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-400"
+                className="w-full rounded-md border border-white/10 bg-white/10 px-3 py-2 text-sm text-white outline-none focus:border-green-400"
               />
             </div>
           </div>
           <button
             type="submit"
-            className="mt-4 flex items-center gap-1.5 rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800"
+            className="mt-4 flex items-center gap-1.5 rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700"
           >
             <Plus className="h-4 w-4" />
             Add
@@ -227,8 +236,8 @@ const ExpenseTracker = () => {
 
         {/* Category breakdown */}
         {expenses.length > 0 && (
-          <div className="mb-8 rounded-lg border border-gray-200 p-4">
-            <h2 className="mb-4 flex items-center gap-1.5 text-sm font-semibold text-gray-900">
+          <div className="mb-8 rounded-lg border border-white/10 bg-black/40 backdrop-blur-md p-4">
+            <h2 className="mb-4 flex items-center gap-1.5 text-sm font-semibold text-white">
               <BarChart3 className="h-4 w-4" />
               Category Breakdown
             </h2>
@@ -236,15 +245,15 @@ const ExpenseTracker = () => {
               {CATEGORIES.filter((cat) => categoryTotals[cat] > 0).map(
                 (cat) => (
                   <div key={cat}>
-                    <div className="mb-1 flex items-center justify-between text-xs text-gray-600">
+                    <div className="mb-1 flex items-center justify-between text-xs text-white/60">
                       <span>{cat}</span>
-                      <span className="font-medium text-gray-900">
+                      <span className="font-medium text-white">
                         {categoryTotals[cat].toLocaleString("en-IN")}
                       </span>
                     </div>
-                    <div className="h-2 w-full rounded-full bg-gray-100">
+                    <div className="h-2 w-full rounded-full bg-white/10">
                       <div
-                        className="h-2 rounded-full bg-gray-900"
+                        className="h-2 rounded-full bg-green-500"
                         style={{
                           width: `${(categoryTotals[cat] / maxCategoryTotal) * 100}%`,
                         }}
@@ -261,12 +270,12 @@ const ExpenseTracker = () => {
         {expenses.length > 0 && (
           <div>
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-gray-900">
+              <h2 className="text-sm font-semibold text-white">
                 All Expenses ({expenses.length})
               </h2>
               <button
                 onClick={handleClearAll}
-                className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+                className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-500/20"
               >
                 <Trash2 className="h-3.5 w-3.5" />
                 Clear All
@@ -275,7 +284,7 @@ const ExpenseTracker = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-gray-200 text-xs font-medium text-gray-500">
+                  <tr className="border-b border-white/10 text-xs font-medium text-white/50">
                     <th className="pb-2 pr-4">Date</th>
                     <th className="pb-2 pr-4">Category</th>
                     <th className="pb-2 pr-4">Amount</th>
@@ -289,22 +298,22 @@ const ExpenseTracker = () => {
                     .map((expense) => (
                       <tr
                         key={expense.id}
-                        className="border-b border-gray-100 text-gray-700"
+                        className="border-b border-white/10 text-white/70"
                       >
                         <td className="py-2.5 pr-4 whitespace-nowrap">
                           {expense.date}
                         </td>
                         <td className="py-2.5 pr-4">{expense.category}</td>
-                        <td className="py-2.5 pr-4 whitespace-nowrap font-medium text-gray-900">
+                        <td className="py-2.5 pr-4 whitespace-nowrap font-medium text-white">
                           {expense.amount.toLocaleString("en-IN")}
                         </td>
-                        <td className="py-2.5 pr-4 text-gray-500">
+                        <td className="py-2.5 pr-4 text-white/50">
                           {expense.notes || "-"}
                         </td>
                         <td className="py-2.5">
                           <button
                             onClick={() => handleDelete(expense.id)}
-                            className="rounded-md p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-red-600"
+                            className="rounded-md p-1 text-white/40 transition-colors hover:bg-white/10 hover:text-red-400"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -319,10 +328,11 @@ const ExpenseTracker = () => {
 
         {/* Empty state */}
         {expenses.length === 0 && (
-          <div className="py-12 text-center text-sm text-gray-400">
+          <div className="py-12 text-center text-sm text-white/40">
             No expenses recorded yet. Add one above to get started.
           </div>
         )}
+      </div>
       </div>
     </div>
   );

@@ -12,7 +12,6 @@ import CropRecommend from "./pages/CropRecommend";
 import Weather from "./pages/Weather";
 import Market from "./pages/Market";
 import RiskAssessment from "./pages/RiskAssessment";
-import PestDetection from "./pages/PestDetection";
 import ExpenseTracker from "./pages/ExpenseTracker";
 import InputAdvisor from "./pages/InputAdvisor";
 
@@ -31,7 +30,6 @@ function App() {
           <Route path="/dashboard/weather" element={<ProtectedRoute><Weather /></ProtectedRoute>} />
           <Route path="/dashboard/market" element={<ProtectedRoute><Market /></ProtectedRoute>} />
           <Route path="/dashboard/risk" element={<ProtectedRoute><RiskAssessment /></ProtectedRoute>} />
-          <Route path="/dashboard/pests" element={<ProtectedRoute><PestDetection /></ProtectedRoute>} />
           <Route path="/dashboard/expenses" element={<ProtectedRoute><ExpenseTracker /></ProtectedRoute>} />
           <Route path="/dashboard/inputs" element={<ProtectedRoute><InputAdvisor /></ProtectedRoute>} />
         </Routes>
