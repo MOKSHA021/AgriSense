@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import Navbar from "../components/Navbar";
 import MandiForm from "../components/market/MandiForm";
@@ -25,7 +24,6 @@ const geocodeMandi = async (mandiName, district, state) => {
 };
 
 const Market = () => {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("mandi");
 
   // ── Districts ──
@@ -130,11 +128,13 @@ const Market = () => {
   const handleSelectMandi = useCallback((mandi) => {
     setSelectedMandi(mandi);
     setRouteInfo(null);
-    setShowRoute(false);
     if (mandi.lat && mandi.lng) {
       const coords = [mandi.lat, mandi.lng];
       setMandiLocation(coords);
       setFlyTarget(coords);
+      setShowRoute(true);
+    } else {
+      setShowRoute(false);
     }
   }, []);
 
@@ -143,8 +143,19 @@ const Market = () => {
     if (clickMode === "farmer") {
       setFarmerLocation(coords);
       setFarmerAddress(`${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}`);
+      setRouteInfo(null);
     } else if (clickMode === "mandi") {
       setMandiLocation(coords);
+      setSelectedMandi({
+        name: "Pinned Mandi",
+        district: "Manual location",
+        lat: coords[0],
+        lng: coords[1],
+        pricePerUnit: 0,
+      });
+      setFlyTarget(coords);
+      setRouteInfo(null);
+      setShowRoute(true);
     }
     setClickMode(null);
   }, [clickMode]);
@@ -226,6 +237,15 @@ const Market = () => {
               onMandiSearch={(coords) => {
                 setMandiLocation(coords);
                 setFlyTarget(coords);
+                setSelectedMandi({
+                  name: "Pinned Mandi",
+                  district: "Manual location",
+                  lat: coords[0],
+                  lng: coords[1],
+                  pricePerUnit: 0,
+                });
+                setRouteInfo(null);
+                setShowRoute(true);
               }}
               onSubmit={handleMandiSearch}
               fetchDistricts={fetchDistricts}

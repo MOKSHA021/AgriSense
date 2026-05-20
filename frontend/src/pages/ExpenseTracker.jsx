@@ -25,6 +25,23 @@ const CATEGORIES = [
   "Other",
 ];
 
+const PLAN_CROPS = [
+  "Wheat",
+  "Rice",
+  "Maize",
+  "Cotton",
+  "Sugarcane",
+  "Potato",
+  "Soybean",
+  "Groundnut",
+  "Millets",
+  "Sorghum",
+  "Banana",
+  "Jute",
+];
+
+const SEASONS = ["Kharif", "Rabi", "Zaid"];
+
 const DEFAULT_PLAN = {
   crop: "Wheat",
   season: "Rabi",
@@ -373,25 +390,35 @@ const ExpenseTracker = () => {
               <label className="mb-1 block text-xs font-medium text-white/55">
                 Crop
               </label>
-              <input
+              <select
                 name="crop"
-                type="text"
                 value={plan.crop}
                 onChange={handlePlanChange}
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:ring-2 focus:ring-green-400"
-              />
+              >
+                {PLAN_CROPS.map((crop) => (
+                  <option key={crop} value={crop} className="bg-zinc-900 text-white">
+                    {crop}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="mb-1 block text-xs font-medium text-white/55">
                 Season
               </label>
-              <input
+              <select
                 name="season"
-                type="text"
                 value={plan.season}
                 onChange={handlePlanChange}
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:ring-2 focus:ring-green-400"
-              />
+              >
+                {SEASONS.map((season) => (
+                  <option key={season} value={season} className="bg-zinc-900 text-white">
+                    {season}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="mb-1 block text-xs font-medium text-white/55">

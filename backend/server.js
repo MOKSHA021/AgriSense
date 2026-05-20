@@ -7,6 +7,7 @@ const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 const marketRoutes = require("./routes/market");
 const expenseRoutes = require("./routes/expenses");
+const inputAdvisorRoutes = require("./routes/inputAdvisor");
 
 
 
@@ -36,6 +37,7 @@ app.use('/api/', limiter);
 app.use('/api/auth', require('./routes/auth'));
 app.use("/api/market", marketRoutes);
 app.use("/api/expenses", expenseRoutes);
+app.use("/api/input-advisor", inputAdvisorRoutes);
 
 app.get('/', (req, res) => res.json({ status: 'AgriSense Backend Running' }));
 

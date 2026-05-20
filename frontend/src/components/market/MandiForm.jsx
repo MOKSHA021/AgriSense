@@ -1,95 +1,113 @@
+import { MapPin, PackageSearch, Scale, Store, Trophy, Wheat } from "lucide-react";
 import LocationSearchBox from "./LocationSearchBox";
 import { CROPS, STATES } from "./constants";
 
 const MandiForm = ({
-  mandiForm, setMandiForm,
-  mandiDistricts, districtLoading, districtError,
-  mandiError, mandiLoading,
-  farmerLocation, farmerAddress,
-  clickMode, setClickMode,
-  onFarmerSearch, onMandiSearch,
-  onSubmit, fetchDistricts,
+  mandiForm,
+  setMandiForm,
+  mandiDistricts,
+  districtLoading,
+  districtError,
+  mandiError,
+  mandiLoading,
+  farmerLocation,
+  farmerAddress,
+  clickMode,
+  setClickMode,
+  onFarmerSearch,
+  onMandiSearch,
+  onSubmit,
+  fetchDistricts,
 }) => {
   return (
-    <div className="bg-black/40 backdrop-blur-md rounded-3xl p-8 shadow-lg border border-white/10">
-      <h2 className="text-xl font-bold text-white mb-1">🏆 Find Best Mandi</h2>
-      <p className="text-white/50 text-sm mb-6">
-        Ranked mandis with real road transport costs.
+    <div className="rounded-3xl border border-white/10 bg-black/40 p-8 shadow-lg backdrop-blur-xl">
+      <h2 className="mb-1 flex items-center gap-2 text-xl font-bold text-white">
+        <Trophy className="h-5 w-5 text-green-400" />
+        Find Best Mandi
+      </h2>
+      <p className="mb-6 text-sm text-white/50">
+        Ranked mandis with road distance and transport cost.
       </p>
 
-      {/* Farmer Location */}
-      <div className="mb-4 p-4 bg-blue-500/10 border border-blue-500/20 rounded-2xl space-y-3">
+      <div className="mb-4 space-y-3 rounded-2xl border border-green-500/20 bg-green-500/10 p-4">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-semibold text-white/70">🚜 Farmer Location</label>
+          <label className="flex items-center gap-2 text-sm font-semibold text-white/70">
+            <MapPin className="h-4 w-4 text-green-400" />
+            Farmer Location
+          </label>
           <button
             type="button"
             onClick={() => setClickMode(clickMode === "farmer" ? null : "farmer")}
-            className={`text-xs px-3 py-1 rounded-full transition ${
+            className={`rounded-full px-3 py-1 text-xs transition ${
               clickMode === "farmer"
-                ? "bg-blue-700 text-white"
-                : "bg-blue-500 text-white hover:bg-blue-600"
+                ? "bg-green-700 text-white"
+                : "bg-green-500 text-white hover:bg-green-600"
             }`}
           >
-            {clickMode === "farmer" ? "🖱️ Click Map..." : "📍 Click to Pin"}
+            {clickMode === "farmer" ? "Click Map..." : "Click to Pin"}
           </button>
         </div>
-        <LocationSearchBox
-          placeholder="Search village / town..."
-          onSelect={onFarmerSearch}
-        />
-        <p className="text-xs text-white/50 truncate">
-          📌 {farmerAddress || `${farmerLocation[0].toFixed(4)}, ${farmerLocation[1].toFixed(4)}`}
+        <LocationSearchBox placeholder="Search village / town..." onSelect={onFarmerSearch} />
+        <p className="truncate text-xs text-white/50">
+          {farmerAddress || `${farmerLocation[0].toFixed(4)}, ${farmerLocation[1].toFixed(4)}`}
         </p>
       </div>
 
-      {/* Manual Mandi Location */}
-      <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl space-y-3">
+      <div className="mb-6 space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-semibold text-white/70">🏪 Pin Mandi Manually</label>
+          <label className="flex items-center gap-2 text-sm font-semibold text-white/70">
+            <Store className="h-4 w-4 text-green-400" />
+            Pin Mandi Manually
+          </label>
           <button
             type="button"
             onClick={() => setClickMode(clickMode === "mandi" ? null : "mandi")}
-            className={`text-xs px-3 py-1 rounded-full transition ${
+            className={`rounded-full px-3 py-1 text-xs transition ${
               clickMode === "mandi"
-                ? "bg-red-700 text-white"
-                : "bg-red-400 text-white hover:bg-red-500"
+                ? "bg-green-700 text-white"
+                : "bg-green-500 text-white hover:bg-green-600"
             }`}
           >
-            {clickMode === "mandi" ? "🖱️ Click Map..." : "📍 Click to Pin"}
+            {clickMode === "mandi" ? "Click Map..." : "Click to Pin"}
           </button>
         </div>
-        <LocationSearchBox
-          placeholder="Search mandi / market name..."
-          onSelect={(coords) => onMandiSearch(coords)}
-        />
+        <LocationSearchBox placeholder="Search mandi / market name..." onSelect={onMandiSearch} />
       </div>
 
       {mandiError && (
-        <div className="bg-red-500/20 text-red-300 text-sm px-4 py-3 rounded-2xl mb-4 border border-red-500/30">
-          ⚠️ {mandiError}
+        <div className="mb-4 rounded-2xl border border-red-500/30 bg-red-500/20 px-4 py-3 text-sm text-red-300">
+          {mandiError}
         </div>
       )}
 
       <form onSubmit={onSubmit} className="flex flex-col gap-5">
-        {/* Crop */}
         <div>
-          <label className="text-sm font-semibold text-white/70 mb-1.5 block">🌾 Crop</label>
+          <label className="mb-1.5 flex items-center gap-2 text-sm font-semibold text-white/70">
+            <Wheat className="h-4 w-4 text-green-400" />
+            Crop
+          </label>
           <select
             value={mandiForm.crop}
             onChange={(e) => setMandiForm({ ...mandiForm, crop: e.target.value })}
             required
-            className="w-full px-4 py-3 border border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white/10"
+            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-green-400"
           >
-            <option value="">Select crop</option>
-            {CROPS.map((c) => (
-              <option key={c.name} value={c.name}>{c.icon} {c.name}</option>
+            <option value="" className="bg-zinc-900 text-white">
+              Select crop
+            </option>
+            {CROPS.map((crop) => (
+              <option key={crop.name} value={crop.name} className="bg-zinc-900 text-white">
+                {crop.name}
+              </option>
             ))}
           </select>
         </div>
 
-        {/* Quantity */}
         <div>
-          <label className="text-sm font-semibold text-white/70 mb-1.5 block">⚖️ Quantity (quintals)</label>
+          <label className="mb-1.5 flex items-center gap-2 text-sm font-semibold text-white/70">
+            <Scale className="h-4 w-4 text-green-400" />
+            Quantity (quintals)
+          </label>
           <input
             type="number"
             min="1"
@@ -97,13 +115,15 @@ const MandiForm = ({
             value={mandiForm.quantity}
             onChange={(e) => setMandiForm({ ...mandiForm, quantity: e.target.value })}
             required
-            className="w-full px-4 py-3 border border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white/10"
+            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-green-400"
           />
         </div>
 
-        {/* State */}
         <div>
-          <label className="text-sm font-semibold text-white/70 mb-1.5 block">📍 State</label>
+          <label className="mb-1.5 flex items-center gap-2 text-sm font-semibold text-white/70">
+            <MapPin className="h-4 w-4 text-green-400" />
+            State
+          </label>
           <select
             value={mandiForm.state}
             onChange={(e) => {
@@ -111,21 +131,25 @@ const MandiForm = ({
               fetchDistricts(e.target.value);
             }}
             required
-            className="w-full px-4 py-3 border border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white/10"
+            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-green-400"
           >
-            <option value="">Select state</option>
-            {STATES.map((s) => (
-              <option key={s} value={s}>{s}</option>
+            <option value="" className="bg-zinc-900 text-white">
+              Select state
+            </option>
+            {STATES.map((state) => (
+              <option key={state} value={state} className="bg-zinc-900 text-white">
+                {state}
+              </option>
             ))}
           </select>
         </div>
 
-        {/* District */}
         <div>
-          <label className="text-sm font-semibold text-white/70 mb-1.5 block">
-            🏘️ District
+          <label className="mb-1.5 flex items-center gap-2 text-sm font-semibold text-white/70">
+            <MapPin className="h-4 w-4 text-green-400" />
+            District
             {districtLoading && (
-              <span className="text-xs text-amber-500 ml-2 font-normal">Loading...</span>
+              <span className="ml-2 text-xs font-normal text-green-400">Loading...</span>
             )}
           </label>
           <select
@@ -133,26 +157,27 @@ const MandiForm = ({
             onChange={(e) => setMandiForm({ ...mandiForm, district: e.target.value })}
             required
             disabled={!mandiForm.state || districtLoading}
-            className="w-full px-4 py-3 border border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white/10 disabled:opacity-50"
+            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-green-400 disabled:opacity-50"
           >
-            <option value="">
+            <option value="" className="bg-zinc-900 text-white">
               {districtLoading ? "Loading districts..." : "Select district"}
             </option>
-            {mandiDistricts.map((d) => (
-              <option key={d} value={d}>{d}</option>
+            {mandiDistricts.map((district) => (
+              <option key={district} value={district} className="bg-zinc-900 text-white">
+                {district}
+              </option>
             ))}
           </select>
-          {districtError && (
-            <p className="text-xs text-red-500 mt-1.5">⚠️ {districtError}</p>
-          )}
+          {districtError && <p className="mt-1.5 text-xs text-red-300">{districtError}</p>}
         </div>
 
         <button
           type="submit"
           disabled={mandiLoading}
-          className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-2xl hover:from-amber-600 hover:to-orange-600 disabled:opacity-50 shadow-md transition-all duration-200"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-green-500 py-3.5 font-bold text-white shadow-md shadow-green-900/20 transition-all duration-200 hover:bg-green-600 disabled:opacity-50"
         >
-          {mandiLoading ? "⏳ Finding mandis..." : "🏆 Find Best Mandi →"}
+          <PackageSearch className="h-4 w-4" />
+          {mandiLoading ? "Finding mandis..." : "Find Best Mandi"}
         </button>
       </form>
     </div>
