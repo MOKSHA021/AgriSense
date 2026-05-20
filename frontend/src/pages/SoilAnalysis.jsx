@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import Navbar from "../components/Navbar";
+import API from "../services/api";
 import {
   Upload,
   Camera,
@@ -12,7 +13,9 @@ import {
   CheckCircle2,
   Sprout,
   MapPin,
+  AlertTriangle,
 } from "lucide-react";
+
 
 const soilDatabase = {
   Alluvial: {
@@ -50,7 +53,29 @@ const soilDatabase = {
     phRange: "5.5 - 7.0",
     crops: ["Groundnut", "Millets", "Barley", "Pulses", "Potato"],
   },
+  Arid: {
+    color: "Light brown to grey",
+    texture: "Sandy with low organic matter",
+    drainage: "Excessive (desert-type)",
+    phRange: "7.5 - 8.5",
+    crops: ["Bajra", "Barley", "Guar", "Mustard", "Date Palm"],
+  },
+  Mountain: {
+    color: "Dark brown to black",
+    texture: "Loamy with high organic matter",
+    drainage: "Well-drained on slopes",
+    phRange: "5.0 - 6.5",
+    crops: ["Apple", "Tea", "Potato", "Ginger", "Cardamom"],
+  },
+  Yellow: {
+    color: "Yellow to yellowish-brown",
+    texture: "Fine to medium loam",
+    drainage: "Moderate",
+    phRange: "5.5 - 6.5",
+    crops: ["Rice", "Jute", "Pulses", "Oilseeds", "Vegetables"],
+  },
 };
+
 
 const previousCropOptions = ["Rice", "Wheat", "Maize", "Cotton", "Sugarcane", "None"];
 
@@ -149,17 +174,41 @@ const SoilAnalysis = () => {
     );
   };
 
+  const [uploadError, setUploadError] = useState("");
+
+  // ── Call backend → ML service for soil image classification ──
+  const analyseSoilImage = async (file) => {
+    setUploadResult(null);
+    setUploadError("");
+    setUploadAnalyzing(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const { data } = await API.post("/ml/predict/soil", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      // data.soil_type_clean is normalised by backend: "Alluvial_Soil" → "Alluvial"
+      const clean = data.soil_type_clean ||
+        (data.soil_type || "").replace(/_Soil$/i, "").replace(/_/g, " ");
+      setUploadResult({
+        soilType:   clean,
+        confidence: data.confidence,
+        allScores:  data.all_scores,
+      });
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message || "Soil analysis failed";
+      setUploadError(msg);
+    } finally {
+      setUploadAnalyzing(false);
+    }
+  };
+
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const url = URL.createObjectURL(file);
     setPreview(url);
-    setUploadResult(null);
-    setUploadAnalyzing(true);
-    setTimeout(() => {
-      setUploadAnalyzing(false);
-      setUploadResult("Alluvial");
-    }, 1500);
+    analyseSoilImage(file);
   };
 
   const handleDrop = (e) => {
@@ -168,12 +217,7 @@ const SoilAnalysis = () => {
     if (!file || !file.type.startsWith("image/")) return;
     const url = URL.createObjectURL(file);
     setPreview(url);
-    setUploadResult(null);
-    setUploadAnalyzing(true);
-    setTimeout(() => {
-      setUploadAnalyzing(false);
-      setUploadResult("Alluvial");
-    }, 1500);
+    analyseSoilImage(file);
   };
 
   const handleAnalyze = () => {
@@ -181,9 +225,17 @@ const SoilAnalysis = () => {
     setManualResult(type);
   };
 
-  const renderSoilResult = (soilType, title) => {
+  // ── Render soil result — now accepts either a string (manual) or an object (ML) ──
+  const renderSoilResult = (soilResult, title) => {
+    // soilResult may be a plain string (manual) or { soilType, confidence, allScores } (ML)
+    const soilType = typeof soilResult === "string" ? soilResult : soilResult?.soilType;
+    const confidence = typeof soilResult === "object" ? soilResult?.confidence : null;
     const data = soilDatabase[soilType];
-    if (!data) return null;
+    if (!data) return (
+      <div className="mt-6 text-sm text-amber-300 border border-amber-500/30 bg-amber-500/10 rounded-lg px-4 py-3">
+        ⚠️ Soil type <strong>{soilType}</strong> not found in local database. The ML model detected it but we don't have display data for this type yet.
+      </div>
+    );
 
     return (
       <div className="space-y-4 mt-6">
@@ -195,6 +247,11 @@ const SoilAnalysis = () => {
         <div className="border border-green-500/30 bg-green-500/20 rounded-lg px-4 py-3">
           <p className="text-sm font-medium text-green-300">
             Detected Soil Type: <span className="font-bold">{soilType} Soil</span>
+            {confidence != null && (
+              <span className="ml-2 text-green-400 text-xs">
+                ({(confidence * 100).toFixed(1)}% confidence)
+              </span>
+            )}
           </p>
         </div>
 
@@ -412,7 +469,14 @@ const SoilAnalysis = () => {
               {uploadAnalyzing && (
                 <div className="flex items-center gap-2 text-sm text-white/60">
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Analyzing soil sample...</span>
+                  <span>Analyzing soil sample with AI model...</span>
+                </div>
+              )}
+
+              {uploadError && (
+                <div className="flex items-center gap-2 text-sm text-red-400 border border-red-500/30 bg-red-500/10 rounded-lg px-3 py-2">
+                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                  <span>{uploadError}</span>
                 </div>
               )}
 
@@ -422,6 +486,7 @@ const SoilAnalysis = () => {
                 onClick={() => {
                   setPreview(null);
                   setUploadResult(null);
+                  setUploadError("");
                   setUploadAnalyzing(false);
                   if (fileInputRef.current) fileInputRef.current.value = "";
                 }}

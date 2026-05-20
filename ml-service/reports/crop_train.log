@@ -1,0 +1,65 @@
+2026-03-11 19:39:39,728 | INFO | === AgriSense | Crop Model Training Started ===
+2026-03-11 19:39:39,769 | INFO | Loaded dataset: 2200 rows × 8 cols
+2026-03-11 19:39:39,802 | INFO | Class distribution (min=100, max=100, classes=22):
+label
+rice           100
+maize          100
+chickpea       100
+kidneybeans    100
+pigeonpeas     100
+mothbeans      100
+mungbean       100
+blackgram      100
+lentil         100
+pomegranate    100
+banana         100
+mango          100
+grapes         100
+watermelon     100
+muskmelon      100
+apple          100
+orange         100
+papaya         100
+coconut        100
+cotton         100
+jute           100
+coffee         100
+2026-03-11 19:39:39,812 | INFO | Train: 1760 | Test: 440
+2026-03-11 19:39:39,813 | INFO | Training with default params (skip --tune to run search)…
+2026-03-11 19:39:41,351 | INFO | Test Accuracy : 99.55%
+2026-03-11 19:39:41,352 | INFO | Weighted F1   : 0.9955
+2026-03-11 19:39:41,367 | INFO | 
+              precision    recall  f1-score   support
+
+       apple       1.00      1.00      1.00        20
+      banana       1.00      1.00      1.00        20
+   blackgram       1.00      0.95      0.97        20
+    chickpea       1.00      1.00      1.00        20
+     coconut       1.00      1.00      1.00        20
+      coffee       1.00      1.00      1.00        20
+      cotton       1.00      1.00      1.00        20
+      grapes       1.00      1.00      1.00        20
+        jute       0.95      1.00      0.98        20
+ kidneybeans       1.00      1.00      1.00        20
+      lentil       1.00      1.00      1.00        20
+       maize       0.95      1.00      0.98        20
+       mango       1.00      1.00      1.00        20
+   mothbeans       1.00      1.00      1.00        20
+    mungbean       1.00      1.00      1.00        20
+   muskmelon       1.00      1.00      1.00        20
+      orange       1.00      1.00      1.00        20
+      papaya       1.00      1.00      1.00        20
+  pigeonpeas       1.00      1.00      1.00        20
+ pomegranate       1.00      1.00      1.00        20
+        rice       1.00      0.95      0.97        20
+  watermelon       1.00      1.00      1.00        20
+
+    accuracy                           1.00       440
+   macro avg       1.00      1.00      1.00       440
+weighted avg       1.00      1.00      1.00       440
+
+2026-03-11 19:39:41,491 | INFO | Feature importances: {'N': 0.10391, 'P': 0.15367, 'K': 0.17917, 'temperature': 0.07584, 'humidity': 0.21194, 'ph': 0.05394, 'rainfall': 0.22153}
+2026-03-11 19:39:41,884 | INFO | Model saved   → C:\Users\moksh\AgriSense\ml-service\models\crop_model.pkl
+2026-03-11 19:39:41,884 | INFO | Encoder saved → C:\Users\moksh\AgriSense\ml-service\models\label_encoder.pkl
+2026-03-11 19:39:41,884 | INFO | Report saved  → C:\Users\moksh\AgriSense\ml-service\reports\crop_model_report.json
+2026-03-11 19:39:41,885 | INFO | === Training Complete ===

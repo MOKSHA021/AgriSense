@@ -1,0 +1,26 @@
+{
+  "trained_at": "2026-03-11T19:16:30.938588+00:00",
+  "crops": [
+    {
+      "crop": "Rice",
+      "status": "success",
+      "metrics": {},
+      "rows": 3541,
+      "date_range": "2001-01-08 \u2192 2026-12-02"
+    },
+    {
+      "crop": "Mustard",
+      "status": "success",
+      "metrics": {},
+      "rows": 8941,
+      "date_range": "2001-03-20 \u2192 2026-03-01"
+    },
+    {
+      "crop": "Tomato",
+      "status": "success",
+      "metrics": {},
+      "rows": 3563,
+      "date_range": "2001-01-04 \u2192 2026-12-02"
+    }
+  ]
+}

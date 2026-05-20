@@ -1,0 +1,47 @@
+2026-03-12 00:47:22,302 | INFO | agrisense | [soil] EfficientNet-B0 loaded | Classes: ['Alluvial_Soil', 'Arid_Soil', 'Black_Soil', 'Laterite_Soil', 'Mountain_Soil', 'Red_Soil', 'Yellow_Soil']
+2026-03-12 00:47:37,939 | INFO | agrisense | [crop] Pipeline loaded | Classes: 22 crops | Soil types available: ['Alluvial_Soil', 'Black_Soil', 'Red_Soil', 'Laterite_Soil', 'Arid_Soil', 'Yellow_Soil', 'Mountain_Soil']
+2026-03-12 00:47:37,996 | INFO | agrisense | =======================================================
+2026-03-12 00:47:37,996 | INFO | agrisense |   AgriSense ML Service — Starting Up
+2026-03-12 00:47:37,997 | INFO | agrisense |   Time    : 2026-03-11T19:17:37.997018Z
+2026-03-12 00:47:37,997 | INFO | agrisense |   Base dir: C:\Users\moksh\AgriSense\ml-service
+2026-03-12 00:47:37,998 | INFO | agrisense |   All core model files found ✅
+2026-03-12 00:47:37,998 | INFO | agrisense | =======================================================
+2026-03-12 00:47:52,861 | INFO | agrisense | → GET /docs
+2026-03-12 00:47:52,863 | INFO | agrisense | ← GET /docs | 200
+2026-03-12 00:47:53,580 | INFO | agrisense | → GET /openapi.json
+2026-03-12 00:47:53,625 | INFO | agrisense | ← GET /openapi.json | 200
+2026-03-12 00:48:42,868 | INFO | agrisense | → POST /predict/soil
+2026-03-12 00:48:43,194 | INFO | agrisense | [soil] → Mountain_Soil (92.71%) | file=cherry-blossom-in-lava-p8cc9zmjtwvlmuvy.jpg size=321KB
+2026-03-12 00:48:43,196 | INFO | agrisense | ← POST /predict/soil | 200
+2026-03-12 00:49:19,720 | INFO | agrisense | → POST /predict/soil
+2026-03-12 00:49:19,874 | INFO | agrisense | [soil] → Mountain_Soil (92.71%) | file=cherry-blossom-in-lava-p8cc9zmjtwvlmuvy.jpg size=321KB
+2026-03-12 00:49:19,876 | INFO | agrisense | ← POST /predict/soil | 200
+2026-03-12 00:50:18,518 | INFO | agrisense | → POST /predict/soil
+2026-03-12 00:50:18,629 | INFO | agrisense | [soil] → Black_Soil (99.55%) | file=Screenshot 2026-03-01 200112.png size=308KB
+2026-03-12 00:50:18,631 | INFO | agrisense | ← POST /predict/soil | 200
+2026-03-12 00:50:53,837 | INFO | agrisense | → POST /predict/soil
+2026-03-12 00:50:54,047 | INFO | agrisense | [soil] → Black_Soil (99.55%) | file=Screenshot 2026-03-01 200112.png size=308KB
+2026-03-12 00:50:54,048 | INFO | agrisense | ← POST /predict/soil | 200
+2026-05-19 16:49:23,299 | INFO | agrisense | [soil] EfficientNet-B0 loaded | Classes: ['Alluvial_Soil', 'Arid_Soil', 'Black_Soil', 'Laterite_Soil', 'Mountain_Soil', 'Red_Soil', 'Yellow_Soil']
+2026-05-19 16:49:40,306 | INFO | agrisense | [crop] Pipeline loaded | Classes: 22 crops | Soil types available: ['Alluvial_Soil', 'Black_Soil', 'Red_Soil', 'Laterite_Soil', 'Arid_Soil', 'Yellow_Soil', 'Mountain_Soil']
+2026-05-19 16:49:40,327 | INFO | agrisense | =======================================================
+2026-05-19 16:49:40,327 | INFO | agrisense |   AgriSense ML Service — Starting Up
+2026-05-19 16:49:40,328 | INFO | agrisense |   Time    : 2026-05-19T11:19:40.328029Z
+2026-05-19 16:49:40,328 | INFO | agrisense |   Base dir: C:\Users\moksh\AgriSense\ml-service
+2026-05-19 16:49:40,328 | INFO | agrisense |   All core model files found ✅
+2026-05-19 16:49:40,328 | INFO | agrisense | =======================================================
+2026-05-19 16:51:17,515 | INFO | agrisense | → GET /
+2026-05-19 16:51:17,518 | INFO | agrisense | ← GET / | 200
+2026-05-20 08:51:04,597 | INFO | agrisense | → POST /predict/soil
+2026-05-20 08:51:06,128 | INFO | agrisense | [soil] → Red_Soil (71.50%) | file=Screenshot 2026-05-20 085036.png size=606KB
+2026-05-20 08:51:06,168 | INFO | agrisense | ← POST /predict/soil | 200
+2026-05-20 08:53:14,001 | INFO | agrisense | → POST /predict/soil
+2026-05-20 08:53:14,966 | INFO | agrisense | [soil] → Laterite_Soil (81.72%) | file=Screenshot 2026-05-20 085208.png size=355KB
+2026-05-20 08:53:14,967 | INFO | agrisense | ← POST /predict/soil | 200
+2026-05-20 08:53:39,706 | INFO | agrisense | → POST /predict/soil
+2026-05-20 08:53:39,826 | INFO | agrisense | [soil] → Red_Soil (71.50%) | file=Screenshot 2026-05-20 085036.png size=606KB
+2026-05-20 08:53:39,827 | INFO | agrisense | ← POST /predict/soil | 200
+2026-05-20 08:54:34,363 | INFO | agrisense | → POST /predict/soil
+2026-05-20 08:54:34,734 | INFO | agrisense | [soil] → Alluvial_Soil (74.48%) | file=Screenshot 2026-05-20 085413.png size=261KB
+2026-05-20 08:54:34,736 | INFO | agrisense | ← POST /predict/soil | 200
+2026-05-20 10:14:36,441 | INFO | agrisense | AgriSense ML Service — Shutting Down

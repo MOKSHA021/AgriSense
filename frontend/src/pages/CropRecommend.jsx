@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
-import { Sprout, TrendingUp, IndianRupee, BarChart3, MapPin, Loader } from "lucide-react";
+import API from "../services/api";
+import { Sprout, TrendingUp, IndianRupee, BarChart3, MapPin, Loader, Cpu } from "lucide-react";
 
 
 const SOIL_PRESETS = {
@@ -164,6 +165,8 @@ export default function CropRecommend() {
   const [locationStatus, setLocationStatus] = useState("idle");
   const [locationName, setLocationName] = useState("");
   const [soilStatus, setSoilStatus] = useState("idle");
+  const [mlStatus, setMlStatus] = useState("idle"); // "idle" | "loading" | "ok" | "fallback"
+  const [activeSoilTypeForML, setActiveSoilTypeForML] = useState("Alluvial"); // tracks which soil is selected
 
   useEffect(() => {
     if (!navigator.geolocation) return;
@@ -257,6 +260,7 @@ export default function CropRecommend() {
 
   function applySoil(name) {
     setActiveSoil(name);
+    setActiveSoilTypeForML(name); // keep ML soil type in sync
     setForm((prev) => ({
       ...prev,
       N: SOIL_PRESETS[name].N,
@@ -265,7 +269,7 @@ export default function CropRecommend() {
     }));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     const inputs = {
       N: Number(form.N),
@@ -278,16 +282,49 @@ export default function CropRecommend() {
       irrigationType,
     };
 
-    const scored = CROPS.map((crop) => {
-      const match = scoreCrop(crop, inputs);
-      const revenue = crop.yield * crop.price;
-      const cost = Math.round(revenue * crop.cost_pct);
-      const profit = revenue - cost;
-      return { ...crop, match, revenue, cost, profit };
-    });
+    // ── Try ML service first ──
+    const soilType = activeSoilTypeForML || activeSoil || "Alluvial";
+    setMlStatus("loading");
+    try {
+      const { data } = await API.post("/ml/predict/crop", {
+        soil_type:   soilType,
+        temperature: inputs.temperature,
+        humidity:    inputs.humidity,
+        rainfall:    inputs.rainfall,
+      });
 
-    scored.sort((a, b) => b.match - a.match);
-    setResults(scored.slice(0, 5));
+      // Enrich ML crops with local financial data
+      const enriched = (data.crops || []).map((mlCrop) => {
+        const local = CROPS.find(
+          (c) => c.name.toLowerCase() === mlCrop.crop.toLowerCase()
+        );
+        const revenue = local ? local.yield * local.price : 0;
+        const cost    = local ? Math.round(revenue * local.cost_pct) : 0;
+        const profit  = revenue - cost;
+        return {
+          name:    mlCrop.crop,
+          match:   Math.round(mlCrop.score * 100),
+          tip:     local?.tip || "Consult your local agricultural extension officer for cultivation tips.",
+          revenue, cost, profit,
+        };
+      });
+
+      setResults(enriched);
+      setMlStatus("ok");
+    } catch (mlErr) {
+      // ── Fallback to local scoring ──
+      console.warn("[CropRecommend] ML service unavailable, using local scoring:", mlErr.message);
+      const scored = CROPS.map((crop) => {
+        const match   = scoreCrop(crop, inputs);
+        const revenue = crop.yield * crop.price;
+        const cost    = Math.round(revenue * crop.cost_pct);
+        const profit  = revenue - cost;
+        return { ...crop, match, revenue, cost, profit };
+      });
+      scored.sort((a, b) => b.match - a.match);
+      setResults(scored.slice(0, 5));
+      setMlStatus("fallback");
+    }
   }
 
   const fields = [
@@ -338,6 +375,17 @@ export default function CropRecommend() {
             {soilStatus === "error" && (
               <div className="flex items-center gap-2 text-sm text-white/40 ml-6">
                 <span>⚠️ Soil data unavailable — use manual presets or enter values</span>
+              </div>
+            )}
+            {mlStatus === "fallback" && (
+              <div className="flex items-center gap-2 text-sm text-orange-300 ml-6">
+                <span>🤖 ML service offline — showing local scoring results</span>
+              </div>
+            )}
+            {mlStatus === "ok" && (
+              <div className="flex items-center gap-2 text-sm text-emerald-300 ml-6">
+                <Cpu className="w-3.5 h-3.5" />
+                <span>Results powered by ML model (Random Forest)</span>
               </div>
             )}
           </div>
@@ -413,9 +461,14 @@ export default function CropRecommend() {
 
               <button
                 type="submit"
-                className="w-full bg-green-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+                className="w-full bg-green-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors disabled:opacity-60"
+                disabled={mlStatus === "loading"}
               >
-                Get Recommendations
+                {mlStatus === "loading" ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader className="w-4 h-4 animate-spin" /> Running ML Model...
+                  </span>
+                ) : "Get Recommendations"}
               </button>
             </form>
           </div>

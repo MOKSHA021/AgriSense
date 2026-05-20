@@ -1,0 +1,106 @@
+2026-03-11 19:39:56,957 | INFO | === AgriSense | Price Model Training Started ===
+2026-03-11 19:39:56,958 | INFO | Loading yearly CSV files…
+2026-03-11 19:39:56,960 | WARNING | Missing yearly CSVs for: [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
+2026-03-11 19:39:59,499 | WARNING |   ⚠️  Agriculture_price_dataset.csv missing columns {'Arrival_Date'} (found: ['STATE', 'District Name', 'Market Name', 'Commodity', 'Variety', 'Grade', 'Min_Price', 'Max_Price', 'Modal_Price', 'Price Date']) — skipping
+2026-03-11 19:39:59,540 | WARNING |   ⚠️  crop_price_dataset.csv missing columns {'Arrival_Date', 'Modal_Price', 'Commodity'} (found: ['month', 'commodity_name', 'avg_modal_price', 'avg_min_price', 'avg_max_price', 'state_name', 'district_name', 'calculationType', 'change']) — skipping
+2026-03-11 19:39:59,541 | INFO | Loading individual crop CSVs…
+2026-03-11 19:39:59,567 | WARNING |   ⚠️  prices_Wheat.csv missing columns {'Arrival_Date', 'Modal_Price'} (found: ['ds', 'y', 'district', 'market', 'Commodity']) — skipping
+2026-03-11 19:39:59,587 | WARNING |   ⚠️  prices_Rice.csv missing columns {'Arrival_Date', 'Modal_Price'} (found: ['ds', 'y', 'district', 'market', 'Commodity']) — skipping
+2026-03-11 19:39:59,613 | WARNING |   ⚠️  prices_Maize.csv missing columns {'Arrival_Date', 'Modal_Price'} (found: ['ds', 'y', 'district', 'market', 'Commodity']) — skipping
+2026-03-11 19:39:59,636 | WARNING |   ⚠️  prices_Mustard.csv missing columns {'Arrival_Date', 'Modal_Price'} (found: ['ds', 'y', 'district', 'market', 'Commodity']) — skipping
+2026-03-11 19:44:10,699 | INFO | === AgriSense | Price Model Training Started ===
+2026-03-11 19:44:10,700 | INFO | Loading yearly CSV files…
+2026-03-11 19:44:10,702 | INFO | Files in C:\Users\moksh\AgriSense\ml-service\data\parquet: ['2001.parquet', '2002.parquet', '2003.parquet', '2004.parquet', '2005.parquet', '2006.parquet', '2007.parquet', '2008.parquet', '2009.parquet', '2010.parquet']...
+2026-03-11 19:44:10,705 | WARNING |   Missing yearly CSVs: [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
+2026-03-11 19:44:10,706 | INFO | Loading Agriculture_price_dataset.csv…
+2026-03-11 19:44:13,156 | INFO |   ✅ Agriculture_price_dataset.csv: 737,392 rows
+2026-03-11 19:44:13,158 | INFO | Loading crop_price_dataset.csv…
+2026-03-11 19:44:13,177 | INFO |   ✅ crop_price_dataset.csv: 549 rows
+2026-03-11 19:44:13,178 | INFO | Loading individual crop CSVs…
+2026-03-11 19:44:13,191 | INFO |   ✅ prices_Wheat.csv: 84 rows → 'Wheat'
+2026-03-11 19:44:13,199 | INFO |   ✅ prices_Rice.csv: 2 rows → 'Rice'
+2026-03-11 19:44:13,208 | INFO |   ✅ prices_Maize.csv: 34 rows → 'Maize'
+2026-03-11 19:44:13,215 | INFO |   ✅ prices_Mustard.csv: 22 rows → 'Mustard'
+2026-03-11 19:44:13,393 | INFO | Removed 529,258 duplicate rows after merge
+2026-03-11 19:44:13,393 | INFO | 
+Total records loaded : 208,825
+2026-03-11 19:44:13,404 | INFO | Crops found          : ['Wheat', 'Tomato', 'Potato', 'Onion', 'Rice', 'Maize', 'Mustard']
+2026-03-11 19:44:13,480 | INFO | [Wheat] Training Prophet | 97 daily points | 2023-01-07 → 2024-12-01
+2026-03-11 19:44:14,012 | INFO | Chain [1] start processing
+2026-03-11 19:44:16,231 | INFO | Chain [1] done processing
+2026-03-11 19:44:16,281 | INFO | [Wheat] ✅ Saved → C:\Users\moksh\AgriSense\ml-service\models\prophet_Wheat.pkl
+2026-03-11 19:44:16,311 | WARNING | [Rice] Skipping — only 25 rows (min=90)
+2026-03-11 19:44:16,329 | INFO | [Maize] Training Prophet | 184 daily points | 2010-01-01 → 2026-01-03
+2026-03-11 19:44:16,711 | INFO | Chain [1] start processing
+2026-03-11 19:44:17,187 | INFO | Chain [1] done processing
+2026-03-11 19:44:17,236 | INFO | [Maize] ✅ Saved → C:\Users\moksh\AgriSense\ml-service\models\prophet_Maize.pkl
+2026-03-11 19:44:17,253 | WARNING | [Mustard] Skipping — only 1 rows (min=90)
+2026-03-11 19:44:17,277 | WARNING | [Tomato] Skipping — only 61 rows (min=90)
+2026-03-11 19:44:17,354 | INFO | [Potato] Training Prophet | 294 daily points | 2023-01-07 → 2025-12-05
+2026-03-11 19:44:17,763 | INFO | Chain [1] start processing
+2026-03-11 19:44:17,880 | INFO | Chain [1] done processing
+2026-03-11 19:44:17,912 | INFO | [Potato] ✅ Saved → C:\Users\moksh\AgriSense\ml-service\models\prophet_Potato.pkl
+2026-03-11 19:44:17,967 | INFO | [Onion] Training Prophet | 260 daily points | 2023-01-07 → 2025-12-05
+2026-03-11 19:44:18,321 | INFO | Chain [1] start processing
+2026-03-11 19:44:18,457 | INFO | Chain [1] done processing
+2026-03-11 19:44:18,486 | INFO | [Onion] ✅ Saved → C:\Users\moksh\AgriSense\ml-service\models\prophet_Onion.pkl
+2026-03-11 19:44:18,489 | INFO | 
+🎉 Done! 4/7 crops trained successfully
+2026-03-11 19:44:18,489 | INFO | Report → C:\Users\moksh\AgriSense\ml-service\reports\price_model_report.json
+2026-03-12 00:45:32,847 | INFO | === AgriSense | Price Model Training Started ===
+2026-03-12 00:45:32,848 | INFO | Loading yearly files (parquet/csv)…
+2026-03-12 00:45:32,850 | INFO | Files in C:\Users\moksh\AgriSense\ml-service\data\parquet: ['2001.parquet', '2002.parquet', '2003.parquet', '2004.parquet', '2005.parquet', '2006.parquet', '2007.parquet', '2008.parquet', '2009.parquet', '2010.parquet']...
+2026-03-12 00:45:34,470 | INFO |   ✅ 2001.parquet: 3,387 rows
+2026-03-12 00:45:34,602 | INFO |   ✅ 2002.parquet: 76,254 rows
+2026-03-12 00:45:34,891 | INFO |   ✅ 2003.parquet: 225,259 rows
+2026-03-12 00:45:35,191 | INFO |   ✅ 2004.parquet: 228,543 rows
+2026-03-12 00:45:35,576 | INFO |   ✅ 2005.parquet: 292,398 rows
+2026-03-12 00:45:36,202 | INFO |   ✅ 2006.parquet: 511,855 rows
+2026-03-12 00:45:36,925 | INFO |   ✅ 2007.parquet: 611,353 rows
+2026-03-12 00:45:37,671 | INFO |   ✅ 2008.parquet: 662,687 rows
+2026-03-12 00:45:38,392 | INFO |   ✅ 2009.parquet: 609,680 rows
+2026-03-12 00:45:39,259 | INFO |   ✅ 2010.parquet: 694,967 rows
+2026-03-12 00:45:40,094 | INFO |   ✅ 2011.parquet: 740,986 rows
+2026-03-12 00:45:41,091 | INFO |   ✅ 2012.parquet: 750,696 rows
+2026-03-12 00:45:42,011 | INFO |   ✅ 2013.parquet: 768,924 rows
+2026-03-12 00:45:43,010 | INFO |   ✅ 2014.parquet: 782,505 rows
+2026-03-12 00:45:44,092 | INFO |   ✅ 2015.parquet: 883,325 rows
+2026-03-12 00:45:45,147 | INFO |   ✅ 2016.parquet: 845,229 rows
+2026-03-12 00:45:46,391 | INFO |   ✅ 2017.parquet: 948,460 rows
+2026-03-12 00:45:47,529 | INFO |   ✅ 2018.parquet: 998,496 rows
+2026-03-12 00:45:48,825 | INFO |   ✅ 2019.parquet: 962,186 rows
+2026-03-12 00:45:49,829 | INFO |   ✅ 2020.parquet: 793,668 rows
+2026-03-12 00:45:50,851 | INFO |   ✅ 2021.parquet: 846,456 rows
+2026-03-12 00:45:52,034 | INFO |   ✅ 2022.parquet: 992,284 rows
+2026-03-12 00:45:53,451 | INFO |   ✅ 2023.parquet: 953,248 rows
+2026-03-12 00:45:54,795 | INFO |   ✅ 2024.parquet: 1,065,327 rows
+2026-03-12 00:45:56,422 | INFO |   ✅ 2025.parquet: 1,020,782 rows
+2026-03-12 00:45:56,570 | INFO |   ✅ 2026.parquet: 56,121 rows
+2026-03-12 00:45:56,570 | INFO | Loading Agriculture_price_dataset.csv…
+2026-03-12 00:45:59,049 | INFO |   ✅ Agriculture_price_dataset.csv: 737,392 rows
+2026-03-12 00:45:59,054 | INFO | Loading crop_price_dataset.csv…
+2026-03-12 00:45:59,120 | INFO |   ✅ crop_price_dataset.csv: 549 rows
+2026-03-12 00:45:59,120 | INFO | Loading individual crop CSVs…
+2026-03-12 00:45:59,146 | INFO |   ✅ prices_Wheat.csv: 84 rows → 'Wheat'
+2026-03-12 00:45:59,190 | INFO |   ✅ prices_Rice.csv: 2 rows → 'Rice'
+2026-03-12 00:45:59,222 | INFO |   ✅ prices_Maize.csv: 34 rows → 'Maize'
+2026-03-12 00:45:59,234 | INFO |   ✅ prices_Mustard.csv: 22 rows → 'Mustard'
+2026-03-12 00:46:05,065 | INFO | Removed 12,209,929 duplicate rows after merge
+2026-03-12 00:46:05,066 | INFO | 
+Total records loaded : 5,853,230
+2026-03-12 00:46:05,329 | INFO | Crops found          : ['Maize', 'Onion', 'Potato', 'Wheat', 'Tomato', 'Rice', 'Mustard']
+2026-03-12 00:46:05,947 | INFO | [Rice] Training Prophet | 3,541 daily points | 2001-01-08 → 2026-12-02
+2026-03-12 00:46:07,093 | INFO | Chain [1] start processing
+2026-03-12 00:46:10,850 | INFO | Chain [1] done processing
+2026-03-12 00:46:10,940 | INFO | [Rice] ✅ Saved → C:\Users\moksh\AgriSense\ml-service\models\prophet_Rice.pkl
+2026-03-12 00:46:11,446 | INFO | [Mustard] Training Prophet | 8,941 daily points | 2001-03-20 → 2026-03-01
+2026-03-12 00:46:13,471 | INFO | Chain [1] start processing
+2026-03-12 00:46:28,060 | INFO | Chain [1] done processing
+2026-03-12 00:46:28,205 | INFO | [Mustard] ✅ Saved → C:\Users\moksh\AgriSense\ml-service\models\prophet_Mustard.pkl
+2026-03-12 00:46:28,681 | INFO | [Tomato] Training Prophet | 3,563 daily points | 2001-01-04 → 2026-12-02
+2026-03-12 00:46:29,692 | INFO | Chain [1] start processing
+2026-03-12 00:46:30,871 | INFO | Chain [1] done processing
+2026-03-12 00:46:30,937 | INFO | [Tomato] ✅ Saved → C:\Users\moksh\AgriSense\ml-service\models\prophet_Tomato.pkl
+2026-03-12 00:46:30,940 | INFO | 
+🎉 Done! 3/3 crops trained successfully
+2026-03-12 00:46:30,941 | INFO | Report → C:\Users\moksh\AgriSense\ml-service\reports\price_model_report.json
