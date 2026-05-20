@@ -3,6 +3,28 @@
 
 @import 'leaflet/dist/leaflet.css';
 @import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
+
+@theme {
+  --font-sans: "Inter", "system-ui", sans-serif;
+  --font-heading: "Outfit", "system-ui", sans-serif;
+  --color-brand-50: #f0fdf4;
+  --color-brand-100: #dcfce7;
+  --color-brand-500: #22c55e;
+  --color-brand-600: #16a34a;
+  --color-brand-700: #15803d;
+  --color-brand-900: #14532d;
+  --color-brand-950: #052e16;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #f8fafc;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
 /* Fix marker icons */
 .leaflet-default-icon-path { background-image: none; }
 
@@ -53,4 +75,4 @@ select {
   border-radius: 12px !important;
   backdrop-filter: blur(12px);
 }
-.leaflet-popup-tip { background: rgba(15,23,18,0.95) !important; }
+.leaflet-popup-tip { background: rgba(15,23,18,0.95) !important; }

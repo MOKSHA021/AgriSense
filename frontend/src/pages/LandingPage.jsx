@@ -68,7 +68,7 @@ const LandingPage = () => {
             AgriSense
           </span>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-4">
           <button
             onClick={() => navigate("/login")}
             className="px-5 py-2 text-white/70 border border-white/10 rounded-xl text-sm font-medium hover:bg-white/5 transition-all"
@@ -123,7 +123,7 @@ const LandingPage = () => {
             onClick={() => navigate("/register")}
             className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-bold rounded-2xl hover:opacity-90 transition-all shadow-xl shadow-green-900/40"
           >
-            Start for Free <ArrowRight className="w-4 h-4" />
+            Start for Free <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>
           <button
             onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })}

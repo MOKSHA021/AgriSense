@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import {
   Upload,
@@ -8,33 +8,38 @@ import {
   Store,
   CheckCircle,
   Loader2,
+  ScanSearch,
+  Image as ImageIcon,
+  ShieldCheck,
+  RefreshCw,
+  X
 } from "lucide-react";
 
 const diseases = [
   {
     name: "Late Blight",
     severity: "High",
-    treatment: "Spray Mancozeb 2.5g/L water, repeat after 7 days",
+    treatment: "Spray Mancozeb 2.5g/L water, repeat after 7 days.",
   },
   {
     name: "Leaf Rust",
     severity: "Medium",
-    treatment: "Apply Propiconazole 1ml/L water",
+    treatment: "Apply Propiconazole 1ml/L water immediately.",
   },
   {
     name: "Aphid Infestation",
     severity: "Medium",
-    treatment: "Spray Imidacloprid 0.5ml/L water",
+    treatment: "Spray Imidacloprid 0.5ml/L water and monitor daily.",
   },
   {
     name: "Powdery Mildew",
     severity: "Low",
-    treatment: "Apply Sulfur dust or Karathane 1ml/L",
+    treatment: "Apply Sulfur dust or Karathane 1ml/L to prevent spread.",
   },
   {
     name: "Healthy",
     severity: "None",
-    treatment: "No treatment needed. Crop looks healthy.",
+    treatment: "No treatment needed. Crop looks healthy and optimal.",
   },
 ];
 
@@ -45,10 +50,10 @@ const nearbyShops = [
 ];
 
 const severityColor = {
-  High: "bg-red-50 text-red-700 border-red-200",
-  Medium: "bg-amber-50 text-amber-700 border-amber-200",
-  Low: "bg-green-50 text-green-700 border-green-200",
-  None: "bg-gray-50 text-gray-600 border-gray-200",
+  High: "bg-rose-50 text-rose-700 border-rose-200 shadow-rose-500/10",
+  Medium: "bg-amber-50 text-amber-700 border-amber-200 shadow-amber-500/10",
+  Low: "bg-brand-50 text-brand-700 border-brand-200 shadow-brand-500/10",
+  None: "bg-emerald-50 text-emerald-700 border-emerald-200 shadow-emerald-500/10",
 };
 
 function getRandomConfidence() {
@@ -59,7 +64,26 @@ const PestDetection = () => {
   const fileInputRef = useRef(null);
   const [preview, setPreview] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [result, setResult] = useState(null);
+
+  useEffect(() => {
+    let interval;
+    if (analyzing) {
+      interval = setInterval(() => {
+        setProgress((old) => {
+          if (old >= 100) {
+            clearInterval(interval);
+            return 100;
+          }
+          return old + 2;
+        });
+      }, 30);
+    } else {
+      setProgress(0);
+    }
+    return () => clearInterval(interval);
+  }, [analyzing]);
 
   const processImage = (file) => {
     if (!file || !file.type.startsWith("image/")) return;
@@ -67,6 +91,9 @@ const PestDetection = () => {
     setPreview(url);
     setResult(null);
     setAnalyzing(true);
+    setProgress(0);
+    
+    // Simulate ML Network Delay
     setTimeout(() => {
       const picked = diseases[Math.floor(Math.random() * diseases.length)];
       setAnalyzing(false);
@@ -89,40 +116,43 @@ const PestDetection = () => {
     setPreview(null);
     setResult(null);
     setAnalyzing(false);
+    setProgress(0);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-slate-50 font-sans pb-20">
       <Navbar />
 
-      <div className="max-w-3xl mx-auto px-4 py-10">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Pest Detection</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Upload a leaf photo to detect pests or diseases and get treatment recommendations.
-          </p>
+      <div className="max-w-4xl mx-auto px-6 py-10">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center shadow-sm">
+            <ScanSearch className="w-6 h-6 text-emerald-600" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold font-heading text-slate-900">AI Pest Detection</h1>
+            <p className="text-slate-500 font-medium mt-1">
+              Upload a clear leaf photo for instant computer vision analysis and treatment guidance.
+            </p>
+          </div>
         </div>
 
-        {/* Upload Section */}
-        <div className="border border-gray-200 rounded-lg p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Bug className="w-5 h-5 text-gray-600" />
-            <h2 className="text-base font-semibold text-gray-800">Leaf Analysis</h2>
-          </div>
-
+        <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
           {!preview ? (
             <div
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-gray-300 rounded-lg p-10 flex flex-col items-center justify-center cursor-pointer hover:border-green-400 transition-colors"
+              className="border-2 border-dashed border-slate-300 rounded-2xl p-16 flex flex-col items-center justify-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/50 transition-all group"
             >
-              <Upload className="w-10 h-10 text-gray-400 mb-3" />
-              <p className="text-sm text-gray-600 font-medium">
-                Drop your leaf photo here or click to browse
-              </p>
-              <p className="text-xs text-gray-400 mt-1">Accepts image files (JPG, PNG, WebP)</p>
+              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-emerald-100 transition-all shadow-inner">
+                <ImageIcon className="w-8 h-8 text-slate-400 group-hover:text-emerald-600" />
+              </div>
+              <h3 className="text-lg font-bold font-heading text-slate-700 mb-1 group-hover:text-emerald-700">Drop your leaf photo here</h3>
+              <p className="text-sm text-slate-500 font-medium mb-4">or click to browse from your device</p>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-lg text-xs font-semibold text-slate-500">
+                <ShieldCheck className="w-4 h-4"/> Supports JPG, PNG, WebP up to 10MB
+              </div>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -132,116 +162,112 @@ const PestDetection = () => {
               />
             </div>
           ) : (
-            <div className="space-y-4">
-              <div className="border border-gray-200 rounded-lg overflow-hidden">
-                <img
-                  src={preview}
-                  alt="Leaf sample"
-                  className="w-full max-h-64 object-cover"
-                />
-              </div>
-
-              {analyzing && (
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Analyzing...</span>
-                </div>
-              )}
-
-              {result && (
-                <div className="space-y-4 mt-2">
-                  {/* Detection Result */}
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-600" />
-                    <h3 className="text-lg font-semibold text-gray-800">Detection Result</h3>
-                  </div>
-
-                  <div className="border border-gray-200 rounded-lg p-4 space-y-4">
-                    {/* Disease Name + Confidence */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <AlertCircle className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm font-semibold text-gray-800">
-                          {result.name}
-                        </span>
-                      </div>
-                      <span className="text-sm font-medium text-gray-500">
-                        {result.confidence}% confidence
-                      </span>
-                    </div>
-
-                    {/* Severity Badge */}
-                    <div>
-                      <span
-                        className={`inline-block px-3 py-1 text-xs font-medium rounded-full border ${severityColor[result.severity]}`}
-                      >
-                        Severity: {result.severity}
-                      </span>
-                    </div>
-
-                    {/* Treatment */}
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-700 mb-2">
-                        Treatment Instructions
-                      </h4>
-                      <ol className="list-decimal list-inside space-y-1">
-                        {result.treatment.split(", ").map((step, i) => (
-                          <li key={i} className="text-sm text-gray-600">
-                            {step}
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                  </div>
-
-                  {/* Nearby Shops */}
-                  {result.severity !== "None" && (
-                    <div className="border border-gray-200 rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Store className="w-4 h-4 text-gray-600" />
-                        <h4 className="text-sm font-semibold text-gray-700">Nearby Shops</h4>
-                      </div>
-                      <div className="space-y-3">
-                        {nearbyShops.map((shop) => (
-                          <div
-                            key={shop.name}
-                            className="flex items-start justify-between border border-gray-100 rounded-lg px-4 py-3"
-                          >
-                            <div className="flex items-start gap-2">
-                              <MapPin className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
-                              <div>
-                                <p className="text-sm font-medium text-gray-800">{shop.name}</p>
-                                <p className="text-xs text-gray-500">{shop.distance}</p>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-sm font-medium text-gray-800">
-                                &#8377;{shop.price}/bottle
-                              </p>
-                              <p
-                                className={`text-xs font-medium ${
-                                  shop.stock === "Low Stock"
-                                    ? "text-amber-600"
-                                    : "text-green-600"
-                                }`}
-                              >
-                                {shop.stock}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Image Preview Area */}
+              <div className="space-y-4">
+                <div className="relative border border-slate-200 rounded-2xl overflow-hidden shadow-inner group bg-slate-100 aspect-square flex items-center justify-center">
+                  <img
+                    src={preview}
+                    alt="Leaf sample"
+                    className={`w-full h-full object-cover transition-all duration-500 ${analyzing ? 'opacity-50 grayscale blur-sm scale-105' : 'opacity-100'}`}
+                  />
+                  
+                  {/* Scanning overlay */}
+                  {analyzing && (
+                    <div className="absolute inset-0 pointer-events-none">
+                       <div className="w-full h-1 bg-emerald-400 shadow-[0_0_15px_3px_rgba(52,211,153,0.5)] absolute top-1/2 animate-pulse"></div>
+                       <div className="absolute inset-0 flex flex-col items-center justify-center">
+                           <ScanSearch className="w-12 h-12 text-emerald-500 animate-pulse mb-3 drop-shadow-lg"/>
+                           <span className="bg-slate-900/80 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-lg flex items-center gap-2">
+                             <Loader2 className="w-4 h-4 animate-spin"/> Analyzing Imagery... {progress}%
+                           </span>
+                       </div>
                     </div>
                   )}
-                </div>
-              )}
 
-              <button
-                onClick={handleReset}
-                className="text-sm text-gray-500 hover:text-gray-700 underline"
-              >
-                Upload a different photo
-              </button>
+                  {!analyzing && (
+                     <button 
+                       onClick={handleReset} 
+                       className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 backdrop-blur-sm transition-colors shadow-lg opacity-0 group-hover:opacity-100"
+                       title="Remove Image"
+                     >
+                       <X className="w-4 h-4" />
+                     </button>
+                  )}
+                </div>
+                {!analyzing && result && (
+                  <button
+                    onClick={handleReset}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition-colors"
+                  >
+                    <RefreshCw className="w-4 h-4" /> Analyze Another Leaf
+                  </button>
+                )}
+              </div>
+
+              {/* Results Area */}
+              <div className="flex flex-col">
+                {analyzing ? (
+                  <div className="h-full border border-slate-100 bg-slate-50/50 rounded-2xl p-6 flex flex-col items-center justify-center text-center">
+                    <div className="w-16 h-16 border-4 border-slate-200 border-t-emerald-500 rounded-full animate-spin mb-4"></div>
+                    <h3 className="text-lg font-bold font-heading text-slate-700 mb-2">Machine Learning Engine Active</h3>
+                    <p className="text-sm font-medium text-slate-500 max-w-xs">Cross-referencing millions of pathogen vectors and leaf health markers...</p>
+                  </div>
+                ) : result ? (
+                  <div className="space-y-5 animate-fade-in flex-1">
+                    {/* Primary Result Box */}
+                    <div className={`p-6 rounded-2xl border shadow-sm ${severityColor[result.severity]}`}>
+                      <div className="flex items-start gap-4">
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-white/50 backdrop-blur-sm shadow-sm`}>
+                          {result.severity === "None" ? <CheckCircle className="w-6 h-6"/> : <AlertCircle className="w-6 h-6"/>}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-1">
+                            <h3 className="text-xl font-bold font-heading">{result.name}</h3>
+                            <span className="text-sm font-bold px-2 py-0.5 rounded-md bg-white/50">{result.confidence}% Match</span>
+                          </div>
+                          <p className="text-sm font-semibold opacity-80 uppercase tracking-widest mb-3">Severity: {result.severity}</p>
+                          <div className="bg-white/60 rounded-xl p-3 shadow-sm border border-white/40">
+                            <h4 className="text-xs font-bold uppercase tracking-wider opacity-60 mb-1">Recommended Treatment</h4>
+                            <p className="text-sm font-semibold leading-relaxed">{result.treatment}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Stores Box */}
+                    {result.severity !== "None" && (
+                      <div className="border border-slate-200 bg-white rounded-2xl p-5 shadow-sm">
+                        <div className="flex items-center gap-2 mb-4">
+                          <Store className="w-5 h-5 text-slate-400" />
+                          <h4 className="font-bold font-heading text-slate-800">Available Near You</h4>
+                        </div>
+                        <div className="space-y-3">
+                          {nearbyShops.map((shop, i) => (
+                            <div key={i} className="flex items-center justify-between group hover:bg-slate-50 p-3 -mx-3 rounded-xl transition-colors cursor-pointer">
+                              <div className="flex items-start gap-3">
+                                <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400 group-hover:text-emerald-600 transition-colors">
+                                  <MapPin className="w-5 h-5" />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-bold text-slate-800">{shop.name}</p>
+                                  <p className="text-xs font-medium text-slate-500">{shop.distance} away</p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm font-bold text-slate-900">&#8377;{shop.price}<span className="text-xs text-slate-500 font-medium">/btl</span></p>
+                                <p className={`text-[10px] uppercase font-bold tracking-wider mt-0.5 ${shop.stock === 'In Stock' ? 'text-emerald-600' : 'text-amber-600'}`}>
+                                  {shop.stock}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : null}
+              </div>
             </div>
           )}
         </div>
