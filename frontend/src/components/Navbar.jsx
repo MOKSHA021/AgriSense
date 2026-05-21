@@ -3,18 +3,19 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import {
   Wheat, LayoutDashboard, FlaskConical, Sprout, CloudSun,
-  TrendingUp, ShieldAlert, Wallet, ShoppingCart, Menu, X, LogOut,
+  TrendingUp, ShieldAlert, Wallet, ShoppingCart, Menu, X, LogOut, Map, Activity, Bot
 } from "lucide-react";
 
 const navLinks = [
-  { label: "Home",     path: "/dashboard",          icon: LayoutDashboard, color: "text-green-400"  },
-  { label: "Soil",     path: "/dashboard/soil",     icon: FlaskConical,    color: "text-amber-400"  },
-  { label: "Crops",    path: "/dashboard/recommend",icon: Sprout,          color: "text-lime-400"   },
-  { label: "Weather",  path: "/dashboard/weather",  icon: CloudSun,        color: "text-blue-400"   },
-  { label: "Market",   path: "/dashboard/market",   icon: TrendingUp,      color: "text-emerald-400"},
-  { label: "Risk",     path: "/dashboard/risk",     icon: ShieldAlert,     color: "text-orange-400" },
-  { label: "Expenses", path: "/dashboard/expenses", icon: Wallet,          color: "text-purple-400" },
-  { label: "Inputs",   path: "/dashboard/inputs",   icon: ShoppingCart,    color: "text-teal-400"   },
+  { label: "Home",        path: "/dashboard",                 icon: LayoutDashboard, color: "text-green-400"  },
+  { label: "Weather",     path: "/dashboard/weather",         icon: CloudSun,        color: "text-blue-400"   },
+  { label: "Soil",        path: "/dashboard/soil",            icon: FlaskConical,    color: "text-amber-400"  },
+  { label: "Crops",       path: "/dashboard/recommend",       icon: Sprout,          color: "text-lime-400"   },
+  { label: "Best Mandi",  path: "/dashboard/best-mandi",      icon: Map,             color: "text-emerald-400"},
+  { label: "Live Prices", path: "/dashboard/live-prices",     icon: Activity,        color: "text-pink-400"   },
+  { label: "Forecast",    path: "/dashboard/price-forecast",  icon: Bot,             color: "text-indigo-400" },
+  { label: "Risk",        path: "/dashboard/risk",            icon: ShieldAlert,     color: "text-orange-400" },
+  { label: "Expenses",    path: "/dashboard/expenses",        icon: Wallet,          color: "text-purple-400" },
 ];
 
 const Navbar = () => {

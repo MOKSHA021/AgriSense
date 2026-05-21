@@ -9,11 +9,12 @@ import VerifyOTP from "./pages/VerifyOTP";
 import Dashboard from "./pages/Dashboard";
 import SoilAnalysis from "./pages/SoilAnalysis";
 import CropRecommend from "./pages/CropRecommend";
-import Weather from "./pages/Weather";
-import Market from "./pages/Market";
+import BestMandi from "./pages/BestMandi";
+import LivePricesDashboard from "./pages/LivePricesDashboard";
+import PriceForecast from "./pages/PriceForecast";
 import RiskAssessment from "./pages/RiskAssessment";
 import ExpenseTracker from "./pages/ExpenseTracker";
-import InputAdvisor from "./pages/InputAdvisor";
+import Weather from "./pages/Weather";
 
 function App() {
   return (
@@ -27,11 +28,12 @@ function App() {
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/dashboard/soil" element={<ProtectedRoute><SoilAnalysis /></ProtectedRoute>} />
           <Route path="/dashboard/recommend" element={<ProtectedRoute><CropRecommend /></ProtectedRoute>} />
+          <Route path="/dashboard/best-mandi" element={<ProtectedRoute><BestMandi /></ProtectedRoute>} />
+          <Route path="/dashboard/live-prices" element={<ProtectedRoute><LivePricesDashboard /></ProtectedRoute>} />
+          <Route path="/dashboard/price-forecast" element={<ProtectedRoute><PriceForecast /></ProtectedRoute>} />
           <Route path="/dashboard/weather" element={<ProtectedRoute><Weather /></ProtectedRoute>} />
-          <Route path="/dashboard/market" element={<ProtectedRoute><Market /></ProtectedRoute>} />
           <Route path="/dashboard/risk" element={<ProtectedRoute><RiskAssessment /></ProtectedRoute>} />
           <Route path="/dashboard/expenses" element={<ProtectedRoute><ExpenseTracker /></ProtectedRoute>} />
-          <Route path="/dashboard/inputs" element={<ProtectedRoute><InputAdvisor /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
