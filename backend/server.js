@@ -17,6 +17,7 @@ dotenv.config();
 connectDB();
 
 const app = express();
+//OYY AVUTHAADAAA
 
 app.use(helmet());
 // app.use(cors()); // ← allows ALL origins
