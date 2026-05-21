@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
+import API from "../services/api";
 import { Sprout, TrendingUp, IndianRupee, BarChart3 } from "lucide-react";
 
 const SOIL_PRESETS = {
@@ -48,64 +49,40 @@ const CROPS = [
     N: [20, 60], P: [10, 30], K: [10, 30],
     temp: [25, 40], humidity: [30, 60], ph: [5.0, 7.0], rainfall: [30, 80],
     irrigated: false, rainfed: true,
-    yield: 10, price: 2350, cost_pct: 0.55,
-    tip: "Ideal for dryland farming; minimal irrigation needed.",
-  },
-  {
-    name: "Sorghum",
-    N: [30, 80], P: [15, 40], K: [15, 40],
-    temp: [25, 38], humidity: [30, 65], ph: [5.5, 7.5], rainfall: [40, 100],
-    irrigated: false, rainfed: true,
-    yield: 12, price: 2750, cost_pct: 0.55,
-    tip: "Dual-purpose varieties provide both grain and fodder.",
-  },
-  {
-    name: "Potato",
-    N: [100, 180], P: [50, 80], K: [60, 100],
-    temp: [15, 25], humidity: [60, 85], ph: [5.0, 6.5], rainfall: [50, 80],
-    irrigated: true, rainfed: false,
-    yield: 100, price: 1200, cost_pct: 0.6,
-    tip: "Hill up soil around stems every 2 weeks for higher tuber count.",
-  },
-  {
-    name: "Banana",
-    N: [100, 200], P: [30, 60], K: [80, 150],
-    temp: [25, 38], humidity: [70, 95], ph: [6.0, 7.5], rainfall: [120, 250],
-    irrigated: true, rainfed: false,
-    yield: 120, price: 800, cost_pct: 0.6,
-    tip: "Desuckering improves bunch weight significantly.",
+    yield: 8, price: 2800, cost_pct: 0.4,
+    tip: "Sow at onset of monsoon for best germination.",
   },
   {
     name: "Cotton",
-    N: [60, 120], P: [20, 50], K: [20, 50],
-    temp: [22, 38], humidity: [40, 70], ph: [6.0, 8.0], rainfall: [50, 120],
+    N: [60, 120], P: [30, 60], K: [30, 60],
+    temp: [20, 35], humidity: [50, 80], ph: [6.0, 8.0], rainfall: [50, 100],
     irrigated: true, rainfed: true,
-    yield: 8, price: 6500, cost_pct: 0.6,
-    tip: "Monitor for bollworm infestation during flowering.",
+    yield: 15, price: 6500, cost_pct: 0.5,
+    tip: "Ensure proper spacing for better boll development.",
   },
   {
-    name: "Groundnut",
-    N: [10, 40], P: [20, 50], K: [20, 50],
-    temp: [22, 35], humidity: [50, 80], ph: [5.5, 7.0], rainfall: [50, 120],
-    irrigated: true, rainfed: true,
-    yield: 10, price: 5550, cost_pct: 0.58,
-    tip: "Apply gypsum at pegging stage to improve pod filling.",
+    name: "Potato",
+    N: [80, 120], P: [40, 80], K: [80, 120],
+    temp: [15, 25], humidity: [70, 90], ph: [5.0, 6.5], rainfall: [40, 80],
+    irrigated: true, rainfed: false,
+    yield: 200, price: 1200, cost_pct: 0.5,
+    tip: "Plant in well-drained sandy loam soil.",
   },
   {
     name: "Soybean",
-    N: [5, 30], P: [30, 60], K: [20, 50],
-    temp: [20, 32], humidity: [50, 80], ph: [6.0, 7.5], rainfall: [60, 120],
+    N: [20, 40], P: [30, 60], K: [20, 40],
+    temp: [20, 30], humidity: [60, 80], ph: [6.0, 7.0], rainfall: [60, 100],
     irrigated: true, rainfed: true,
-    yield: 10, price: 4300, cost_pct: 0.58,
-    tip: "Inoculate seeds with Rhizobium for better nitrogen fixation.",
+    yield: 12, price: 4500, cost_pct: 0.4,
+    tip: "Inoculate seeds with rhizobium for better nitrogen fixation.",
   },
   {
-    name: "Jute",
-    N: [40, 80], P: [15, 30], K: [20, 40],
-    temp: [25, 38], humidity: [70, 95], ph: [5.5, 7.0], rainfall: [150, 300],
-    irrigated: false, rainfed: true,
-    yield: 12, price: 4750, cost_pct: 0.6,
-    tip: "Ret jute in slow-flowing clean water for best fibre quality.",
+    name: "Groundnut",
+    N: [20, 40], P: [30, 50], K: [20, 40],
+    temp: [25, 35], humidity: [50, 70], ph: [5.5, 7.0], rainfall: [50, 80],
+    irrigated: true, rainfed: true,
+    yield: 15, price: 5500, cost_pct: 0.4,
+    tip: "Harvest when 75% of pods are mature.",
   },
 ];
 
@@ -160,6 +137,24 @@ export default function CropRecommend() {
   const [irrigationType, setIrrigationType] = useState("irrigated");
   const [activeSoil, setActiveSoil] = useState(null);
   const [results, setResults] = useState(null);
+  const [soilPresets, setSoilPresets] = useState(SOIL_PRESETS);
+  const [crops, setCrops] = useState(CROPS);
+
+  useEffect(() => {
+    const loadReferenceData = async () => {
+      try {
+        const [soilRes, cropsRes] = await Promise.all([
+          API.get("/reference/soil-presets"),
+          API.get("/reference/crops"),
+        ]);
+        setSoilPresets(soilRes.data.soilPresets || SOIL_PRESETS);
+        setCrops(cropsRes.data.crops || CROPS);
+      } catch (err) {
+        console.error("Failed to load reference data:", err);
+      }
+    };
+    loadReferenceData();
+  }, []);
 
   function handleChange(e) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -169,9 +164,9 @@ export default function CropRecommend() {
     setActiveSoil(name);
     setForm((prev) => ({
       ...prev,
-      N: SOIL_PRESETS[name].N,
-      P: SOIL_PRESETS[name].P,
-      K: SOIL_PRESETS[name].K,
+      N: soilPresets[name].N,
+      P: soilPresets[name].P,
+      K: soilPresets[name].K,
     }));
   }
 
@@ -188,16 +183,46 @@ export default function CropRecommend() {
       irrigationType,
     };
 
-    const scored = CROPS.map((crop) => {
-      const match = scoreCrop(crop, inputs);
-      const revenue = crop.yield * crop.price;
-      const cost = Math.round(revenue * crop.cost_pct);
-      const profit = revenue - cost;
-      return { ...crop, match, revenue, cost, profit };
-    });
+    // Use ML service for crop recommendation instead of rule-based scoring
+    const soilType = activeSoil || "Alluvial";
+    API.post("/ml/predict/crop", {
+      soil_type: soilType,
+      temperature: inputs.temperature,
+      humidity: inputs.humidity,
+      rainfall: inputs.rainfall,
+    })
+      .then(({ data }) => {
+        // Map ML results to crop data with financial estimates
+        const mlResults = data.crops.map((mlCrop) => {
+          const cropData = crops.find((c) => c.name === mlCrop.crop);
+          if (!cropData) return null;
+          const revenue = cropData.yield * cropData.price;
+          const cost = Math.round(revenue * cropData.cost_pct);
+          const profit = revenue - cost;
+          return {
+            ...cropData,
+            match: Math.round(mlCrop.score * 100), // Convert score to percentage
+            revenue,
+            cost,
+            profit,
+          };
+        }).filter(Boolean);
 
-    scored.sort((a, b) => b.match - a.match);
-    setResults(scored.slice(0, 5));
+        setResults(mlResults.slice(0, 5));
+      })
+      .catch((err) => {
+        console.error("ML prediction failed, falling back to rule-based:", err);
+        // Fallback to rule-based scoring if ML fails
+        const scored = crops.map((crop) => {
+          const match = scoreCrop(crop, inputs);
+          const revenue = crop.yield * crop.price;
+          const cost = Math.round(revenue * crop.cost_pct);
+          const profit = revenue - cost;
+          return { ...crop, match, revenue, cost, profit };
+        });
+        scored.sort((a, b) => b.match - a.match);
+        setResults(scored.slice(0, 5));
+      });
   }
 
   const fields = [
@@ -229,7 +254,7 @@ export default function CropRecommend() {
               <div className="mb-5">
                 <p className="text-sm font-medium text-gray-700 mb-2">Soil Type (auto-fills NPK)</p>
                 <div className="flex flex-wrap gap-2">
-                  {Object.keys(SOIL_PRESETS).map((soil) => (
+                  {Object.keys(soilPresets).map((soil) => (
                     <button
                       key={soil}
                       type="button"

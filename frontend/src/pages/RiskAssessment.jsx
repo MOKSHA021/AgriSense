@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
+import API from "../services/api";
 import {
   ShieldAlert, Search, AlertTriangle, Droplets, Sun,
   Thermometer, Snowflake, Loader, MapPin, Sprout, Clock, CheckCircle,
@@ -7,48 +8,11 @@ import {
 
 const SEASONS = ["Kharif", "Rabi", "Zaid"];
 
-const computeRisks = (current, forecast) => {
-  const temp = current.main?.temp ?? 25;
-  const humidity = current.main?.humidity ?? 50;
-  const totalRainMm = forecast.reduce((sum, item) => sum + (item.rain?.["3h"] || 0), 0) || 0;
-  const hasRainForecast = totalRainMm > 0;
-
-  const lvl = (high, mid) => totalRainMm > high ? "HIGH" : totalRainMm > mid ? "MEDIUM" : "LOW";
-
-  let floodLevel = "LOW", floodDesc = "No significant rainfall expected. Fields are safe.", floodAction = "Continue normal operations and monitor weather updates.";
-  if (totalRainMm > 200) { floodLevel = "HIGH"; floodDesc = `Heavy rainfall forecast (${Math.round(totalRainMm)}mm). Waterlogging and flooding likely.`; floodAction = "Clear drainage channels immediately. Move livestock to higher ground. Avoid low-lying fields."; }
-  else if (totalRainMm > 100) { floodLevel = "MEDIUM"; floodDesc = `Moderate rainfall expected (${Math.round(totalRainMm)}mm). Some waterlogging possible.`; floodAction = "Ensure drainage systems are functioning. Delay sowing in flood-prone areas."; }
-
-  let droughtLevel = "LOW", droughtDesc = "Adequate moisture levels detected. No drought concern.", droughtAction = "Maintain regular irrigation schedule.";
-  if (humidity < 30 && !hasRainForecast) { droughtLevel = "HIGH"; droughtDesc = `Very low humidity (${humidity}%) with no rain forecast. Severe moisture deficit likely.`; droughtAction = "Increase irrigation frequency. Apply mulch to retain soil moisture. Consider drought-resistant varieties."; }
-  else if (humidity < 50) { droughtLevel = "MEDIUM"; droughtDesc = `Below-average humidity (${humidity}%). Moderate moisture stress possible.`; droughtAction = "Monitor soil moisture closely. Schedule supplemental irrigation if needed."; }
-
-  let heatLevel = "LOW", heatDesc = "Temperature is within a safe range for most crops.", heatAction = "No special measures needed. Continue regular field work.";
-  if (temp > 40) { heatLevel = "HIGH"; heatDesc = `Extreme temperature (${Math.round(temp)}°C). Crop wilting and heat damage expected.`; heatAction = "Irrigate early morning and late evening. Provide shade for nurseries. Avoid midday field work."; }
-  else if (temp > 35) { heatLevel = "MEDIUM"; heatDesc = `Elevated temperature (${Math.round(temp)}°C). Some heat-sensitive crops may be affected.`; heatAction = "Increase watering frequency. Monitor for signs of heat stress in crops."; }
-
-  let frostLevel = "LOW", frostDesc = "No frost risk at current temperatures.", frostAction = "No protective measures required.";
-  if (temp < 5) { frostLevel = "HIGH"; frostDesc = `Near-freezing temperature (${Math.round(temp)}°C). Frost damage to crops is highly likely.`; frostAction = "Cover sensitive crops with row covers or mulch. Avoid sowing frost-sensitive varieties. Use smudge pots if available."; }
-  else if (temp < 10) { frostLevel = "MEDIUM"; frostDesc = `Cool temperature (${Math.round(temp)}°C). Light frost possible during early morning.`; frostAction = "Monitor overnight temperatures. Prepare frost covers for vulnerable crops."; }
-
-  return [
-    { name: "Flood Risk", icon: Droplets, level: floodLevel, description: floodDesc, action: floodAction },
-    { name: "Drought Risk", icon: Sun, level: droughtLevel, description: droughtDesc, action: droughtAction },
-    { name: "Heat Stress", icon: Thermometer, level: heatLevel, description: heatDesc, action: heatAction },
-    { name: "Frost Risk", icon: Snowflake, level: frostLevel, description: frostDesc, action: frostAction },
-  ];
-};
-
-const getSafeCrops = (risks) => {
-  const levels = Object.fromEntries(risks.map((r) => [r.name, r.level]));
-  const crops = [];
-  if (levels["Flood Risk"] === "HIGH") { crops.push({ name: "Rice (Paddy)", reason: "Thrives in waterlogged conditions and tolerates excess moisture." }); crops.push({ name: "Jute", reason: "Grows well in high-moisture and humid environments." }); }
-  if (levels["Drought Risk"] === "HIGH") { crops.push({ name: "Pearl Millet (Bajra)", reason: "Highly drought-tolerant and requires minimal water." }); crops.push({ name: "Sorghum (Jowar)", reason: "Deep root system helps survive prolonged dry spells." }); }
-  if (levels["Heat Stress"] === "HIGH" || levels["Heat Stress"] === "MEDIUM") { crops.push({ name: "Finger Millet (Ragi)", reason: "Heat-tolerant and nutritious grain suitable for hot climates." }); crops.push({ name: "Sesame (Til)", reason: "Performs well under high temperature and low rainfall." }); }
-  if (levels["Frost Risk"] === "HIGH" || levels["Frost Risk"] === "MEDIUM") { crops.push({ name: "Wheat", reason: "Cold-hardy crop that tolerates low temperatures well." }); crops.push({ name: "Mustard", reason: "Grows well in cool weather and withstands light frost." }); }
-  if (crops.length === 0) crops.push({ name: "Wheat", reason: "Versatile crop suitable for moderate conditions." }, { name: "Rice (Paddy)", reason: "Stable choice with favorable weather conditions." }, { name: "Maize", reason: "Good yield potential in current low-risk conditions." }, { name: "Pulses (Moong/Urad)", reason: "Short-duration crops ideal when conditions are favorable." });
-  const seen = new Set();
-  return crops.filter((c) => { if (seen.has(c.name)) return false; seen.add(c.name); return true; }).slice(0, 4);
+const ICON_MAP = {
+  Droplets: Droplets,
+  Sun: Sun,
+  Thermometer: Thermometer,
+  Snowflake: Snowflake,
 };
 
 const LEVEL_CONFIG = {
@@ -65,6 +29,7 @@ const RiskAssessment = () => {
   const [risks, setRisks] = useState(null);
   const [cityName, setCityName] = useState("");
   const [detecting, setDetecting] = useState(false);
+  const [safeCrops, setSafeCrops] = useState([]);
 
   const fetchAndAssess = async (query) => {
     setLoading(true); setError(""); setRisks(null);
@@ -89,7 +54,24 @@ const RiskAssessment = () => {
       const current = { main: { temp: data.current.temperature_2m, humidity: data.current.relative_humidity_2m } };
       const forecast = (data.hourly?.precipitation || []).map((p) => ({ rain: { "3h": p } }));
       setCityName(resolvedName); setCityInput(resolvedName);
-      setRisks(computeRisks(current, forecast));
+
+      // Compute risks using backend API
+      try {
+        const { data: risksData } = await API.post("/reference/compute-risks", { current, forecast });
+        setRisks(risksData.risks);
+
+        // Fetch safe crops from backend
+        try {
+          const { data: safeCropsData } = await API.post("/reference/safe-crops", { risks: risksData.risks });
+          setSafeCrops(safeCropsData.safeCrops || []);
+        } catch (err) {
+          console.error("Failed to fetch safe crops:", err);
+          setSafeCrops([]);
+        }
+      } catch (err) {
+        console.error("Failed to compute risks:", err);
+        setError("Failed to compute risks. Please try again.");
+      }
     } catch (err) { setError(err.message || "Could not fetch weather data"); }
     finally { setLoading(false); }
   };
@@ -121,7 +103,6 @@ const RiskAssessment = () => {
   const overallLabel = riskPct >= 60 ? "HIGH RISK" : riskPct >= 30 ? "MODERATE RISK" : "LOW RISK";
   const overallColor = riskPct >= 60 ? "text-red-400" : riskPct >= 30 ? "text-amber-400" : "text-green-400";
   const overallBarColor = riskPct >= 60 ? "bg-red-500" : riskPct >= 30 ? "bg-amber-500" : "bg-green-500";
-  const safeCrops = risks ? getSafeCrops(risks) : [];
   const showDelayedSowing = highCount >= 2;
 
   return (
@@ -202,7 +183,7 @@ const RiskAssessment = () => {
               {/* Risk Cards Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {risks.map((risk) => {
-                  const Icon = risk.icon;
+                  const Icon = ICON_MAP[risk.icon] || AlertTriangle;
                   const cfg = LEVEL_CONFIG[risk.level];
                   return (
                     <div key={risk.name} className={`bg-gradient-to-br ${cfg.card} border rounded-2xl p-5`}>

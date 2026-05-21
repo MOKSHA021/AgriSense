@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import {
   ShoppingCart,
@@ -33,6 +33,19 @@ const InputAdvisor = () => {
   const [loading, setLoading] = useState(false);
   const [detecting, setDetecting] = useState(false);
   const [error, setError] = useState("");
+  const [availableCrops, setAvailableCrops] = useState(CROPS);
+
+  useEffect(() => {
+    const loadAvailableCrops = async () => {
+      try {
+        const { data } = await API.get("/input-advisor/crops");
+        setAvailableCrops(data.crops || CROPS);
+      } catch (err) {
+        console.error("Failed to load available crops:", err);
+      }
+    };
+    loadAvailableCrops();
+  }, []);
 
   const resetResults = () => {
     setResults(null);
@@ -171,7 +184,7 @@ const InputAdvisor = () => {
                   <option value="" className="bg-zinc-900 text-white">
                     Choose a crop
                   </option>
-                  {CROPS.map((c) => (
+                  {availableCrops.map((c) => (
                     <option key={c} value={c} className="bg-zinc-900 text-white">
                       {c}
                     </option>

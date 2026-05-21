@@ -77,7 +77,7 @@ const LivePrices = () => {
           <button
             type="submit"
             disabled={liveLoading}
-            className="w-full py-3.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold rounded-2xl hover:opacity-90 disabled:opacity-50 shadow-md transition"
+            className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold rounded-2xl hover:opacity-90 disabled:opacity-50 shadow-lg shadow-green-900/30 transition-all"
           >
             {liveLoading ? "⏳ Fetching..." : "📊 Get Live Prices →"}
           </button>
@@ -112,19 +112,19 @@ const LivePrices = () => {
             <div className="grid grid-cols-3 gap-3 text-center">
               <div className="bg-black/40 backdrop-blur-md rounded-2xl p-3 shadow-sm border border-white/10">
                 <p className="text-xs text-white/40 mb-1">Avg Modal</p>
-                <p className="font-bold text-blue-600 text-lg">
+                <p className="font-bold text-blue-400 text-lg">
                   ₹{liveData.avgModal?.toLocaleString() ?? "—"}
                 </p>
               </div>
               <div className="bg-black/40 backdrop-blur-md rounded-2xl p-3 shadow-sm border border-white/10">
                 <p className="text-xs text-white/40 mb-1">Lowest</p>
-                <p className="font-bold text-red-500 text-lg">
+                <p className="font-bold text-red-400 text-lg">
                   ₹{liveData.minPrice?.toLocaleString() ?? "—"}
                 </p>
               </div>
               <div className="bg-black/40 backdrop-blur-md rounded-2xl p-3 shadow-sm border border-white/10">
                 <p className="text-xs text-white/40 mb-1">Highest</p>
-                <p className="font-bold text-green-600 text-lg">
+                <p className="font-bold text-green-400 text-lg">
                   ₹{liveData.maxPrice?.toLocaleString() ?? "—"}
                 </p>
               </div>

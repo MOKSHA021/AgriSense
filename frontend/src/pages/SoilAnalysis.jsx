@@ -17,66 +17,6 @@ import {
 } from "lucide-react";
 
 
-const soilDatabase = {
-  Alluvial: {
-    color: "Light grey to ash grey",
-    texture: "Sandy loam to clay loam",
-    drainage: "Well-drained",
-    phRange: "6.5 - 8.0",
-    crops: ["Rice", "Wheat", "Sugarcane", "Maize", "Cotton"],
-  },
-  Black: {
-    color: "Deep black to dark grey",
-    texture: "Clayey and compact",
-    drainage: "Poor (high water retention)",
-    phRange: "7.2 - 8.5",
-    crops: ["Cotton", "Sorghum", "Wheat", "Sugarcane", "Groundnut"],
-  },
-  Red: {
-    color: "Red to reddish-brown",
-    texture: "Sandy to clayey",
-    drainage: "Moderate",
-    phRange: "5.5 - 7.0",
-    crops: ["Millets", "Groundnut", "Potato", "Maize", "Pulses"],
-  },
-  Laterite: {
-    color: "Reddish-brown",
-    texture: "Coarse and gravelly",
-    drainage: "Excessive",
-    phRange: "5.0 - 6.5",
-    crops: ["Tea", "Coffee", "Cashew", "Rubber", "Coconut"],
-  },
-  Sandy: {
-    color: "Light yellow to brown",
-    texture: "Loose and gritty",
-    drainage: "Excessive (low retention)",
-    phRange: "5.5 - 7.0",
-    crops: ["Groundnut", "Millets", "Barley", "Pulses", "Potato"],
-  },
-  Arid: {
-    color: "Light brown to grey",
-    texture: "Sandy with low organic matter",
-    drainage: "Excessive (desert-type)",
-    phRange: "7.5 - 8.5",
-    crops: ["Bajra", "Barley", "Guar", "Mustard", "Date Palm"],
-  },
-  Mountain: {
-    color: "Dark brown to black",
-    texture: "Loamy with high organic matter",
-    drainage: "Well-drained on slopes",
-    phRange: "5.0 - 6.5",
-    crops: ["Apple", "Tea", "Potato", "Ginger", "Cardamom"],
-  },
-  Yellow: {
-    color: "Yellow to yellowish-brown",
-    texture: "Fine to medium loam",
-    drainage: "Moderate",
-    phRange: "5.5 - 6.5",
-    crops: ["Rice", "Jute", "Pulses", "Oilseeds", "Vegetables"],
-  },
-};
-
-
 const previousCropOptions = ["Rice", "Wheat", "Maize", "Cotton", "Sugarcane", "None"];
 
 const characteristicsFields = [
@@ -108,6 +48,20 @@ const SoilAnalysis = () => {
   const [gpsStatus, setGpsStatus] = useState("idle");
   const [gpsLocation, setGpsLocation] = useState("");
   const [gpsSoilData, setGpsSoilData] = useState(null);
+
+  const [soilDatabase, setSoilDatabase] = useState({});
+
+  useEffect(() => {
+    const loadSoilDatabase = async () => {
+      try {
+        const { data } = await API.get("/reference/soil-database");
+        setSoilDatabase(data.soilDatabase || {});
+      } catch (err) {
+        console.error("Failed to load soil database:", err);
+      }
+    };
+    loadSoilDatabase();
+  }, []);
 
   const fetchSoilByGPS = async () => {
     if (!navigator.geolocation) {

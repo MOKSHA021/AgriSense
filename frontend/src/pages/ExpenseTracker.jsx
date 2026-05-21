@@ -69,7 +69,10 @@ const ExpenseTracker = () => {
   const [expenses, setExpenses] = useState([]);
   const [plan, setPlan] = useState(DEFAULT_PLAN);
   const [savedPlan, setSavedPlan] = useState(DEFAULT_PLAN);
-  const [category, setCategory] = useState(CATEGORIES[0]);
+  const [categories, setCategories] = useState([]);
+  const [planCrops, setPlanCrops] = useState([]);
+  const [seasons, setSeasons] = useState([]);
+  const [category, setCategory] = useState("");
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [notes, setNotes] = useState("");
@@ -81,6 +84,29 @@ const ExpenseTracker = () => {
 
   useEffect(() => {
     let active = true;
+
+    const loadReferenceData = async () => {
+      try {
+        const [catRes, cropRes, seasonRes] = await Promise.all([
+          API.get("/reference/expense-categories"),
+          API.get("/reference/plan-crops"),
+          API.get("/reference/seasons"),
+        ]);
+        if (!active) return;
+        setCategories(catRes.data.categories || []);
+        setPlanCrops(cropRes.data.crops || []);
+        setSeasons(seasonRes.data.seasons || []);
+        setCategory(catRes.data.categories?.[0] || "");
+      } catch (err) {
+        if (active) {
+          console.error("Failed to load reference data:", err);
+          setCategories(CATEGORIES);
+          setPlanCrops(PLAN_CROPS);
+          setSeasons(SEASONS);
+          setCategory(CATEGORIES[0]);
+        }
+      }
+    };
 
     const loadRecord = async () => {
       try {
@@ -100,6 +126,7 @@ const ExpenseTracker = () => {
       }
     };
 
+    loadReferenceData();
     loadRecord();
     return () => {
       active = false;
@@ -126,7 +153,7 @@ const ExpenseTracker = () => {
     statusColor = "bg-red-500/30 text-red-300 border-red-500/40";
   }
 
-  const categoryTotals = CATEGORIES.reduce((acc, cat) => {
+  const categoryTotals = categories.reduce((acc, cat) => {
     acc[cat] = expenses
       .filter((e) => e.category === cat)
       .reduce((sum, e) => sum + e.amount, 0);
@@ -396,7 +423,7 @@ const ExpenseTracker = () => {
                 onChange={handlePlanChange}
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:ring-2 focus:ring-green-400"
               >
-                {PLAN_CROPS.map((crop) => (
+                {planCrops.map((crop) => (
                   <option key={crop} value={crop} className="bg-zinc-900 text-white">
                     {crop}
                   </option>
@@ -413,7 +440,7 @@ const ExpenseTracker = () => {
                 onChange={handlePlanChange}
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:ring-2 focus:ring-green-400"
               >
-                {SEASONS.map((season) => (
+                {seasons.map((season) => (
                   <option key={season} value={season} className="bg-zinc-900 text-white">
                     {season}
                   </option>
@@ -508,7 +535,7 @@ const ExpenseTracker = () => {
                 onChange={(e) => setCategory(e.target.value)}
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:ring-2 focus:ring-green-400"
               >
-                {CATEGORIES.map((cat) => (
+                {categories.map((cat) => (
                   <option key={cat} value={cat} className="bg-zinc-900 text-white">
                     {cat}
                   </option>
@@ -579,7 +606,7 @@ const ExpenseTracker = () => {
               Category Breakdown
             </h2>
             <div className="space-y-3">
-              {CATEGORIES.filter((cat) => categoryTotals[cat] > 0).map(
+              {categories.filter((cat) => categoryTotals[cat] > 0).map(
                 (cat) => (
                   <div key={cat}>
                     <div className="mb-1 flex items-center justify-between text-xs text-white/55">

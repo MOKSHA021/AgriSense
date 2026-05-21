@@ -8,6 +8,8 @@ const connectDB = require('./config/db');
 const marketRoutes = require("./routes/market");
 const expenseRoutes = require("./routes/expenses");
 const inputAdvisorRoutes = require("./routes/inputAdvisor");
+const referenceRoutes = require("./routes/reference");
+const mlRoutes = require("./routes/ml");
 
 
 
@@ -38,6 +40,8 @@ app.use('/api/auth', require('./routes/auth'));
 app.use("/api/market", marketRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/input-advisor", inputAdvisorRoutes);
+app.use("/api/reference", referenceRoutes);
+app.use("/api/ml", mlRoutes);
 
 app.get('/', (req, res) => res.json({ status: 'AgriSense Backend Running' }));
 
