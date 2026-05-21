@@ -52,9 +52,9 @@ const LivePrices = () => {
               required
               className="w-full px-4 py-3 border border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white/10"
             >
-              <option value="">Select crop</option>
+              <option value="" className="bg-zinc-900 text-white">Select crop</option>
               {CROPS.map((c) => (
-                <option key={c.name} value={c.name}>{c.icon} {c.name}</option>
+                <option key={c.name} value={c.name} className="bg-zinc-900 text-white">{c.icon} {c.name}</option>
               ))}
             </select>
           </div>
@@ -67,9 +67,9 @@ const LivePrices = () => {
               required
               className="w-full px-4 py-3 border border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white/10"
             >
-              <option value="">Select state</option>
+              <option value="" className="bg-zinc-900 text-white">Select state</option>
               {STATES.map((s) => (
-                <option key={s} value={s}>{s}</option>
+                <option key={s} value={s} className="bg-zinc-900 text-white">{s}</option>
               ))}
             </select>
           </div>
@@ -89,9 +89,15 @@ const LivePrices = () => {
 
         {liveLoading && (
           <div className="bg-black/40 backdrop-blur-md rounded-3xl p-8 border border-white/10 flex items-center justify-center min-h-[300px]">
-            <div className="text-center space-y-3">
-              <p className="text-3xl animate-bounce">📊</p>
-              <p className="text-white/40 text-sm animate-pulse">Fetching live prices...</p>
+            <div className="flex flex-col items-center justify-center space-y-5">
+              <div className="relative w-16 h-16 flex items-center justify-center">
+                <div className="absolute inset-0 rounded-full border-[3px] border-white/5"></div>
+                <div className="absolute inset-0 rounded-full border-[3px] border-emerald-500 border-t-transparent animate-spin drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+              </div>
+              <div className="flex flex-col items-center">
+                <p className="text-emerald-400 font-semibold text-sm tracking-widest uppercase mb-1 animate-pulse">Connecting</p>
+                <p className="text-white/40 text-xs text-center">Fetching real-time market data...</p>
+              </div>
             </div>
           </div>
         )}

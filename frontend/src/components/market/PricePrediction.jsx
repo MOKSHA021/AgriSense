@@ -99,12 +99,12 @@ const PricePrediction = () => {
               required
               className="w-full px-4 py-3 border border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-400 bg-white/5"
             >
-              <option value="">Select crop</option>
-              <optgroup label="🤖 Prophet ML Model">
-                {mlCrops.map((c) => <option key={c.name} value={c.name}>{c.icon} {c.name}</option>)}
+              <option value="" className="bg-zinc-900 text-white">Select crop</option>
+              <optgroup label="🤖 Prophet ML Model" className="bg-zinc-900 text-white">
+                {mlCrops.map((c) => <option key={c.name} value={c.name} className="bg-zinc-900 text-white">{c.icon} {c.name}</option>)}
               </optgroup>
-              <optgroup label="📊 Statistical Fallback">
-                {otherCrops.map((c) => <option key={c.name} value={c.name}>{c.icon} {c.name}</option>)}
+              <optgroup label="📊 Statistical Fallback" className="bg-zinc-900 text-white">
+                {otherCrops.map((c) => <option key={c.name} value={c.name} className="bg-zinc-900 text-white">{c.icon} {c.name}</option>)}
               </optgroup>
             </select>
           </div>
