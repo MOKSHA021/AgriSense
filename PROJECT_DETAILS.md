@@ -148,34 +148,37 @@ Frontend displays weather data
 
 ---
 
-### 4. Market Prices
+### 4. Market Prices (Split Architecture)
 
-**Purpose**: Provide agricultural commodity prices from mandi markets.
+**Purpose**: Provide comprehensive market tools including finding the best mandi, checking live prices, and predicting future trends.
 
 **Data Flow**:
 ```
-Frontend (MarketPrices.jsx)
-  ↓ API.get("/api/market/commodity/:commodity")
-Backend (market.js → marketController.js)
-  ↓ Fetches from data.gov.in API
-  ↓ Scrapes from todaypricerates.com
-Backend returns price data
-Frontend displays market prices
+Best Mandi (BestMandi.jsx)
+  ↓ Background geocoding via Nominatim
+  ↓ API.post("/market/best-mandis")
+
+Live Prices (LivePricesDashboard.jsx)
+  ↓ Scrapes from Agmarknet / todaypricerates
+
+Price Forecast (PriceForecast.jsx)
+  ↓ Prophet ML Time-Series Prediction
 ```
 
 **API Endpoints**:
-- `GET /api/market/commodity/:commodity` - Get market prices for commodity
-- `GET /api/market/commodities` - Get list of available commodities
+- `GET /api/market/commodity/:commodity` - Get market prices
+- `GET /api/market/commodities` - List available commodities
+- `POST /api/market/best-mandis` - Get best options
 
 **Data Sources**:
-- Price data: data.gov.in API, todaypricerates.com (external)
+- Price data: data.gov.in API, todaypricerates.com
+- Geocoding: OpenStreetMap Nominatim
 
-**Logic Type**: External API + Web Scraping
+**Logic Type**: External API + Web Scraping + ML Prediction
 
 **Files**:
-- Frontend: `frontend/src/pages/MarketPrices.jsx`
-- Backend Route: `backend/routes/market.js`
-- Backend Controller: `backend/controllers/marketController.js`
+- Frontend: `frontend/src/pages/BestMandi.jsx`, `frontend/src/pages/LivePricesDashboard.jsx`, `frontend/src/pages/PriceForecast.jsx`
+- Backend: `backend/routes/market.js`, `backend/controllers/marketController.js`
 
 ---
 
@@ -265,46 +268,7 @@ Frontend displays forecast
 
 ---
 
-### 7. Input Advisor
 
-**Purpose**: Recommend agricultural inputs (seeds, fertilizers) with seller information.
-
-**Data Flow**:
-```
-Frontend (InputAdvisor.jsx)
-  ↓ useEffect on mount
-  ↓ API.get("/input-advisor/crops")
-Backend (inputAdvisor.js)
-  ↓ Returns crops from CROP_REQUIREMENTS keys
-Frontend stores in state
-  ↓ User enters crop, area, location
-  ↓ API.post("/input-advisor/recommend", { crop, area, location })
-Backend (inputAdvisor.js)
-  ↓ Uses CROP_REQUIREMENTS (hardcoded in backend)
-  ↓ Queries MongoDB InputInventory for sellers
-  ↓ Calculates total cost
-  ↓ Returns recommendations
-Frontend displays sellers and total cost
-```
-
-**API Endpoints**:
-- `GET /api/input-advisor/crops` - Get available crops
-- `POST /api/input-advisor/recommend` - Get input recommendations
-- `GET /api/input-advisor/inventory` - Get seller inventory
-- `POST /api/input-advisor/inventory` - Add seller inventory (admin)
-
-**Data Sources**:
-- Crop requirements: Backend static data (inputAdvisor.js)
-- Seller inventory: MongoDB (InputInventory model)
-
-**Logic Type**: Rule-based calculations with MongoDB
-
-**Files**:
-- Frontend: `frontend/src/pages/InputAdvisor.jsx`
-- Backend Route: `backend/routes/inputAdvisor.js`
-- Backend Model: `backend/models/InputInventory.js`
-
----
 
 ### 8. Pest Detection (Incomplete)
 
@@ -428,7 +392,7 @@ All 5 features previously using static/hardcoded data have been migrated to use 
 2. **Risk Assessment**: Risk computation and safe crops logic centralized in backend
 3. **Soil Analysis**: Soil database fetched from `/api/reference/soil-database`
 4. **Crop Recommendation**: Soil presets and crop data fetched from `/api/reference/*`
-5. **Input Advisor**: Crop list fetched from `/api/input-advisor/crops`
+4. **Crop Recommendation**: Soil presets and crop data fetched from `/api/reference/*`
 
 ### ML Integration
 1. **Crop Recommendation**: Now uses ML Service (Random Forest) instead of rule-based scoring
@@ -441,10 +405,6 @@ All 5 features previously using static/hardcoded data have been migrated to use 
 ### Risk Assessment
 - Replace rule-based logic with ML model for risk prediction
 - Train model on historical weather data and crop outcomes
-
-### Input Advisor
-- Move CROP_REQUIREMENTS to reference API
-- Implement dynamic seller data management
 
 ### Pest Detection
 - Complete ML model integration for pest detection
@@ -486,8 +446,9 @@ AgriSense/
 │   │   ├── pages/
 │   │   │   ├── Dashboard.jsx
 │   │   │   ├── ExpenseTracker.jsx
-│   │   │   ├── InputAdvisor.jsx
-│   │   │   ├── MarketPrices.jsx
+│   │   │   ├── BestMandi.jsx
+│   │   │   ├── LivePricesDashboard.jsx
+│   │   │   ├── PriceForecast.jsx
 │   │   │   ├── RiskAssessment.jsx
 │   │   │   ├── SoilAnalysis.jsx
 │   │   │   ├── CropRecommend.jsx
@@ -538,12 +499,6 @@ AgriSense/
 - `POST /api/expenses`
 - `POST /api/expenses/plan`
 
-### Input Advisor API (requires auth)
-- `GET /api/input-advisor/crops`
-- `POST /api/input-advisor/recommend`
-- `GET /api/input-advisor/inventory`
-- `POST /api/input-advisor/inventory`
-
 ### Market API
 - `GET /api/market/commodities`
 - `GET /api/market/commodity/:commodity`
@@ -561,10 +516,11 @@ AgriSense/
 | Soil Analysis | Backend API + ML Service | ML-based | ✅ Complete |
 | Crop Recommendation | Backend API + ML Service | ML-based | ✅ Complete |
 | Weather Forecast | External API | External API | ✅ Complete |
-| Market Prices | External APIs | External API + Scraping | ✅ Complete |
+| Best Mandi | External APIs | Geocoding | ✅ Complete |
+| Live Prices | External APIs | API + Scraping | ✅ Complete |
+| Price Forecast | ML Service | Prophet Model | ✅ Complete |
 | Risk Assessment | Backend API | Rule-based (centralized) | ✅ Complete |
 | Expense Tracker | Backend API + MongoDB | CRUD | ✅ Complete |
-| Input Advisor | Backend API + MongoDB | Rule-based | ✅ Complete |
 | Pest Detection | - | - | ⏳ Incomplete |
 
 ---

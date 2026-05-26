@@ -17,7 +17,6 @@ dotenv.config();
 connectDB();
 
 const app = express();
-//OYY AVUTHAADAAA
 
 app.use(helmet());
 // app.use(cors()); // ← allows ALL origins
@@ -35,8 +34,6 @@ const limiter = rateLimit({
   message: { message: 'Too many requests, please try again after 15 minutes' }
 });
 app.use('/api/', limiter);
-
-// Only auth for now
 app.use('/api/auth', require('./routes/auth'));
 app.use("/api/market", marketRoutes);
 app.use("/api/expenses", expenseRoutes);
