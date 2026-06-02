@@ -7,7 +7,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import VerifyOTP from "./pages/VerifyOTP";
 import Dashboard from "./pages/Dashboard";
-import SoilAnalysis from "./pages/SoilAnalysis";
+
 import CropRecommend from "./pages/CropRecommend";
 import BestMandi from "./pages/BestMandi";
 import LivePricesDashboard from "./pages/LivePricesDashboard";
@@ -26,7 +26,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/verify-otp" element={<VerifyOTP />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/dashboard/soil" element={<ProtectedRoute><SoilAnalysis /></ProtectedRoute>} />
+
           <Route path="/dashboard/recommend" element={<ProtectedRoute><CropRecommend /></ProtectedRoute>} />
           <Route path="/dashboard/best-mandi" element={<ProtectedRoute><BestMandi /></ProtectedRoute>} />
           <Route path="/dashboard/live-prices" element={<ProtectedRoute><LivePricesDashboard /></ProtectedRoute>} />
