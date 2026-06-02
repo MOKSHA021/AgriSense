@@ -71,10 +71,14 @@ class PriceResponse(BaseModel):
 def predict_price(data: PriceInput):
     model = _load_model(data.crop_name)
     if model is None:
-        raise HTTPException(
-            status_code=404,
-            detail=f"No price model found for '{data.crop_name}'. "
-                   f"Run train_price.py first."
+        logger.warning(f"[price] No price model found for '{data.crop_name}'. Using mock mode.")
+        return PriceResponse(
+            crop=data.crop_name,
+            harvest_date=data.harvest_date,
+            predicted_price=2500.0,
+            lower_bound=2400.0,
+            upper_bound=2600.0,
+            confidence_level="mock"
         )
 
     target_dt = pd.to_datetime(data.harvest_date)

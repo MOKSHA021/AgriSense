@@ -20,17 +20,23 @@ _model_path   = os.path.join(BASE_DIR, 'models', 'crop_model.pkl')
 _encoder_path = os.path.join(BASE_DIR, 'models', 'label_encoder.pkl')
 _npk_path     = os.path.join(BASE_DIR, 'data',   'soil_npk.json')
 
-for _p, _name in [(_model_path, 'crop_model'), (_encoder_path, 'label_encoder'), (_npk_path, 'soil_npk.json')]:
-    if not os.path.exists(_p):
-        raise RuntimeError(f"[crop] Required file not found: {_p}")
+pipeline = None
+le = None
+npk = {}
 
-pipeline = joblib.load(_model_path)   # ← Full sklearn Pipeline (scaler + RF)
-le       = joblib.load(_encoder_path)
-with open(_npk_path) as f:
-    npk = json.load(f)
+if os.path.exists(_npk_path):
+    with open(_npk_path) as f:
+        npk = json.load(f)
+else:
+    logger.warning(f"[crop] Required file not found: {_npk_path}")
 
-logger.info(f"[crop] Pipeline loaded | Classes: {len(le.classes_)} crops | "
-            f"Soil types available: {list(npk.keys())}")
+if os.path.exists(_model_path) and os.path.exists(_encoder_path):
+    pipeline = joblib.load(_model_path)   # ← Full sklearn Pipeline (scaler + RF)
+    le       = joblib.load(_encoder_path)
+    logger.info(f"[crop] Pipeline loaded | Classes: {len(le.classes_)} crops | "
+                f"Soil types available: {list(npk.keys())}")
+else:
+    logger.warning("[crop] Model files not found. Using mock mode.")
 
 
 # ── Schema ────────────────────────────────────────────────────────────────────
@@ -74,6 +80,17 @@ def predict_crop(data: CropInput):
         data.temperature, data.humidity,
         s['ph'], data.rainfall
     ]]
+
+    if pipeline is None or le is None:
+        logger.warning("[crop] Returning mock data since model is missing.")
+        return CropResponse(
+            soil_type=data.soil_type,
+            crops=[
+                CropPrediction(crop="Rice", score=0.95),
+                CropPrediction(crop="Wheat", score=0.85),
+                CropPrediction(crop="Maize", score=0.75),
+            ]
+        )
 
     try:
         probs    = pipeline.predict_proba(features)[0]

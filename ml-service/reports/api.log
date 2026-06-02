@@ -45,3 +45,22 @@
 2026-05-20 08:54:34,734 | INFO | agrisense | [soil] ‚Üí Alluvial_Soil (74.48%) | file=Screenshot 2026-05-20 085413.png size=261KB
 2026-05-20 08:54:34,736 | INFO | agrisense | ‚Üê POST /predict/soil | 200
 2026-05-20 10:14:36,441 | INFO | agrisense | AgriSense ML Service ‚Äî Shutting Down
+2026-06-02 19:04:39,008 | WARNING | agrisense | [soil] Model file not found: C:\Users\POSHITH\GITHUB\New folder (4)\AgriSense\ml-service\models\soil_model.pt. Using mock mode.
+2026-06-02 19:04:40,200 | WARNING | agrisense | [crop] Required file not found: C:\Users\POSHITH\GITHUB\New folder (4)\AgriSense\ml-service\data\soil_npk.json
+2026-06-02 19:04:40,201 | WARNING | agrisense | [crop] Model files not found. Using mock mode.
+2026-06-02 19:04:47,851 | INFO | agrisense | =======================================================
+2026-06-02 19:04:47,852 | INFO | agrisense |   AgriSense ML Service ó Starting Up
+2026-06-02 19:04:47,856 | INFO | agrisense |   Time    : 2026-06-02T13:34:47.856426Z
+2026-06-02 19:04:47,856 | INFO | agrisense |   Base dir: C:\Users\POSHITH\GITHUB\New folder (4)\AgriSense\ml-service
+2026-06-02 19:04:47,858 | WARNING | agrisense | Missing model files (run training scripts first): ['crop_model.pkl', 'label_encoder.pkl', 'soil_model.pt']
+2026-06-02 19:04:47,859 | INFO | agrisense | =======================================================
+2026-06-02 19:04:47,965 | INFO | agrisense | AgriSense ML Service ó Shutting Down
+2026-06-02 19:05:11,150 | WARNING | agrisense | [soil] Model file not found: C:\Users\POSHITH\GITHUB\New folder (4)\AgriSense\ml-service\models\soil_model.pt. Using mock mode.
+2026-06-02 19:05:11,763 | WARNING | agrisense | [crop] Required file not found: C:\Users\POSHITH\GITHUB\New folder (4)\AgriSense\ml-service\data\soil_npk.json
+2026-06-02 19:05:11,764 | WARNING | agrisense | [crop] Model files not found. Using mock mode.
+2026-06-02 19:05:14,106 | INFO | agrisense | =======================================================
+2026-06-02 19:05:14,107 | INFO | agrisense |   AgriSense ML Service ó Starting Up
+2026-06-02 19:05:14,108 | INFO | agrisense |   Time    : 2026-06-02T13:35:14.108092Z
+2026-06-02 19:05:14,108 | INFO | agrisense |   Base dir: C:\Users\POSHITH\GITHUB\New folder (4)\AgriSense\ml-service
+2026-06-02 19:05:14,110 | WARNING | agrisense | Missing model files (run training scripts first): ['crop_model.pkl', 'label_encoder.pkl', 'soil_model.pt']
+2026-06-02 19:05:14,111 | INFO | agrisense | =======================================================
