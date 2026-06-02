@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AnimatedBackground from "./components/AnimatedBackground";
 
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
@@ -19,6 +20,7 @@ import Weather from "./pages/Weather";
 function App() {
   return (
     <AuthProvider>
+      <AnimatedBackground />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />

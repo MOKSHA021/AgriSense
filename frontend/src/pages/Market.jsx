@@ -13,7 +13,7 @@ const geocodeMandi = async (mandiName, district, state) => {
     const query = `${mandiName}, ${district}, ${state}, India`;
     const res = await fetch(
       `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`,
-      { headers: { "User-Agent": "AgriSense/1.0" } }
+      { headers: { "Accept-Language": "en-US,en;q=0.9" } }
     );
     const data = await res.json();
     if (data.length) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
@@ -59,11 +59,11 @@ const Market = () => {
         setFlyTarget(coords);
         fetch(
           `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords[0]}&lon=${coords[1]}`,
-          { headers: { "User-Agent": "AgriSense/1.0" } }
+          { headers: { "Accept-Language": "en-US,en;q=0.9" } }
         )
-          .then((r) => r.json())
-          .then((d) => setFarmerAddress(d.display_name?.split(",").slice(0, 3).join(", ")))
-          .catch(() => {});
+          .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
+          .then((d) => setFarmerAddress(d.display_name?.split(",").slice(0, 3).join(", ") || "Hyderabad"))
+          .catch(() => { setFarmerAddress("Hyderabad") });
       },
       () => {}
     );

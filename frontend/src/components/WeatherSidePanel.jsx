@@ -206,9 +206,21 @@ const WeatherSidePanel = () => {
       
       let resolvedCityName = cityNameFallback;
       if (!resolvedCityName) {
-        const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
-        const geo = await geoRes.json();
-        resolvedCityName = geo.address?.city || geo.address?.town || geo.address?.village || geo.address?.county || "Your Location";
+        try {
+          const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`, {
+            headers: {
+              "Accept-Language": "en-US,en;q=0.9"
+            }
+          });
+          if (geoRes.ok) {
+            const geo = await geoRes.json();
+            resolvedCityName = geo.address?.city || geo.address?.town || geo.address?.village || geo.address?.county || "Hyderabad";
+          } else {
+            resolvedCityName = "Hyderabad";
+          }
+        } catch (e) {
+          resolvedCityName = "Hyderabad";
+        }
       }
 
       const curWeather = mapWmoToOwm(data.current.weather_code, data.current.is_day);

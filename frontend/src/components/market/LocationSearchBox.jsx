@@ -3,7 +3,7 @@ import { Loader, MapPin, Search } from "lucide-react";
 
 async function nominatimSearch(query) {
   const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`;
-  const res = await fetch(url, { headers: { "User-Agent": "AgriSense/1.0" } });
+  const res = await fetch(url, { headers: { "Accept-Language": "en-US,en;q=0.9" } });
   return res.json();
 }
 

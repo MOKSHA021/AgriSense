@@ -1,17 +1,17 @@
 import { useContext, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  Wheat, LayoutDashboard, FlaskConical, Sprout, CloudSun,
-  TrendingUp, ShieldAlert, Wallet, ShoppingCart, Menu, X, LogOut, Map, Activity, Bot
+  Wheat, LayoutDashboard, Sprout, CloudSun,
+  ShieldAlert, Wallet, Menu, X, LogOut, Map, Activity, Bot
 } from "lucide-react";
 
 const navLinks = [
-  { label: "Home",        path: "/dashboard",                 icon: LayoutDashboard, color: "text-green-400"  },
+  { label: "Home",        path: "/dashboard",                 icon: LayoutDashboard, color: "text-emerald-400" },
   { label: "Weather",     path: "/dashboard/weather",         icon: CloudSun,        color: "text-blue-400"   },
-
-  { label: "Crops",       path: "/dashboard/recommend",       icon: Sprout,          color: "text-lime-400"   },
-  { label: "Best Mandi",  path: "/dashboard/best-mandi",      icon: Map,             color: "text-emerald-400"},
+  { label: "Crops",       path: "/dashboard/recommend",       icon: Sprout,          color: "text-green-400"  },
+  { label: "Best Mandi",  path: "/dashboard/best-mandi",      icon: Map,             color: "text-teal-400"   },
   { label: "Live Prices", path: "/dashboard/live-prices",     icon: Activity,        color: "text-pink-400"   },
   { label: "Forecast",    path: "/dashboard/price-forecast",  icon: Bot,             color: "text-indigo-400" },
   { label: "Risk",        path: "/dashboard/risk",            icon: ShieldAlert,     color: "text-orange-400" },
@@ -21,6 +21,7 @@ const navLinks = [
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const userName = user?.user?.name || user?.name || "Farmer";
@@ -29,113 +30,116 @@ const Navbar = () => {
   const handleLogout = () => { logout(); navigate("/login"); };
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-white/8 bg-black/50 backdrop-blur-xl">
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
+    <nav className="sticky top-0 z-50 w-full border-b border-white/5 bg-transparent backdrop-blur-3xl">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
         {/* Logo */}
-        <NavLink to="/dashboard" className="flex items-center gap-2 shrink-0">
-          <div className="w-7 h-7 bg-gradient-to-br from-green-400 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg shadow-green-900/40">
+        <NavLink to="/dashboard" className="flex items-center gap-2.5 shrink-0 group">
+          <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-green-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-900/40 group-hover:scale-105 transition-transform">
             <Wheat className="h-4 w-4 text-white" />
           </div>
-          <span className="text-base font-bold bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent">
+          <span className="text-lg font-bold text-white tracking-tight">
             AgriSense
           </span>
         </NavLink>
 
-        {/* Desktop nav */}
-        <div className="hidden items-center gap-0.5 md:flex overflow-x-auto">
-          {navLinks.map(({ label, path, icon: Icon, color }) => (
-            <NavLink
-              key={path}
-              to={path}
-              end={path === "/dashboard"}
-              className={({ isActive }) =>
-                `group relative flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-medium transition-all duration-200 ${
-                  isActive
-                    ? "bg-white/10 text-white"
-                    : "text-white/45 hover:bg-white/8 hover:text-white/80"
-                }`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <Icon className={`h-3.5 w-3.5 transition-colors ${isActive ? color : "text-current"}`} />
+        {/* Desktop nav with Framer Motion layout animations */}
+        <div className="hidden items-center gap-1 md:flex">
+          {navLinks.map(({ label, path, icon: Icon, color }) => {
+            const isActive = location.pathname === path || (path !== "/dashboard" && location.pathname.startsWith(path));
+            
+            return (
+              <NavLink
+                key={path}
+                to={path}
+                className={`relative flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
+                  isActive ? "text-white" : "text-white/40 hover:text-white/80"
+                }`}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="activeNavTab"
+                    className="absolute inset-0 bg-white/10 rounded-xl"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
+                <span className="relative z-10 flex items-center gap-2">
+                  <Icon className={`h-4 w-4 transition-colors ${isActive ? color : "text-current"}`} />
                   {label}
-                  {isActive && (
-                    <span className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full ${color.replace("text-", "bg-")} opacity-80`} />
-                  )}
-                </>
-              )}
-            </NavLink>
-          ))}
+                </span>
+              </NavLink>
+            );
+          })}
         </div>
 
         {/* Right side */}
-        <div className="flex items-center gap-2">
-          <div className="hidden items-center gap-2 md:flex">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-green-500/30 to-emerald-500/30 border border-green-500/30 text-sm font-bold text-green-300">
+        <div className="flex items-center gap-3">
+          <div className="hidden items-center gap-3 md:flex border-l border-white/10 pl-4">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20 border border-emerald-500/30 text-xs font-bold text-emerald-400">
               {initials}
             </div>
-            <span className="text-xs font-medium text-white/50 max-w-[80px] truncate">{userName}</span>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-1 rounded-xl px-2.5 py-1.5 text-xs text-white/40 transition-all hover:bg-red-500/10 hover:text-red-400 border border-transparent hover:border-red-500/20"
+              className="group flex items-center justify-center h-8 w-8 rounded-full hover:bg-red-500/10 hover:text-red-400 text-white/40 transition-colors"
               title="Logout"
             >
-              <LogOut className="h-3.5 w-3.5" />
+              <LogOut className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
             </button>
           </div>
 
           {/* Mobile hamburger */}
           <button
             onClick={() => setMenuOpen((prev) => !prev)}
-            className="rounded-xl p-2 text-white/50 hover:bg-white/10 hover:text-white md:hidden transition-colors"
+            className="rounded-xl p-2 text-white/60 hover:bg-white/10 hover:text-white md:hidden transition-colors"
           >
             {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {menuOpen && (
-        <div className="border-t border-white/8 bg-black/60 backdrop-blur-xl px-4 pb-5 pt-3 md:hidden">
-          <div className="grid grid-cols-2 gap-1">
-            {navLinks.map(({ label, path, icon: Icon, color }) => (
-              <NavLink
-                key={path}
-                to={path}
-                end={path === "/dashboard"}
-                onClick={() => setMenuOpen(false)}
-                className={({ isActive }) =>
-                  `flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
-                    isActive ? "bg-white/10 text-white" : "text-white/50 hover:bg-white/8 hover:text-white"
-                  }`
-                }
-              >
-                {({ isActive }) => (
-                  <>
+      {/* Mobile menu with AnimatePresence */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="border-t border-white/5 bg-[#030712]/95 backdrop-blur-3xl overflow-hidden md:hidden"
+          >
+            <div className="px-4 py-4 grid grid-cols-2 gap-2">
+              {navLinks.map(({ label, path, icon: Icon, color }) => {
+                const isActive = location.pathname === path || (path !== "/dashboard" && location.pathname.startsWith(path));
+                return (
+                  <NavLink
+                    key={path}
+                    to={path}
+                    onClick={() => setMenuOpen(false)}
+                    className={`flex items-center gap-2.5 rounded-xl px-3 py-3 text-sm font-medium transition-all ${
+                      isActive ? "bg-white/10 text-white" : "text-white/40 hover:bg-white/5 hover:text-white"
+                    }`}
+                  >
                     <Icon className={`h-4 w-4 ${isActive ? color : "text-current"}`} />
                     {label}
-                  </>
-                )}
-              </NavLink>
-            ))}
-          </div>
-          <div className="mt-4 flex items-center justify-between border-t border-white/8 pt-3">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-green-500/30 to-emerald-500/30 border border-green-500/30 text-sm font-bold text-green-300">
-                {initials}
-              </div>
-              <span className="text-sm font-medium text-white/60">{userName}</span>
+                  </NavLink>
+                );
+              })}
             </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm text-white/40 hover:bg-red-500/10 hover:text-red-400 transition-all"
-            >
-              <LogOut className="h-4 w-4" /> Logout
-            </button>
-          </div>
-        </div>
-      )}
+            <div className="flex items-center justify-between border-t border-white/5 px-6 py-4 bg-white/5">
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-500/20 border border-emerald-500/30 text-sm font-bold text-emerald-400">
+                  {initials}
+                </div>
+                <span className="text-sm font-medium text-white/80">{userName}</span>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-white/40 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+              >
+                <LogOut className="h-4 w-4" /> Logout
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };

@@ -1,32 +1,36 @@
 import Navbar from "../components/Navbar";
 import LivePrices from "../components/market/LivePrices";
+import { motion } from "framer-motion";
+import { Activity } from "lucide-react";
 
 const LivePricesDashboard = () => {
   return (
-    <div className="min-h-screen relative">
-      <div className="fixed inset-0 z-0">
-        <img
-          src="https://images.unsplash.com/photo-1595841696677-6489ff3f8cd1?w=1920&q=80"
-          alt=""
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/50" />
-      </div>
-      <div className="relative z-10">
-        <Navbar />
-        <main className="max-w-6xl mx-auto px-4 py-10 space-y-8">
+    <div className="min-h-screen bg-transparent text-white selection:bg-emerald-500/30">
+      <Navbar />
+
+      <main className="relative z-10 max-w-6xl mx-auto px-6 py-12">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-10 flex items-center gap-4"
+        >
+          <div className="w-12 h-12 bg-pink-500/20 rounded-2xl flex items-center justify-center border border-pink-500/30">
+            <Activity className="w-6 h-6 text-pink-400" />
+          </div>
           <div>
-            <h1 className="text-2xl font-bold text-white drop-shadow">📋 Live Market Prices</h1>
-            <p className="text-white/70 text-sm mt-1">
-              Real-time prices from mandis across India.
+            <h1 className="text-3xl font-bold text-white tracking-tight">Live Market Prices</h1>
+            <p className="text-white/40 text-sm mt-1 font-medium">
+              Real-time commodity rates straight from the mandis.
             </p>
           </div>
-          <LivePrices />
-          <p className="text-center text-xs text-white/40 pb-4 mt-8">
-            🌾 AgriSense · Mandi data: Agmarknet · © {new Date().getFullYear()}
-          </p>
-        </main>
-      </div>
+        </motion.div>
+
+        <LivePrices />
+        
+        <p className="text-center text-xs text-white/30 font-medium mt-16">
+          AgriSense · Data powered by Agmarknet · © {new Date().getFullYear()}
+        </p>
+      </main>
     </div>
   );
 };

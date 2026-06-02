@@ -64,3 +64,8 @@
 2026-06-02 19:05:14,108 | INFO | agrisense |   Base dir: C:\Users\POSHITH\GITHUB\New folder (4)\AgriSense\ml-service
 2026-06-02 19:05:14,110 | WARNING | agrisense | Missing model files (run training scripts first): ['crop_model.pkl', 'label_encoder.pkl', 'soil_model.pt']
 2026-06-02 19:05:14,111 | INFO | agrisense | =======================================================
+2026-06-02 19:10:12,698 | WARNING | agrisense | [soil] Returning mock data since model is missing.
+2026-06-02 19:10:23,652 | WARNING | agrisense | [soil] Returning mock data since model is missing.
+2026-06-02 19:10:32,432 | WARNING | agrisense | [soil] Returning mock data since model is missing.
+2026-06-02 19:31:47,291 | WARNING | agrisense | [price] No price model found for 'Tomato'. Using mock mode.
+2026-06-02 19:48:02,149 | WARNING | agrisense | [soil] Returning mock data since model is missing.

@@ -90,8 +90,9 @@ const InputAdvisor = () => {
           const { latitude, longitude } = pos.coords;
           const response = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
-            { headers: { "User-Agent": "AgriSense/1.0" } },
+            { headers: { "Accept-Language": "en-US,en;q=0.9" } },
           );
+          if (!response.ok) throw new Error("Fetch failed");
           const data = await response.json();
           const address = data.address || {};
           const resolved =
@@ -101,11 +102,11 @@ const InputAdvisor = () => {
             address.suburb ||
             address.county ||
             address.state ||
-            "Detected location";
+            "Hyderabad";
           setLocation(resolved);
           resetResults();
         } catch {
-          setLocation(`${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`);
+          setLocation("Hyderabad");
           resetResults();
         } finally {
           setDetecting(false);

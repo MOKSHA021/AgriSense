@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/Navbar";
 import API from "../services/api";
 import {
@@ -184,20 +185,21 @@ export default function CropRecommend() {
       async (pos) => {
         const { latitude, longitude } = pos.coords;
         try {
-          const [geoRes, weatherRes, soilRes] = await Promise.all([
-            // Location Name
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`, { headers: { "User-Agent": "AgriSense/1.0" } }),
+          const [geo, wData, sData] = await Promise.all([
+            // Location Name (Fallback on fail)
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`, { headers: { "Accept-Language": "en-US,en;q=0.9" } })
+              .then(res => res.ok ? res.json() : {})
+              .catch(() => ({})),
             // Weather from Open-Meteo
-            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,precipitation`),
+            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,precipitation`)
+              .then(res => res.json()),
             // Soil from SoilGrids
             fetch(`https://rest.isric.org/soilgrids/v2.0/properties/query?lon=${longitude}&lat=${latitude}&property=nitrogen&property=phh2o&property=soc&property=cec&depth=0-5cm&value=mean`)
+              .then(res => res.json())
+              .catch(() => ({}))
           ]);
 
-          const geo = await geoRes.json();
-          const wData = await weatherRes.json();
-          const sData = await soilRes.json();
-
-          setLocationName(geo.address?.city || geo.address?.town || geo.address?.village || geo.address?.county || "Your Location");
+          setLocationName(geo.address?.city || geo.address?.town || geo.address?.village || geo.address?.county || "Hyderabad");
           
           // Set Weather
           // Using a proxy for rainfall (100mm default if no heavy precipitation now, just to have a baseline). 
@@ -346,15 +348,7 @@ export default function CropRecommend() {
   };
 
   return (
-    <div className="min-h-screen relative">
-      <div className="fixed inset-0 z-0">
-        <img
-          src="https://images.unsplash.com/photo-1592982537447-6f296d9b3004?w=1920&q=80"
-          alt="Agriculture"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-      </div>
+    <div className="min-h-screen bg-transparent text-white selection:bg-emerald-500/30">
 
       <div className="relative z-10">
         <Navbar />
@@ -374,7 +368,12 @@ export default function CropRecommend() {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Left Column: Data Acquisition */}
-            <div className="lg:col-span-5 space-y-6">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, type: "spring" }}
+              className="lg:col-span-5 space-y-6"
+            >
               
               {/* Step 1: GPS Auto-Detect */}
               <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-2xl">
@@ -454,10 +453,15 @@ export default function CropRecommend() {
                 </div>
               </div>
 
-            </div>
+            </motion.div>
 
             {/* Right Column: Parameters & Results */}
-            <div className="lg:col-span-7 space-y-6">
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.1, type: "spring" }}
+              className="lg:col-span-7 space-y-6"
+            >
               
               {/* Aggregated Parameters */}
               <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-2xl">
@@ -535,15 +539,26 @@ export default function CropRecommend() {
               </div>
 
               {/* Results */}
-              {results && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <AnimatePresence>
+                {results && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="space-y-4"
+                  >
                   <h2 className="text-xl font-bold text-white flex items-center gap-2 drop-shadow">
                     <TrendingUp className="w-6 h-6 text-green-400" />
                     Top Recommendations
                   </h2>
                   
                   {results.map((crop, i) => (
-                    <div key={crop.name} className="bg-black/60 backdrop-blur-xl border border-white/10 hover:border-green-500/30 transition-colors rounded-2xl p-5 shadow-2xl">
+                    <motion.div 
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: i * 0.1 }}
+                      key={crop.name} 
+                      className="bg-white/[0.02] backdrop-blur-xl border border-white/10 hover:bg-white/[0.04] transition-colors rounded-3xl p-6 shadow-2xl"
+                    >
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-green-500/20 border border-green-500/40 text-green-300 font-bold flex items-center justify-center">
@@ -584,11 +599,12 @@ export default function CropRecommend() {
                           </p>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
               )}
-            </div>
+              </AnimatePresence>
+            </motion.div>
           </div>
         </div>
       </div>

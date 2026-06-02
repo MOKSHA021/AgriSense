@@ -4,52 +4,56 @@ const MandiCard = ({ mandi, index, isSelected, routeInfo, onSelect, onShowRoute 
   return (
     <div
       onClick={() => onSelect(mandi)}
-      className={`cursor-pointer rounded-2xl border bg-black/40 p-5 shadow-lg backdrop-blur-xl transition-all duration-200 hover:bg-white/5 ${
+      className={`cursor-pointer rounded-2xl border bg-white/[0.02] p-5 shadow-lg backdrop-blur-2xl transition-all duration-300 hover:bg-white/[0.04] ${
         isSelected
-          ? "border-green-400 ring-2 ring-green-400/20"
+          ? "border-teal-500 shadow-[0_0_20px_rgba(20,184,166,0.15)]"
           : mandi.isBest
-            ? "border-green-400/40"
-            : "border-white/10"
+            ? "border-teal-500/30"
+            : "border-white/5"
       }`}
     >
-      <div className="mb-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-4">
           <div
-            className={`flex h-9 w-9 items-center justify-center rounded-xl text-sm font-bold text-white ${
-              index === 0 ? "bg-green-500" : index === 1 ? "bg-white/20" : "bg-white/10"
+            className={`flex h-10 w-10 items-center justify-center rounded-xl text-sm font-black tracking-tighter text-white shadow-inner ${
+              index === 0 ? "bg-gradient-to-br from-teal-400 to-emerald-500" : index === 1 ? "bg-white/20" : "bg-white/5"
             }`}
           >
             #{index + 1}
           </div>
           <div>
-            <h3 className="flex items-center gap-2 font-bold text-white">
-              <Store className="h-4 w-4 text-white/60" />
+            <h3 className="flex items-center gap-2 font-bold text-white text-lg tracking-tight mb-0.5">
+              <Store className="h-4 w-4 text-white/40" />
               {mandi.name}
             </h3>
-            <p className="text-xs text-white/40">
+            <p className="text-xs font-medium text-white/40 uppercase tracking-wider">
               {mandi.district}
-              {mandi.date && ` - ${mandi.date}`}
+              {mandi.date && ` · ${mandi.date}`}
             </p>
           </div>
         </div>
 
-        <div className="flex flex-col items-end gap-1">
+        <div className="flex flex-col items-end gap-1.5">
           {mandi.isBest && (
-            <span className="flex items-center gap-1 rounded-full bg-green-500/20 px-3 py-1 text-xs font-bold text-green-300">
+            <span className="flex items-center gap-1 rounded-full bg-teal-500/20 border border-teal-500/30 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-teal-300 shadow-[0_0_10px_rgba(20,184,166,0.2)]">
               <Trophy className="h-3 w-3" />
               Best Deal
             </span>
           )}
           <span
-            className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-              mandi.isRealData ? "bg-green-500/25 text-green-300" : "bg-amber-500/25 text-amber-300"
+            className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+              mandi.isRealData 
+                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" 
+                : "bg-amber-500/10 border-amber-500/20 text-amber-400"
             }`}
           >
             {mandi.isRealData ? "Live" : "Demo"}
           </span>
           <span
-            className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs ${
-              mandi.lat && mandi.lng ? "bg-green-500/20 text-green-300" : "bg-white/10 text-white/40"
+            className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+              mandi.lat && mandi.lng 
+                ? "bg-blue-500/10 border-blue-500/20 text-blue-400" 
+                : "bg-white/5 border-white/10 text-white/40"
             }`}
           >
             <MapPin className="h-3 w-3" />
@@ -58,24 +62,24 @@ const MandiCard = ({ mandi, index, isSelected, routeInfo, onSelect, onShowRoute 
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-2 text-center">
-        <div className="rounded-xl bg-white/5 py-2.5">
-          <p className="text-xs text-white/40">Price/qtl</p>
+      <div className="grid grid-cols-3 gap-3 text-center">
+        <div className="rounded-xl border border-white/5 bg-white/5 py-3">
+          <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-white/40">Price/qtl</p>
           <p className="flex items-center justify-center font-bold text-sm text-white">
             <IndianRupee className="h-3.5 w-3.5" />
-            {mandi.pricePerUnit}
+            {mandi.pricePerUnit?.toLocaleString()}
           </p>
         </div>
-        <div className="rounded-xl bg-white/5 py-2.5">
-          <p className="text-xs text-white/40">Transport</p>
-          <p className="font-bold text-sm text-green-300">
-            {isSelected && routeInfo ? `-${routeInfo.totalCost?.toLocaleString()}` : "after route"}
+        <div className="rounded-xl border border-white/5 bg-white/5 py-3">
+          <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-white/40">Transport</p>
+          <p className="font-bold text-sm text-red-400">
+            {isSelected && routeInfo ? `-₹${routeInfo.totalCost?.toLocaleString()}` : "calc route"}
           </p>
         </div>
-        <div className="rounded-xl bg-white/5 py-2.5">
-          <p className="text-xs text-white/40">Gross Revenue</p>
-          <p className="font-bold text-sm text-green-300">
-            {(mandi.pricePerUnit * (mandi.quantity || 1))?.toLocaleString()}
+        <div className="rounded-xl border border-teal-500/10 bg-teal-500/5 py-3">
+          <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-teal-400/60">Gross Rev</p>
+          <p className="font-bold text-base text-teal-400">
+            ₹{(mandi.pricePerUnit * (mandi.quantity || 1))?.toLocaleString()}
           </p>
         </div>
       </div>
@@ -86,16 +90,16 @@ const MandiCard = ({ mandi, index, isSelected, routeInfo, onSelect, onShowRoute 
             e.stopPropagation();
             onShowRoute();
           }}
-          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-green-500 py-2 text-xs font-bold text-white transition hover:bg-green-600"
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-lg transition hover:from-teal-400 hover:to-emerald-400"
         >
-          <Route className="h-3.5 w-3.5" />
+          <Route className="h-4 w-4" />
           Recalculate Route
         </button>
       )}
 
       {isSelected && !mandi.lat && (
-        <div className="mt-3 rounded-xl border border-amber-500/30 bg-amber-500/20 p-2 text-center">
-          <p className="text-xs text-amber-300">Still locating this mandi on map...</p>
+        <div className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-center">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400">Locating coordinates...</p>
         </div>
       )}
     </div>

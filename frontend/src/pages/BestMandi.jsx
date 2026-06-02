@@ -4,6 +4,8 @@ import Navbar from "../components/Navbar";
 import MandiForm from "../components/market/MandiForm";
 import MandiCard from "../components/market/MandiCard";
 import MandiMap from "../components/market/MandiMap";
+import { motion, AnimatePresence } from "framer-motion";
+import { Map, Loader2 } from "lucide-react";
 
 // ── Geocode mandi name → lat/lng via Nominatim ──
 const geocodeMandi = async (mandiName, district, state) => {
@@ -11,7 +13,7 @@ const geocodeMandi = async (mandiName, district, state) => {
     const query = `${mandiName}, ${district}, ${state}, India`;
     const res = await fetch(
       `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`,
-      { headers: { "User-Agent": "AgriSense/1.0" } }
+      { headers: { "Accept-Language": "en-US,en;q=0.9" } }
     );
     const data = await res.json();
     if (data.length) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
@@ -55,11 +57,11 @@ const BestMandi = () => {
         setFlyTarget(coords);
         fetch(
           `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords[0]}&lon=${coords[1]}`,
-          { headers: { "User-Agent": "AgriSense/1.0" } }
+          { headers: { "Accept-Language": "en-US,en;q=0.9" } }
         )
-          .then((r) => r.json())
-          .then((d) => setFarmerAddress(d.display_name?.split(",").slice(0, 3).join(", ")))
-          .catch(() => {});
+          .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
+          .then((d) => setFarmerAddress(d.display_name?.split(",").slice(0, 3).join(", ") || "Hyderabad"))
+          .catch(() => { setFarmerAddress("Hyderabad") });
       },
       () => {}
     );
@@ -165,72 +167,84 @@ const BestMandi = () => {
   );
 
   return (
-    <div className="min-h-screen relative">
-      <div className="fixed inset-0 z-0">
-        <img
-          src="https://images.unsplash.com/photo-1595841696677-6489ff3f8cd1?w=1920&q=80"
-          alt=""
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/50" />
-      </div>
-      <div className="relative z-10">
+    <div className="min-h-screen bg-transparent text-white selection:bg-emerald-500/30">
       <Navbar />
 
-      <main className="max-w-6xl mx-auto px-4 py-10 space-y-8">
-        <div>
-          <h1 className="text-2xl font-bold text-white drop-shadow">🏆 Best Mandi Finder</h1>
-          <p className="text-white/70 text-sm mt-1">
-            Find the most profitable market near you based on live prices and transport costs.
-          </p>
-        </div>
+      <main className="relative z-10 max-w-7xl mx-auto px-6 py-12 space-y-8">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-10 flex items-center gap-4"
+        >
+          <div className="w-12 h-12 bg-teal-500/20 rounded-2xl flex items-center justify-center border border-teal-500/30">
+            <Map className="w-6 h-6 text-teal-400" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-white tracking-tight">Best Mandi Finder</h1>
+            <p className="text-white/40 text-sm mt-1 font-medium">
+              Find the most profitable market near you based on live prices and transport costs.
+            </p>
+          </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left: Form */}
-          <MandiForm
-            mandiForm={mandiForm}
-            setMandiForm={setMandiForm}
-            mandiDistricts={mandiDistricts}
-            districtLoading={districtLoading}
-            districtError={districtError}
-            mandiError={mandiError}
-            mandiLoading={mandiLoading}
-            farmerLocation={farmerLocation}
-            farmerAddress={farmerAddress}
-            clickMode={clickMode}
-            setClickMode={setClickMode}
-            onFarmerSearch={(coords, name) => {
-              setFarmerLocation(coords);
-              setFarmerAddress(name.split(",").slice(0, 3).join(", "));
-              setFlyTarget(coords);
-            }}
-            onMandiSearch={(coords) => {
-              setMandiLocation(coords);
-              setFlyTarget(coords);
-              setSelectedMandi({
-                name: "Pinned Mandi",
-                district: "Manual location",
-                lat: coords[0],
-                lng: coords[1],
-                pricePerUnit: 0,
-              });
-              setRouteInfo(null);
-              setShowRoute(true);
-            }}
-            onSubmit={handleMandiSearch}
-            fetchDistricts={fetchDistricts}
-          />
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1, type: "spring" }}
+            className="lg:col-span-5"
+          >
+            <MandiForm
+              mandiForm={mandiForm}
+              setMandiForm={setMandiForm}
+              mandiDistricts={mandiDistricts}
+              districtLoading={districtLoading}
+              districtError={districtError}
+              mandiError={mandiError}
+              mandiLoading={mandiLoading}
+              farmerLocation={farmerLocation}
+              farmerAddress={farmerAddress}
+              clickMode={clickMode}
+              setClickMode={setClickMode}
+              onFarmerSearch={(coords, name) => {
+                setFarmerLocation(coords);
+                setFarmerAddress(name.split(",").slice(0, 3).join(", "));
+                setFlyTarget(coords);
+              }}
+              onMandiSearch={(coords) => {
+                setMandiLocation(coords);
+                setFlyTarget(coords);
+                setSelectedMandi({
+                  name: "Pinned Mandi",
+                  district: "Manual location",
+                  lat: coords[0],
+                  lng: coords[1],
+                  pricePerUnit: 0,
+                });
+                setRouteInfo(null);
+                setShowRoute(true);
+              }}
+              onSubmit={handleMandiSearch}
+              fetchDistricts={fetchDistricts}
+            />
+          </motion.div>
 
           {/* Right: Results + Map */}
-          <div className="flex flex-col gap-6">
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2, type: "spring" }}
+            className="lg:col-span-7 flex flex-col gap-6"
+          >
 
             {/* Loading skeleton */}
             {mandiLoading && (
               <div className="flex flex-col gap-4">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="bg-black/40 backdrop-blur-md rounded-2xl p-5 border border-white/10 animate-pulse">
+                  <div key={i} className="bg-white/[0.02] backdrop-blur-2xl rounded-3xl p-6 border border-white/5 animate-pulse">
                     <div className="flex gap-3 mb-4">
-                      <div className="w-9 h-9 bg-white/10 rounded-xl" />
+                      <div className="w-10 h-10 bg-white/10 rounded-xl" />
                       <div className="flex-1 space-y-2">
                         <div className="h-4 bg-white/10 rounded w-1/2" />
                         <div className="h-3 bg-white/5 rounded w-1/3" />
@@ -248,122 +262,144 @@ const BestMandi = () => {
 
             {/* Mandi Result Cards */}
             {mandiResults && !mandiLoading && (
-              <div className="flex flex-col gap-4 max-h-[450px] overflow-y-auto pr-1">
-                <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl px-5 py-3 text-white flex items-center justify-between">
-                  <span className="font-semibold text-sm">
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col gap-4 max-h-[500px] overflow-y-auto pr-2"
+              >
+                <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-[2rem] px-6 py-4 text-white flex items-center justify-between shadow-xl">
+                  <span className="font-bold text-sm tracking-tight">
                     🌾 {mandiResults.crop} · {mandiResults.quantity} qtl · {mandiResults.district}, {mandiResults.state}
                   </span>
-                  <span className="text-amber-100 text-xs">
-                    {mandiResults.mandis.length} mandis found
+                  <span className="text-amber-100 text-xs font-bold uppercase tracking-wider">
+                    {mandiResults.mandis.length} mandis
                   </span>
                 </div>
 
-                {mandiResults.mandis.slice(0, 5).map((m, i) => (
-                  <MandiCard
-                    key={i}
-                    mandi={m}
-                    index={i}
-                    quantity={Number(mandiForm.quantity)}
-                    isSelected={selectedMandi?.name === m.name}
-                    routeInfo={routeInfo}
-                    onSelect={handleSelectMandi}
-                    onShowRoute={() => setShowRoute(true)}
-                  />
-                ))}
-              </div>
+                <AnimatePresence>
+                  {mandiResults.mandis.slice(0, 5).map((m, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: i * 0.1 }}
+                    >
+                      <MandiCard
+                        mandi={m}
+                        index={i}
+                        quantity={Number(mandiForm.quantity)}
+                        isSelected={selectedMandi?.name === m.name}
+                        routeInfo={routeInfo}
+                        onSelect={handleSelectMandi}
+                        onShowRoute={() => setShowRoute(true)}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </motion.div>
             )}
 
             {/* Map */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-semibold text-white/70">🗺️ Map</label>
+            <div className="bg-white/[0.02] backdrop-blur-2xl rounded-3xl p-6 border border-white/5">
+              <div className="flex items-center justify-between mb-4">
+                <label className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                  <Map className="w-4 h-4 text-teal-400" /> Map View
+                </label>
                 {clickMode && (
-                  <span className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full animate-pulse">
+                  <span className="text-xs bg-teal-500/10 border border-teal-500/20 text-teal-400 px-3 py-1.5 rounded-full animate-pulse font-bold tracking-wide">
                     🖱️ Click map to set {clickMode === "farmer" ? "farm" : "mandi"} location
                   </span>
                 )}
               </div>
 
-              <MandiMap
-                farmerLocation={farmerLocation}
-                farmerAddress={farmerAddress}
-                mandiLocation={mandiLocation}
-                selectedMandi={selectedMandi}
-                clickMode={clickMode}
-                onMapClick={handleMapClick}
-                flyTarget={flyTarget}
-                showRoute={showRoute}
-                quantity={Number(mandiForm.quantity) || 1}
-                onRouteFound={handleRouteFound}
-                onFarmerMove={() => setClickMode("farmer")}
-              />
+              <div className="rounded-2xl overflow-hidden shadow-2xl border border-white/10 relative z-0">
+                <MandiMap
+                  farmerLocation={farmerLocation}
+                  farmerAddress={farmerAddress}
+                  mandiLocation={mandiLocation}
+                  selectedMandi={selectedMandi}
+                  clickMode={clickMode}
+                  onMapClick={handleMapClick}
+                  flyTarget={flyTarget}
+                  showRoute={showRoute}
+                  quantity={Number(mandiForm.quantity) || 1}
+                  onRouteFound={handleRouteFound}
+                  onFarmerMove={() => setClickMode("farmer")}
+                />
+              </div>
 
               {/* Route Info Card */}
-              {routeInfo && (
-                <div className="mt-3 p-4 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl">
-                  <h4 className="text-sm font-bold text-amber-400 mb-3">🛣️ Route Summary</h4>
+              <AnimatePresence>
+                {routeInfo && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10, height: 0 }}
+                    animate={{ opacity: 1, y: 0, height: "auto" }}
+                    exit={{ opacity: 0, y: 10, height: 0 }}
+                    className="mt-4 p-5 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl shadow-xl overflow-hidden"
+                  >
+                    <h4 className="text-sm font-bold text-amber-400 mb-4 tracking-tight">🛣️ Route Summary</h4>
 
-                  <div className="grid grid-cols-3 gap-3 text-center mb-3">
-                    <div className="bg-white/10 rounded-xl p-2">
-                      <p className="text-xs text-white/40">Distance</p>
-                      <p className="font-bold text-blue-400">{routeInfo.distanceKm} km</p>
+                    <div className="grid grid-cols-3 gap-3 text-center mb-4">
+                      <div className="bg-white/5 rounded-xl p-3 border border-white/5">
+                        <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Distance</p>
+                        <p className="font-bold text-blue-400 text-base">{routeInfo.distanceKm} km</p>
+                      </div>
+                      <div className="bg-white/5 rounded-xl p-3 border border-white/5">
+                        <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Est. Time</p>
+                        <p className="font-bold text-emerald-400 text-base">~{routeInfo.durationMin} min</p>
+                      </div>
+                      <div className="bg-white/5 rounded-xl p-3 border border-white/5">
+                        <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Total Cost</p>
+                        <p className="font-bold text-red-400 text-base">
+                          ₹{routeInfo.totalCost?.toLocaleString()}
+                        </p>
+                      </div>
                     </div>
-                    <div className="bg-white/10 rounded-xl p-2">
-                      <p className="text-xs text-white/40">Est. Time</p>
-                      <p className="font-bold text-emerald-400">~{routeInfo.durationMin} min</p>
-                    </div>
-                    <div className="bg-white/10 rounded-xl p-2">
-                      <p className="text-xs text-white/40">Total Cost</p>
-                      <p className="font-bold text-red-400">
-                        ₹{routeInfo.totalCost?.toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
 
-                  <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                    <div className="bg-orange-500/10 rounded-xl py-2">
-                      <p className="text-white/40">Fuel</p>
-                      <p className="font-semibold text-orange-400">
-                        ₹{routeInfo.breakdown?.fuelCost?.toLocaleString()}
-                      </p>
+                    <div className="grid grid-cols-3 gap-3 text-center text-xs">
+                      <div className="bg-orange-500/10 rounded-xl py-3 border border-orange-500/10">
+                        <p className="text-white/40 font-bold mb-1">Fuel</p>
+                        <p className="font-bold text-orange-400 text-sm">
+                          ₹{routeInfo.breakdown?.fuelCost?.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="bg-purple-500/10 rounded-xl py-3 border border-purple-500/10">
+                        <p className="text-white/40 font-bold mb-1">Toll</p>
+                        <p className="font-bold text-purple-400 text-sm">
+                          ₹{routeInfo.breakdown?.tollCost?.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="bg-white/5 rounded-xl py-3 border border-white/5">
+                        <p className="text-white/40 font-bold mb-1">Loading</p>
+                        <p className="font-bold text-white/60 text-sm">
+                          ₹{routeInfo.breakdown?.loadingCost?.toLocaleString()}
+                        </p>
+                      </div>
                     </div>
-                    <div className="bg-purple-500/10 rounded-xl py-2">
-                      <p className="text-white/40">Toll</p>
-                      <p className="font-semibold text-purple-400">
-                        ₹{routeInfo.breakdown?.tollCost?.toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="bg-white/5 rounded-xl py-2">
-                      <p className="text-white/40">Loading</p>
-                      <p className="font-semibold text-white/60">
-                        ₹{routeInfo.breakdown?.loadingCost?.toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
 
-                  <p className="text-xs text-white/40 text-center mt-2">
-                    🚛 {routeInfo.truckType} truck · based on real road distance
-                  </p>
-                </div>
-              )}
+                    <p className="text-xs text-white/40 text-center mt-4 font-medium">
+                      🚛 {routeInfo.truckType} truck · based on real road distance
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Selected mandi label */}
               {selectedMandi && (
-                <div className="mt-2 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-center">
+                <div className="mt-4 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-center">
                   <p className="text-sm font-semibold text-emerald-400">
-                    ✅ Selected: <span className="font-bold">{selectedMandi.name}</span>
+                    ✅ Selected: <span className="font-bold text-emerald-300">{selectedMandi.name}</span>
                   </p>
                 </div>
               )}
             </div>
-          </div>
+          </motion.div>
         </div>
 
-        <p className="text-center text-xs text-white/40 pb-4 mt-8">
+        <p className="text-center text-xs text-white/30 pb-4 mt-12 font-medium">
           🌾 AgriSense · Route Optimization via OpenRouteService
         </p>
       </main>
-      </div>
     </div>
   );
 };
