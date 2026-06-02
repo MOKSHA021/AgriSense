@@ -182,27 +182,37 @@ const RiskAssessment = () => {
 
               {/* Risk Cards Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {risks.map((risk) => {
-                  const Icon = ICON_MAP[risk.icon] || AlertTriangle;
-                  const cfg = LEVEL_CONFIG[risk.level];
-                  return (
-                    <div key={risk.name} className={`bg-gradient-to-br ${cfg.card} border rounded-2xl p-5`}>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <Icon className="w-4 h-4 text-white/70" />
-                          <span className="text-sm font-semibold text-white">{risk.name}</span>
+                {risks.length > 0 ? (
+                  risks.map((risk) => {
+                    const Icon = ICON_MAP[risk.icon] || AlertTriangle;
+                    const cfg = LEVEL_CONFIG[risk.level];
+                    return (
+                      <div key={risk.name} className={`bg-gradient-to-br ${cfg.card} border rounded-2xl p-5`}>
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <Icon className="w-4 h-4 text-white/70" />
+                            <span className="text-sm font-semibold text-white">{risk.name}</span>
+                          </div>
+                          <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${cfg.badge}`}>{risk.level}</span>
                         </div>
-                        <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border ${cfg.badge}`}>{risk.level}</span>
+                        {/* Level bar */}
+                        <div className="w-full h-1.5 bg-white/10 rounded-full mb-3">
+                          <div className={`h-full ${cfg.bar} rounded-full`} style={{ width: risk.level === "HIGH" ? "100%" : risk.level === "MEDIUM" ? "55%" : "18%" }} />
+                        </div>
+                        <p className="text-xs text-white/65 mb-2">{risk.description}</p>
+                        <p className="text-xs text-white/45"><span className="font-medium text-white/55">Action: </span>{risk.action}</p>
                       </div>
-                      {/* Level bar */}
-                      <div className="w-full h-1.5 bg-white/10 rounded-full mb-3">
-                        <div className={`h-full ${cfg.bar} rounded-full`} style={{ width: risk.level === "HIGH" ? "100%" : risk.level === "MEDIUM" ? "55%" : "18%" }} />
-                      </div>
-                      <p className="text-xs text-white/65 mb-2">{risk.description}</p>
-                      <p className="text-xs text-white/45"><span className="font-medium text-white/55">Action: </span>{risk.action}</p>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                ) : (
+                  <div className="col-span-full bg-green-500/10 border border-green-500/20 rounded-2xl p-8 text-center flex flex-col items-center justify-center">
+                    <CheckCircle className="w-10 h-10 text-green-400 mb-3" />
+                    <h3 className="text-lg font-bold text-green-300">Optimal Weather Conditions</h3>
+                    <p className="text-sm text-green-400/80 mt-1 max-w-md">
+                      No significant weather risks detected for the next 5 days. Conditions are highly favorable for farming operations.
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Delayed Sowing */}

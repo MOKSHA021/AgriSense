@@ -331,12 +331,14 @@ const computeRisks = (current, forecast) => {
   if (temp < 5) { frostLevel = "HIGH"; frostDesc = `Near-freezing temperature (${Math.round(temp)}°C). Frost damage to crops is highly likely.`; frostAction = "Cover sensitive crops with row covers or mulch. Avoid sowing frost-sensitive varieties. Use smudge pots if available."; }
   else if (temp < 10) { frostLevel = "MEDIUM"; frostDesc = `Cool temperature (${Math.round(temp)}°C). Light frost possible during early morning.`; frostAction = "Monitor overnight temperatures. Prepare frost covers for vulnerable crops."; }
 
-  return [
+  const allRisks = [
     { name: "Flood Risk", icon: "Droplets", level: floodLevel, description: floodDesc, action: floodAction },
     { name: "Drought Risk", icon: "Sun", level: droughtLevel, description: droughtDesc, action: droughtAction },
     { name: "Heat Stress", icon: "Thermometer", level: heatLevel, description: heatDesc, action: heatAction },
     { name: "Frost Risk", icon: "Snowflake", level: frostLevel, description: frostDesc, action: frostAction },
   ];
+  
+  return allRisks.filter(risk => risk.level !== "LOW");
 };
 
 // POST /api/reference/compute-risks

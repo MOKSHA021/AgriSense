@@ -15,8 +15,40 @@ import {
   Loader,
 } from "lucide-react";
 
-const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
-const BASE = "https://api.openweathermap.org/data/2.5";
+const mapWmoToOwm = (code, isDay = 1) => {
+  const d = isDay ? 'd' : 'n';
+  const map = {
+    0: { id: 800, main: 'Clear', description: 'clear sky', icon: `01${d}` },
+    1: { id: 801, main: 'Clouds', description: 'few clouds', icon: `02${d}` },
+    2: { id: 802, main: 'Clouds', description: 'scattered clouds', icon: `03${d}` },
+    3: { id: 804, main: 'Clouds', description: 'overcast clouds', icon: `04${d}` },
+    45: { id: 741, main: 'Fog', description: 'fog', icon: `50${d}` },
+    48: { id: 741, main: 'Fog', description: 'depositing rime fog', icon: `50${d}` },
+    51: { id: 300, main: 'Drizzle', description: 'light drizzle', icon: `09${d}` },
+    53: { id: 301, main: 'Drizzle', description: 'moderate drizzle', icon: `09${d}` },
+    55: { id: 302, main: 'Drizzle', description: 'heavy drizzle', icon: `09${d}` },
+    56: { id: 310, main: 'Drizzle', description: 'light freezing drizzle', icon: `09${d}` },
+    57: { id: 312, main: 'Drizzle', description: 'dense freezing drizzle', icon: `09${d}` },
+    61: { id: 500, main: 'Rain', description: 'slight rain', icon: `10${d}` },
+    63: { id: 501, main: 'Rain', description: 'moderate rain', icon: `10${d}` },
+    65: { id: 502, main: 'Rain', description: 'heavy rain', icon: `10${d}` },
+    66: { id: 511, main: 'Rain', description: 'light freezing rain', icon: `13${d}` },
+    67: { id: 511, main: 'Rain', description: 'heavy freezing rain', icon: `13${d}` },
+    71: { id: 600, main: 'Snow', description: 'slight snow fall', icon: `13${d}` },
+    73: { id: 601, main: 'Snow', description: 'moderate snow fall', icon: `13${d}` },
+    75: { id: 602, main: 'Snow', description: 'heavy snow fall', icon: `13${d}` },
+    77: { id: 611, main: 'Snow', description: 'snow grains', icon: `13${d}` },
+    80: { id: 520, main: 'Rain', description: 'slight rain showers', icon: `09${d}` },
+    81: { id: 521, main: 'Rain', description: 'moderate rain showers', icon: `09${d}` },
+    82: { id: 522, main: 'Rain', description: 'violent rain showers', icon: `09${d}` },
+    85: { id: 620, main: 'Snow', description: 'slight snow showers', icon: `13${d}` },
+    86: { id: 622, main: 'Snow', description: 'heavy snow showers', icon: `13${d}` },
+    95: { id: 200, main: 'Thunderstorm', description: 'thunderstorm', icon: `11${d}` },
+    96: { id: 211, main: 'Thunderstorm', description: 'thunderstorm with slight hail', icon: `11${d}` },
+    99: { id: 212, main: 'Thunderstorm', description: 'thunderstorm with heavy hail', icon: `11${d}` },
+  };
+  return map[code] || { id: 800, main: 'Clear', description: 'clear sky', icon: `01${d}` };
+};
 
 const getFarmingAdvice = (weather) => {
   if (!weather) return [];
@@ -155,26 +187,56 @@ const Weather = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const fetchWeatherByCoords = async (lat, lon) => {
+  const fetchWeatherByCoords = async (lat, lon, cityNameFallback = null) => {
     setLoading(true);
     setError("");
     try {
-      const [curRes, foreRes] = await Promise.all([
-        fetch(
-          `${BASE}/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
-        ),
-        fetch(
-          `${BASE}/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
-        ),
-      ]);
-      if (!curRes.ok || !foreRes.ok)
-        throw new Error("Failed to fetch weather data");
-      const curData = await curRes.json();
-      const foreData = await foreRes.json();
+      const weatherRes = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,surface_pressure,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`
+      );
+      if (!weatherRes.ok) throw new Error("Failed to fetch weather data");
+      const data = await weatherRes.json();
+      
+      let resolvedCityName = cityNameFallback;
+      if (!resolvedCityName) {
+        const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+        const geo = await geoRes.json();
+        resolvedCityName = geo.address?.city || geo.address?.town || geo.address?.village || geo.address?.county || "Your Location";
+      }
+
+      const curWeather = mapWmoToOwm(data.current.weather_code, data.current.is_day);
+      const curData = {
+        name: resolvedCityName,
+        weather: [curWeather],
+        main: {
+          temp: data.current.temperature_2m,
+          feels_like: data.current.apparent_temperature,
+          humidity: data.current.relative_humidity_2m,
+          pressure: data.current.surface_pressure,
+        },
+        wind: { speed: Math.round((data.current.wind_speed_10m * 1000) / 3600 * 10) / 10 }, // Convert km/h to m/s
+        visibility: 10000,
+      };
+
+      const list = [];
+      for (let i = 0; i < data.hourly.time.length; i += 3) {
+        const timeStr = data.hourly.time[i].replace("T", " ") + ":00";
+        const hourWeather = mapWmoToOwm(data.hourly.weather_code[i], 1);
+        list.push({
+          dt_txt: timeStr,
+          main: {
+            temp: data.hourly.temperature_2m[i],
+            humidity: data.hourly.relative_humidity_2m[i],
+          },
+          wind: { speed: Math.round((data.hourly.wind_speed_10m[i] * 1000) / 3600 * 10) / 10 },
+          weather: [hourWeather],
+        });
+      }
+
       setCurrent(curData);
-      setCity(curData.name);
-      setSearchInput(curData.name);
-      setForecast(groupForecastByDay(foreData.list));
+      setCity(resolvedCityName);
+      setSearchInput(resolvedCityName);
+      setForecast(groupForecastByDay(list));
     } catch (err) {
       setError(err.message || "Could not load weather data");
     } finally {
@@ -187,24 +249,14 @@ const Weather = () => {
     setLoading(true);
     setError("");
     try {
-      const [curRes, foreRes] = await Promise.all([
-        fetch(
-          `${BASE}/weather?q=${encodeURIComponent(name)}&units=metric&appid=${API_KEY}`
-        ),
-        fetch(
-          `${BASE}/forecast?q=${encodeURIComponent(name)}&units=metric&appid=${API_KEY}`
-        ),
-      ]);
-      if (!curRes.ok || !foreRes.ok)
-        throw new Error("City not found. Please check the name and try again.");
-      const curData = await curRes.json();
-      const foreData = await foreRes.json();
-      setCurrent(curData);
-      setCity(curData.name);
-      setForecast(groupForecastByDay(foreData.list));
+      const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=en`);
+      const geoData = await geoRes.json();
+      if (!geoData.results?.length) throw new Error("City not found. Please check the name and try again.");
+      
+      const { latitude, longitude, name: resolvedName } = geoData.results[0];
+      await fetchWeatherByCoords(latitude, longitude, resolvedName);
     } catch (err) {
       setError(err.message || "Could not load weather data");
-    } finally {
       setLoading(false);
     }
   };
