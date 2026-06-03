@@ -1,0 +1,89 @@
+2026-05-20 18:04:53,117 | INFO | agrisense | =======================================================
+2026-05-20 18:04:53,118 | INFO | agrisense |   AgriSense ML Service — Starting Up
+2026-05-20 18:04:53,118 | INFO | agrisense |   Time    : 2026-05-20T12:34:53.118673Z
+2026-05-20 18:04:53,118 | INFO | agrisense |   Base dir: C:\Users\moksh\AgriSense\ml-service
+2026-05-20 18:04:53,121 | INFO | agrisense |   All core model files found ✅
+2026-05-20 18:04:53,121 | INFO | agrisense | =======================================================
+2026-05-20 18:05:20,895 | INFO | agrisense | → GET /
+2026-05-20 18:05:20,900 | INFO | agrisense | ← GET / | 200
+INFO:     127.0.0.1:50278 - "GET / HTTP/1.1" 200 OK
+2026-05-20 18:07:46,144 | INFO | agrisense | → GET /
+2026-05-20 18:07:46,146 | INFO | agrisense | ← GET / | 200
+INFO:     127.0.0.1:59818 - "GET / HTTP/1.1" 200 OK
+2026-05-20 18:08:05,476 | INFO | agrisense | → GET /
+2026-05-20 18:08:05,477 | INFO | agrisense | ← GET / | 200
+INFO:     127.0.0.1:60124 - "GET / HTTP/1.1" 200 OK
+2026-05-20 18:08:43,756 | INFO | agrisense | → GET /
+2026-05-20 18:08:43,757 | INFO | agrisense | ← GET / | 200
+INFO:     127.0.0.1:60418 - "GET / HTTP/1.1" 200 OK
+2026-05-20 18:08:43,779 | INFO | agrisense | → GET /docs
+2026-05-20 18:08:43,780 | INFO | agrisense | ← GET /docs | 200
+INFO:     127.0.0.1:60418 - "GET /docs HTTP/1.1" 200 OK
+2026-05-20 18:10:25,491 | INFO | agrisense | → GET /
+2026-05-20 18:10:25,492 | INFO | agrisense | ← GET / | 200
+INFO:     127.0.0.1:61183 - "GET / HTTP/1.1" 200 OK
+2026-05-20 18:10:25,820 | INFO | agrisense | → GET /docs
+2026-05-20 18:10:25,821 | INFO | agrisense | ← GET /docs | 200
+INFO:     127.0.0.1:61183 - "GET /docs HTTP/1.1" 200 OK
+2026-05-20 18:10:25,825 | INFO | agrisense | → GET /
+2026-05-20 18:10:25,826 | INFO | agrisense | ← GET / | 200
+INFO:     127.0.0.1:61183 - "GET / HTTP/1.1" 200 OK
+2026-05-20 18:10:25,832 | INFO | agrisense | → GET /docs
+2026-05-20 18:10:25,833 | INFO | agrisense | ← GET /docs | 200
+INFO:     127.0.0.1:61183 - "GET /docs HTTP/1.1" 200 OK
+2026-05-20 18:42:40,974 | INFO | agrisense | → POST /predict/soil
+2026-05-20 18:42:42,365 | INFO | agrisense | [soil] EfficientNet-B0 loaded | Classes: ['Alluvial_Soil', 'Arid_Soil', 'Black_Soil', 'Laterite_Soil', 'Mountain_Soil', 'Red_Soil', 'Yellow_Soil']
+2026-05-20 18:42:42,708 | INFO | agrisense | [soil] → Alluvial_Soil (74.48%) | file=Screenshot 2026-05-20 085413.png size=261KB
+2026-05-20 18:42:42,726 | INFO | agrisense | ← POST /predict/soil | 200
+INFO:     127.0.0.1:53148 - "POST /predict/soil HTTP/1.1" 200 OK
+2026-05-20 18:45:07,052 | INFO | agrisense | → POST /predict/soil
+2026-05-20 18:45:07,172 | INFO | agrisense | [soil] → Red_Soil (71.50%) | file=Screenshot 2026-05-20 085036.png size=606KB
+2026-05-20 18:45:07,173 | INFO | agrisense | ← POST /predict/soil | 200
+INFO:     127.0.0.1:51692 - "POST /predict/soil HTTP/1.1" 200 OK
+2026-05-20 18:52:59,695 | INFO | agrisense | → POST /predict/soil
+2026-05-20 18:52:59,773 | INFO | agrisense | [soil] → Red_Soil (71.50%) | file=Screenshot 2026-05-20 085036.png size=606KB
+2026-05-20 18:52:59,773 | INFO | agrisense | ← POST /predict/soil | 200
+INFO:     127.0.0.1:54098 - "POST /predict/soil HTTP/1.1" 200 OK
+2026-05-20 19:00:41,242 | INFO | agrisense | → POST /predict/soil
+2026-05-20 19:00:41,329 | INFO | agrisense | [soil] → Red_Soil (71.50%) | file=Screenshot 2026-05-20 085036.png size=606KB
+2026-05-20 19:00:41,329 | INFO | agrisense | ← POST /predict/soil | 200
+INFO:     127.0.0.1:51972 - "POST /predict/soil HTTP/1.1" 200 OK
+2026-05-21 08:28:37,077 | INFO | agrisense | → POST /predict/soil
+2026-05-21 08:28:37,230 | INFO | agrisense | [soil] → Alluvial_Soil (74.48%) | file=Screenshot 2026-05-20 085413.png size=261KB
+2026-05-21 08:28:37,231 | INFO | agrisense | ← POST /predict/soil | 200
+INFO:     127.0.0.1:58270 - "POST /predict/soil HTTP/1.1" 200 OK
+2026-05-21 08:29:38,710 | INFO | agrisense | → POST /predict/crop
+2026-05-21 08:30:04,417 | INFO | agrisense | [crop] Pipeline loaded | Classes: 22 crops | Soil types available: ['Alluvial_Soil', 'Black_Soil', 'Red_Soil', 'Laterite_Soil', 'Arid_Soil', 'Yellow_Soil', 'Mountain_Soil']
+2026-05-21 08:30:04,751 | INFO | agrisense | [crop] soil=Black_Soil source=user_supplied temp=40.0 → top=watermelon (21.33%)
+2026-05-21 08:30:04,756 | INFO | agrisense | ← POST /predict/crop | 200
+INFO:     127.0.0.1:58622 - "POST /predict/crop HTTP/1.1" 200 OK
+2026-05-21 08:30:25,634 | INFO | agrisense | → POST /predict/crop
+2026-05-21 08:30:25,805 | INFO | agrisense | [crop] soil=Black_Soil source=user_supplied temp=40.0 → top=watermelon (21.33%)
+2026-05-21 08:30:25,807 | INFO | agrisense | ← POST /predict/crop | 200
+INFO:     127.0.0.1:58716 - "POST /predict/crop HTTP/1.1" 200 OK
+2026-05-21 08:30:52,384 | INFO | agrisense | → POST /predict/crop
+2026-05-21 08:30:52,534 | INFO | agrisense | [crop] soil=Alluvial_Soil source=user_supplied temp=36.0 → top=muskmelon (28.67%)
+2026-05-21 08:30:52,535 | INFO | agrisense | ← POST /predict/crop | 200
+INFO:     127.0.0.1:52923 - "POST /predict/crop HTTP/1.1" 200 OK
+2026-05-21 08:35:48,069 | INFO | agrisense | → POST /predict/price
+2026-05-21 08:35:48,252 | INFO | agrisense | [price] Loading Prophet model for Mustard
+2026-05-21 08:35:51,129 | ERROR | prophet.plot | Importing plotly failed. Interactive plots will not work.
+2026-05-21 08:35:54,519 | INFO | agrisense | [price] Mustard @ 2026-08-21 → ₹5736 [4883–6668]
+2026-05-21 08:35:54,523 | INFO | agrisense | ← POST /predict/price | 200
+INFO:     127.0.0.1:52997 - "POST /predict/price HTTP/1.1" 200 OK
+2026-05-21 08:36:17,642 | INFO | agrisense | → POST /predict/price
+2026-05-21 08:36:17,648 | INFO | agrisense | [price] Loading Prophet model for Tomato
+2026-05-21 08:36:18,860 | WARNING | agrisense | [price] Exact date 2026-08-21 not in forecast range; using nearest: 2026-09-01T00:00:00.000000
+2026-05-21 08:36:18,861 | INFO | agrisense | [price] Tomato @ 2026-08-21 → ₹1945 [987–3604]
+2026-05-21 08:36:18,863 | INFO | agrisense | ← POST /predict/price | 200
+INFO:     127.0.0.1:64937 - "POST /predict/price HTTP/1.1" 200 OK
+2026-05-21 08:37:44,591 | INFO | agrisense | → POST /predict/price
+2026-05-21 08:37:45,802 | WARNING | agrisense | [price] Exact date 2026-08-21 not in forecast range; using nearest: 2026-09-01T00:00:00.000000
+2026-05-21 08:37:45,803 | INFO | agrisense | [price] Tomato @ 2026-08-21 → ₹1945 [991–3863]
+2026-05-21 08:37:45,805 | INFO | agrisense | ← POST /predict/price | 200
+INFO:     127.0.0.1:60815 - "POST /predict/price HTTP/1.1" 200 OK
+2026-05-21 08:38:11,555 | INFO | agrisense | → POST /predict/price
+2026-05-21 08:38:11,572 | INFO | agrisense | [price] Loading Prophet model for Wheat
+2026-05-21 08:38:12,221 | INFO | agrisense | [price] Wheat @ 2026-08-21 → ₹1147 [945–1395]
+2026-05-21 08:38:12,222 | INFO | agrisense | ← POST /predict/price | 200
+INFO:     127.0.0.1:62220 - "POST /predict/price HTTP/1.1" 200 OK

@@ -62,46 +62,53 @@ const getFarmingAdvice = (weather) => {
   if (id >= 200 && id < 300)
     tips.push({
       icon: AlertTriangle,
-      color: "text-red-400 bg-red-500/10 border-red-500/20",
+      color: "text-red-600 bg-red-50 border-red-200",
+      borderLeft: "border-l-4 border-l-red-500",
       text: "Thunderstorm expected — avoid open-field work and secure livestock.",
     });
   if (id >= 500 && id < 600)
     tips.push({
       icon: CloudRain,
-      color: "text-blue-400 bg-blue-500/10 border-blue-500/20",
+      color: "text-blue-600 bg-blue-50 border-blue-200",
+      borderLeft: "border-l-4 border-l-blue-500",
       text: "Rain forecasted — postpone pesticide spraying to avoid wash-off.",
     });
   if (id >= 600 && id < 700)
     tips.push({
       icon: Snowflake,
-      color: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
+      color: "text-cyan-600 bg-cyan-50 border-cyan-200",
+      borderLeft: "border-l-4 border-l-cyan-500",
       text: "Frost risk — protect sensitive crops with mulching or row covers.",
     });
 
   if (temp > 35)
     tips.push({
       icon: Thermometer,
-      color: "text-orange-400 bg-orange-500/10 border-orange-500/20",
+      color: "text-orange-600 bg-orange-50 border-orange-200",
+      borderLeft: "border-l-4 border-l-orange-500",
       text: "High heat — irrigate early morning or late evening to reduce evaporation.",
     });
   else if (temp < 5)
     tips.push({
       icon: Snowflake,
-      color: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
+      color: "text-cyan-600 bg-cyan-50 border-cyan-200",
+      borderLeft: "border-l-4 border-l-cyan-500",
       text: "Cold snap — cover nurseries and avoid sowing frost-sensitive crops.",
     });
 
   if (humidity > 80)
     tips.push({
       icon: Droplets,
-      color: "text-teal-400 bg-teal-500/10 border-teal-500/20",
+      color: "text-teal-600 bg-teal-50 border-teal-200",
+      borderLeft: "border-l-4 border-l-teal-500",
       text: "High humidity — monitor for fungal infections like blight and mildew.",
     });
 
   if (id === 800)
     tips.push({
       icon: Sun,
-      color: "text-yellow-400 bg-yellow-500/10 border-yellow-500/20",
+      color: "text-[#2D6A4F] bg-[#EBF5EE] border-[#C3E6CB]",
+      borderLeft: "border-l-4 border-l-[#2D6A4F]",
       text: "Clear skies — good day for harvesting, drying, and field preparation.",
     });
 
@@ -125,7 +132,7 @@ const getRiskAlerts = (weather) => {
     alerts.push({
       icon: Thermometer,
       label: "Heat Stress",
-      text: "Temperature exceeds 40\u00B0C. Provide shade for livestock and increase irrigation.",
+      text: "Temperature exceeds 40°C. Provide shade for livestock and increase irrigation.",
     });
   if (id === 800 && humidity < 25)
     alerts.push({
@@ -296,287 +303,286 @@ const Weather = () => {
   const riskAlerts = getRiskAlerts(current);
 
   return (
-    <div className="relative min-h-screen bg-transparent text-white selection:bg-emerald-500/30">
+    <div className="relative min-h-screen bg-[#F7F4EE] selection:bg-emerald-200">
       
       <div className="relative z-10">
-      <Navbar />
+        <Navbar />
 
-      <main className="max-w-5xl mx-auto px-6 py-12">
-        {/* Page Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-10 flex items-center gap-4"
-        >
-          <div className="w-12 h-12 bg-sky-500/20 rounded-2xl flex items-center justify-center border border-sky-500/30 shadow-[0_0_20px_rgba(14,165,233,0.15)]">
-            <CloudSun className="w-6 h-6 text-sky-400" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-black text-white tracking-tight">Weather</h1>
-            <p className="text-white/40 text-sm mt-1 font-medium">Real-time weather data with farming-specific advice.</p>
-          </div>
-        </motion.div>
-
-        {/* Search Bar */}
-        <motion.form
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          onSubmit={handleSearch}
-          className="flex flex-col sm:flex-row items-center gap-3 mb-10"
-        >
-          <div className="relative flex-1 w-full group">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <Search className="w-5 h-5 text-white/30 group-focus-within:text-sky-400 transition-colors" />
-            </div>
-            <input
-              type="text"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Search city..."
-              className="w-full pl-12 pr-4 py-4 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl text-sm font-medium text-white placeholder:text-white/20 outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all shadow-xl"
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-sky-500 to-blue-500 text-white text-sm font-bold uppercase tracking-wider rounded-2xl shadow-[0_0_20px_rgba(14,165,233,0.3)] transition-all hover:from-sky-400 hover:to-blue-400 flex items-center justify-center gap-2"
+        <main className="max-w-5xl mx-auto px-6 py-12">
+          {/* Page Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-10 flex items-center gap-4"
           >
-            <Navigation className="w-4 h-4" />
-            Locate
-          </button>
-        </motion.form>
+            <div className="w-12 h-12 bg-sky-100 rounded-2xl flex items-center justify-center border border-sky-200 shadow-sm">
+              <CloudSun className="w-6 h-6 text-sky-500" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-black text-[#1B4332] tracking-tight">Weather</h1>
+              <p className="text-[#6B8C7B] text-sm mt-1 font-medium">Real-time weather data with farming-specific advice.</p>
+            </div>
+          </motion.div>
 
-        <AnimatePresence>
-          {/* Error */}
-          {error && (
-            <motion.div 
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="flex items-center gap-3 border border-red-500/20 bg-red-500/10 text-red-400 text-sm font-medium rounded-2xl px-5 py-4 mb-8 backdrop-blur-xl"
+          {/* Search Bar */}
+          <motion.form
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            onSubmit={handleSearch}
+            className="flex flex-col sm:flex-row items-center gap-3 mb-10"
+          >
+            <div className="relative flex-1 w-full group">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Search className="w-5 h-5 text-[#6B8C7B] group-focus-within:text-sky-500 transition-colors" />
+              </div>
+              <input
+                type="text"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder="Search city..."
+                className="w-full pl-12 pr-4 py-4 rounded-2xl border border-[#E0EDD9] bg-white text-sm font-medium text-[#1B3A28] placeholder:text-[#6B8C7B]/50 outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition-all shadow-sm"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full sm:w-auto px-8 py-4 bg-[#1B4332] hover:bg-[#2D6A4F] text-white text-sm font-bold uppercase tracking-wider rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2"
             >
-              <AlertTriangle className="w-5 h-5 shrink-0" />
-              <span>{error}</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <Navigation className="w-4 h-4" />
+              Locate
+            </button>
+          </motion.form>
 
-        {/* Loading */}
-        {loading && (
-          <div className="flex flex-col items-center justify-center py-32 text-white/40">
-            <Loader className="w-10 h-10 animate-spin text-sky-500 mb-4" />
-            <span className="text-sm font-medium tracking-widest uppercase">Fetching Atmosphere...</span>
-          </div>
-        )}
-
-        {/* Current Weather */}
-        {!loading && current && (
-          <div className="space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-              {/* Current conditions */}
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2 }}
-                className="lg:col-span-5 rounded-[2.5rem] border border-white/5 bg-gradient-to-br from-white/[0.05] to-transparent p-8 shadow-2xl backdrop-blur-2xl relative overflow-hidden flex flex-col justify-between"
+          <AnimatePresence>
+            {/* Error */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="flex items-center gap-3 border border-red-200 bg-red-50 text-red-600 text-sm font-medium rounded-2xl px-5 py-4 mb-8"
               >
-                <div className="absolute top-0 right-0 p-8 opacity-20 pointer-events-none">
-                  <CloudSun className="w-64 h-64 text-white blur-3xl mix-blend-overlay" />
-                </div>
-                
-                <div className="relative z-10 flex items-start justify-between mb-8">
-                  <div>
-                    <h2 className="text-3xl font-black text-white tracking-tight">
-                      {city}
-                    </h2>
-                    <p className="text-sm font-medium text-sky-400 capitalize mt-1">
-                      {current.weather[0].description}
-                    </p>
-                  </div>
-                  <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center backdrop-blur-xl border border-white/10 shadow-xl">
-                    <img
-                      src={`https://openweathermap.org/img/wn/${current.weather[0].icon}@2x.png`}
-                      alt={current.weather[0].description}
-                      className="w-24 h-24 object-contain filter drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
-                    />
-                  </div>
-                </div>
-
-                <div className="relative z-10 mt-auto">
-                  <p className="text-[5rem] leading-none font-black text-white tracking-tighter mb-8">
-                    {Math.round(current.main.temp)}<span className="text-white/30 text-5xl">&deg;C</span>
-                  </p>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    <div className="flex flex-col gap-1 p-3 rounded-2xl bg-white/5 border border-white/5">
-                      <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-white/40">
-                        <Thermometer className="w-3 h-3" />
-                        Feels
-                      </div>
-                      <span className="text-sm font-bold text-white">{Math.round(current.main.feels_like)}&deg;C</span>
-                    </div>
-                    <div className="flex flex-col gap-1 p-3 rounded-2xl bg-white/5 border border-white/5">
-                      <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-white/40">
-                        <Droplets className="w-3 h-3" />
-                        Humid
-                      </div>
-                      <span className="text-sm font-bold text-white">{current.main.humidity}%</span>
-                    </div>
-                    <div className="flex flex-col gap-1 p-3 rounded-2xl bg-white/5 border border-white/5">
-                      <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-white/40">
-                        <Wind className="w-3 h-3" />
-                        Wind
-                      </div>
-                      <span className="text-sm font-bold text-white">{current.wind.speed} m/s</span>
-                    </div>
-                    <div className="flex flex-col gap-1 p-3 rounded-2xl bg-white/5 border border-white/5">
-                      <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-white/40">
-                        <Gauge className="w-3 h-3" />
-                        Press
-                      </div>
-                      <span className="text-sm font-bold text-white">{current.main.pressure} hPa</span>
-                    </div>
-                    <div className="flex flex-col gap-1 p-3 rounded-2xl bg-white/5 border border-white/5 sm:col-span-2">
-                      <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-white/40">
-                        <Eye className="w-3 h-3" />
-                        Visibility
-                      </div>
-                      <span className="text-sm font-bold text-white">{(current.visibility / 1000).toFixed(1)} km</span>
-                    </div>
-                  </div>
-                </div>
+                <AlertTriangle className="w-5 h-5 shrink-0" />
+                <span>{error}</span>
               </motion.div>
+            )}
+          </AnimatePresence>
 
-              <div className="lg:col-span-7 flex flex-col gap-8">
-                {/* 5-Day Forecast */}
-                {forecast.length > 0 && (
-                  <motion.div 
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-8 shadow-2xl backdrop-blur-2xl"
-                  >
-                    <h2 className="text-sm font-bold uppercase tracking-widest text-white/50 mb-6 flex items-center gap-2">
-                      <CloudSun className="w-4 h-4 text-white/40" />
-                      5-Day Forecast
-                    </h2>
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                      {forecast.map((day, idx) => (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.4 + (idx * 0.1) }}
-                          key={day.date}
-                          className="flex flex-col items-center border border-white/5 bg-white/[0.02] rounded-2xl p-4 transition-colors hover:bg-white/[0.05]"
-                        >
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-sky-400 mb-2">
-                            {formatDay(day.date)}
-                          </p>
-                          <div className="w-12 h-12 flex items-center justify-center mb-2">
-                            <img
-                              src={`https://openweathermap.org/img/wn/${day.icon}@2x.png`}
-                              alt={day.desc}
-                              className="w-16 h-16 object-contain filter drop-shadow-[0_0_8px_rgba(255,255,255,0.1)]"
-                            />
-                          </div>
-                          <p className="text-base font-bold text-white">
-                            {day.tempMax}&deg;C
-                            <span className="text-white/30 text-xs font-medium ml-1">
-                              {day.tempMin}&deg;C
-                            </span>
-                          </p>
-                          <div className="flex items-center gap-3 mt-3 pt-3 border-t border-white/5 w-full justify-center text-[10px] font-bold text-white/40">
-                            <span className="flex items-center gap-1">
-                              <Droplets className="w-3 h-3 text-blue-400" />
-                              {day.humidity}%
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Wind className="w-3 h-3 text-gray-400" />
-                              {day.wind} m/s
-                            </span>
-                          </div>
-                        </motion.div>
-                      ))}
+          {/* Loading */}
+          {loading && (
+            <div className="flex flex-col items-center justify-center py-32 text-[#6B8C7B]">
+              <Loader className="w-10 h-10 animate-spin text-sky-500 mb-4" />
+              <span className="text-sm font-medium tracking-widest uppercase">Fetching Atmosphere...</span>
+            </div>
+          )}
+
+          {/* Current Weather */}
+          {!loading && current && (
+            <div className="space-y-8">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                {/* Current conditions hero */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="lg:col-span-5 bg-white rounded-[2.5rem] border border-[#E0EDD9] p-8 shadow-sm relative overflow-hidden flex flex-col justify-between"
+                >
+                  {/* Dark green accent top strip */}
+                  <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#1B4332] to-[#52B788] rounded-t-[2.5rem]" />
+
+                  <div className="relative z-10 flex items-start justify-between mb-8 mt-2">
+                    <div>
+                      <h2 className="text-3xl font-black text-[#1B4332] tracking-tight">
+                        {city}
+                      </h2>
+                      <p className="text-sm font-medium text-[#2D6A4F] capitalize mt-1">
+                        {current.weather[0].description}
+                      </p>
                     </div>
-                  </motion.div>
-                )}
+                    <div className="w-20 h-20 bg-[#F0F7EE] rounded-3xl flex items-center justify-center border border-[#E0EDD9] shadow-sm">
+                      <img
+                        src={`https://openweathermap.org/img/wn/${current.weather[0].icon}@2x.png`}
+                        alt={current.weather[0].description}
+                        className="w-24 h-24 object-contain"
+                      />
+                    </div>
+                  </div>
 
-                <div className="grid sm:grid-cols-2 gap-8">
-                  {/* Risk Alerts */}
-                  {riskAlerts.length > 0 && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5 }}
-                      className="rounded-[2rem] border border-red-500/20 bg-red-500/[0.02] p-6 shadow-2xl backdrop-blur-2xl relative overflow-hidden"
-                    >
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 blur-3xl rounded-full" />
-                      <h2 className="text-sm font-bold uppercase tracking-widest text-red-400 mb-5 flex items-center gap-2">
-                        <AlertTriangle className="w-4 h-4" />
-                        Risk Alerts
-                      </h2>
-                      <ul className="space-y-3 relative z-10">
-                        {riskAlerts.map((alert, i) => {
-                          const Icon = alert.icon;
-                          return (
-                            <li
-                              key={i}
-                              className="flex flex-col gap-2 border border-red-500/10 rounded-xl p-4 bg-red-500/[0.05]"
-                            >
-                              <div className="flex items-center gap-2 text-red-400">
-                                <Icon className="w-4 h-4 shrink-0" />
-                                <span className="text-xs font-bold uppercase tracking-wider">{alert.label}</span>
-                              </div>
-                              <p className="text-sm font-medium text-red-200">
-                                {alert.text}
-                              </p>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </motion.div>
-                  )}
+                  <div className="relative z-10 mt-auto">
+                    <p className="text-[5rem] leading-none font-black text-[#1B4332] tracking-tighter mb-8">
+                      {Math.round(current.main.temp)}<span className="text-[#6B8C7B] text-5xl">&deg;C</span>
+                    </p>
 
-                  {/* Farming Advice */}
-                  {advice.length > 0 && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.6 }}
-                      className="rounded-[2rem] border border-emerald-500/20 bg-emerald-500/[0.02] p-6 shadow-2xl backdrop-blur-2xl relative overflow-hidden sm:col-span-1"
-                      style={{ gridColumn: riskAlerts.length === 0 ? 'span 2' : undefined }}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      <div className="flex flex-col gap-1 p-3 rounded-2xl bg-[#F7F4EE] border border-[#E0EDD9]">
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#6B8C7B]">
+                          <Thermometer className="w-3 h-3" />
+                          Feels
+                        </div>
+                        <span className="text-sm font-bold text-[#1B4332]">{Math.round(current.main.feels_like)}&deg;C</span>
+                      </div>
+                      <div className="flex flex-col gap-1 p-3 rounded-2xl bg-[#F7F4EE] border border-[#E0EDD9]">
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#6B8C7B]">
+                          <Droplets className="w-3 h-3" />
+                          Humid
+                        </div>
+                        <span className="text-sm font-bold text-[#1B4332]">{current.main.humidity}%</span>
+                      </div>
+                      <div className="flex flex-col gap-1 p-3 rounded-2xl bg-[#F7F4EE] border border-[#E0EDD9]">
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#6B8C7B]">
+                          <Wind className="w-3 h-3" />
+                          Wind
+                        </div>
+                        <span className="text-sm font-bold text-[#1B4332]">{current.wind.speed} m/s</span>
+                      </div>
+                      <div className="flex flex-col gap-1 p-3 rounded-2xl bg-[#F7F4EE] border border-[#E0EDD9]">
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#6B8C7B]">
+                          <Gauge className="w-3 h-3" />
+                          Press
+                        </div>
+                        <span className="text-sm font-bold text-[#1B4332]">{current.main.pressure} hPa</span>
+                      </div>
+                      <div className="flex flex-col gap-1 p-3 rounded-2xl bg-[#F7F4EE] border border-[#E0EDD9] sm:col-span-2">
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#6B8C7B]">
+                          <Eye className="w-3 h-3" />
+                          Visibility
+                        </div>
+                        <span className="text-sm font-bold text-[#1B4332]">{(current.visibility / 1000).toFixed(1)} km</span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <div className="lg:col-span-7 flex flex-col gap-8">
+                  {/* 5-Day Forecast */}
+                  {forecast.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="bg-white rounded-[2.5rem] border border-[#E0EDD9] p-8 shadow-sm"
                     >
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-3xl rounded-full" />
-                      <h2 className="text-sm font-bold uppercase tracking-widest text-emerald-400 mb-5 flex items-center gap-2">
-                        <CloudSun className="w-4 h-4" />
-                        Farming Advice
+                      <h2 className="text-sm font-bold uppercase tracking-widest text-[#6B8C7B] mb-6 flex items-center gap-2">
+                        <CloudSun className="w-4 h-4 text-[#2D6A4F]" />
+                        5-Day Forecast
                       </h2>
-                      <ul className="space-y-3 relative z-10">
-                        {advice.map((tip, i) => {
-                          const Icon = tip.icon;
-                          return (
-                            <li
-                              key={i}
-                              className="flex items-start gap-3 border border-white/5 rounded-xl p-4 bg-white/[0.02]"
-                            >
-                              <div className={`p-2 rounded-lg border ${tip.color} shrink-0`}>
-                                <Icon className="w-4 h-4" />
-                              </div>
-                              <span className="text-sm font-medium text-emerald-100/70 mt-1">
-                                {tip.text}
+                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                        {forecast.map((day, idx) => (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4 + (idx * 0.1) }}
+                            key={day.date}
+                            className="flex flex-col items-center border border-[#E0EDD9] bg-[#F7F4EE] rounded-2xl p-4 transition-colors hover:bg-[#EBF5EE] hover:border-[#C3E6CB]"
+                          >
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#2D6A4F] mb-2">
+                              {formatDay(day.date)}
+                            </p>
+                            <div className="w-12 h-12 flex items-center justify-center mb-2">
+                              <img
+                                src={`https://openweathermap.org/img/wn/${day.icon}@2x.png`}
+                                alt={day.desc}
+                                className="w-16 h-16 object-contain"
+                              />
+                            </div>
+                            <p className="text-base font-bold text-[#1B4332]">
+                              {day.tempMax}&deg;C
+                              <span className="text-[#6B8C7B] text-xs font-medium ml-1">
+                                {day.tempMin}&deg;C
                               </span>
-                            </li>
-                          );
-                        })}
-                      </ul>
+                            </p>
+                            <div className="flex items-center gap-3 mt-3 pt-3 border-t border-[#E0EDD9] w-full justify-center text-[10px] font-bold text-[#6B8C7B]">
+                              <span className="flex items-center gap-1">
+                                <Droplets className="w-3 h-3 text-blue-400" />
+                                {day.humidity}%
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Wind className="w-3 h-3 text-[#6B8C7B]" />
+                                {day.wind} m/s
+                              </span>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
                     </motion.div>
                   )}
+
+                  <div className="grid sm:grid-cols-2 gap-8">
+                    {/* Risk Alerts */}
+                    {riskAlerts.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                        className="bg-white rounded-[2rem] border border-red-200 p-6 shadow-sm relative overflow-hidden"
+                      >
+                        <div className="absolute top-0 left-0 bottom-0 w-1 bg-red-500 rounded-l-[2rem]" />
+                        <h2 className="text-sm font-bold uppercase tracking-widest text-red-600 mb-5 flex items-center gap-2 pl-2">
+                          <AlertTriangle className="w-4 h-4" />
+                          Risk Alerts
+                        </h2>
+                        <ul className="space-y-3">
+                          {riskAlerts.map((alert, i) => {
+                            const Icon = alert.icon;
+                            return (
+                              <li
+                                key={i}
+                                className="flex flex-col gap-2 border border-red-100 rounded-xl p-4 bg-red-50"
+                              >
+                                <div className="flex items-center gap-2 text-red-600">
+                                  <Icon className="w-4 h-4 shrink-0" />
+                                  <span className="text-xs font-bold uppercase tracking-wider">{alert.label}</span>
+                                </div>
+                                <p className="text-sm font-medium text-red-700">
+                                  {alert.text}
+                                </p>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </motion.div>
+                    )}
+
+                    {/* Farming Advice */}
+                    {advice.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.6 }}
+                        className="bg-white rounded-[2rem] border border-[#E0EDD9] p-6 shadow-sm relative overflow-hidden sm:col-span-1"
+                        style={{ gridColumn: riskAlerts.length === 0 ? 'span 2' : undefined }}
+                      >
+                        <div className="absolute top-0 left-0 bottom-0 w-1 bg-[#2D6A4F] rounded-l-[2rem]" />
+                        <h2 className="text-sm font-bold uppercase tracking-widest text-[#2D6A4F] mb-5 flex items-center gap-2 pl-2">
+                          <CloudSun className="w-4 h-4" />
+                          Farming Advice
+                        </h2>
+                        <ul className="space-y-3">
+                          {advice.map((tip, i) => {
+                            const Icon = tip.icon;
+                            return (
+                              <li
+                                key={i}
+                                className={`flex items-start gap-3 border rounded-xl p-4 ${tip.color} ${tip.borderLeft}`}
+                              >
+                                <div className="shrink-0 mt-0.5">
+                                  <Icon className="w-4 h-4" />
+                                </div>
+                                <span className="text-sm font-medium mt-0.5">
+                                  {tip.text}
+                                </span>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </motion.div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
-      </main>
+          )}
+        </main>
       </div>
     </div>
   );

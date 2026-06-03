@@ -167,22 +167,24 @@ const BestMandi = () => {
   );
 
   return (
-    <div className="min-h-screen bg-transparent text-white selection:bg-emerald-500/30">
+    <div className="min-h-screen bg-[#F7F9FA] selection:bg-emerald-100">
       <Navbar />
 
-      <main className="relative z-10 max-w-7xl mx-auto px-6 py-12 space-y-8">
+      <main className="dashboard-main-content max-w-7xl mx-auto px-6 py-8">
+        
+        {/* Page Header */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-10 flex items-center gap-4"
+          className="mb-8 flex items-center gap-4 pt-4"
         >
-          <div className="w-12 h-12 bg-teal-500/20 rounded-2xl flex items-center justify-center border border-teal-500/30">
-            <Map className="w-6 h-6 text-teal-400" />
+          <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center border border-emerald-100 shadow-sm">
+            <Map className="w-6 h-6 text-[#1E8E5A]" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-white tracking-tight">Best Mandi Finder</h1>
-            <p className="text-white/40 text-sm mt-1 font-medium">
-              Find the most profitable market near you based on live prices and transport costs.
+            <h1 className="text-3xl font-extrabold text-[#0F6B4A] tracking-tight font-heading">Best Mandi Finder</h1>
+            <p className="text-slate-400 text-xs sm:text-sm mt-1 font-semibold">
+              Locate high-revenue market options factoring live prices and road transport mileage.
             </p>
           </div>
         </motion.div>
@@ -237,22 +239,21 @@ const BestMandi = () => {
             transition={{ delay: 0.2, type: "spring" }}
             className="lg:col-span-7 flex flex-col gap-6"
           >
-
             {/* Loading skeleton */}
             {mandiLoading && (
               <div className="flex flex-col gap-4">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="bg-white/[0.02] backdrop-blur-2xl rounded-3xl p-6 border border-white/5 animate-pulse">
+                  <div key={i} className="bg-white rounded-3xl p-6 border border-slate-200 animate-pulse">
                     <div className="flex gap-3 mb-4">
-                      <div className="w-10 h-10 bg-white/10 rounded-xl" />
+                      <div className="w-10 h-10 bg-slate-100 rounded-xl" />
                       <div className="flex-1 space-y-2">
-                        <div className="h-4 bg-white/10 rounded w-1/2" />
-                        <div className="h-3 bg-white/5 rounded w-1/3" />
+                        <div className="h-4 bg-slate-100 rounded w-1/2" />
+                        <div className="h-3 bg-slate-50 rounded w-1/3" />
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-2">
                       {[1, 2, 3].map((j) => (
-                        <div key={j} className="h-12 bg-white/5 rounded-xl" />
+                        <div key={j} className="h-12 bg-slate-50 rounded-xl" />
                       ))}
                     </div>
                   </div>
@@ -267,12 +268,12 @@ const BestMandi = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex flex-col gap-4 max-h-[500px] overflow-y-auto pr-2"
               >
-                <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-[2rem] px-6 py-4 text-white flex items-center justify-between shadow-xl">
-                  <span className="font-bold text-sm tracking-tight">
+                <div className="bg-[#1E8E5A] rounded-2xl px-6 py-4 text-white flex items-center justify-between shadow-sm">
+                  <span className="font-bold text-xs tracking-tight">
                     🌾 {mandiResults.crop} · {mandiResults.quantity} qtl · {mandiResults.district}, {mandiResults.state}
                   </span>
-                  <span className="text-amber-100 text-xs font-bold uppercase tracking-wider">
-                    {mandiResults.mandis.length} mandis
+                  <span className="text-emerald-100 text-[10px] font-bold uppercase tracking-wider">
+                    {mandiResults.mandis.length} Mandis Available
                   </span>
                 </div>
 
@@ -299,20 +300,20 @@ const BestMandi = () => {
               </motion.div>
             )}
 
-            {/* Map */}
-            <div className="bg-white/[0.02] backdrop-blur-2xl rounded-3xl p-6 border border-white/5">
+            {/* Map wrapper */}
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
-                <label className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                  <Map className="w-4 h-4 text-teal-400" /> Map View
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                  <Map className="w-4 h-4 text-[#1E8E5A]" /> Map Projection
                 </label>
                 {clickMode && (
-                  <span className="text-xs bg-teal-500/10 border border-teal-500/20 text-teal-400 px-3 py-1.5 rounded-full animate-pulse font-bold tracking-wide">
-                    🖱️ Click map to set {clickMode === "farmer" ? "farm" : "mandi"} location
+                  <span className="text-[10px] bg-emerald-50 border border-emerald-100 text-[#0F6B4A] px-3.5 py-1.5 rounded-full animate-pulse font-bold tracking-wide">
+                    🖱️ Click map to pin {clickMode === "farmer" ? "farm" : "mandi"}
                   </span>
                 )}
               </div>
 
-              <div className="rounded-2xl overflow-hidden shadow-2xl border border-white/10 relative z-0">
+              <div className="rounded-2xl overflow-hidden border border-slate-200 relative z-0 shadow-inner">
                 <MandiMap
                   farmerLocation={farmerLocation}
                   farmerAddress={farmerAddress}
@@ -335,60 +336,60 @@ const BestMandi = () => {
                     initial={{ opacity: 0, y: 10, height: 0 }}
                     animate={{ opacity: 1, y: 0, height: "auto" }}
                     exit={{ opacity: 0, y: 10, height: 0 }}
-                    className="mt-4 p-5 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl shadow-xl overflow-hidden"
+                    className="mt-4 p-5 bg-slate-50 border border-slate-200 rounded-2xl shadow-inner overflow-hidden"
                   >
-                    <h4 className="text-sm font-bold text-amber-400 mb-4 tracking-tight">🛣️ Route Summary</h4>
+                    <h4 className="text-xs font-bold text-[#0F6B4A] uppercase tracking-widest mb-4">🛣️ Logistics Analysis</h4>
 
                     <div className="grid grid-cols-3 gap-3 text-center mb-4">
-                      <div className="bg-white/5 rounded-xl p-3 border border-white/5">
-                        <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Distance</p>
-                        <p className="font-bold text-blue-400 text-base">{routeInfo.distanceKm} km</p>
+                      <div className="bg-white rounded-xl p-3 border border-slate-200 shadow-sm">
+                        <p className="text-[9px] text-slate-400 uppercase tracking-widest font-bold mb-1">Road Distance</p>
+                        <p className="font-black text-slate-800 text-sm">{routeInfo.distanceKm} km</p>
                       </div>
-                      <div className="bg-white/5 rounded-xl p-3 border border-white/5">
-                        <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Est. Time</p>
-                        <p className="font-bold text-emerald-400 text-base">~{routeInfo.durationMin} min</p>
+                      <div className="bg-white rounded-xl p-3 border border-slate-200 shadow-sm">
+                        <p className="text-[9px] text-slate-400 uppercase tracking-widest font-bold mb-1">Duration</p>
+                        <p className="font-black text-slate-800 text-sm">~{routeInfo.durationMin} min</p>
                       </div>
-                      <div className="bg-white/5 rounded-xl p-3 border border-white/5">
-                        <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Total Cost</p>
-                        <p className="font-bold text-red-400 text-base">
+                      <div className="bg-white rounded-xl p-3 border border-slate-200 shadow-sm">
+                        <p className="text-[9px] text-slate-400 uppercase tracking-widest font-bold mb-1">Freight Cost</p>
+                        <p className="font-black text-red-650 text-sm">
                           ₹{routeInfo.totalCost?.toLocaleString()}
                         </p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-3 gap-3 text-center text-xs">
-                      <div className="bg-orange-500/10 rounded-xl py-3 border border-orange-500/10">
-                        <p className="text-white/40 font-bold mb-1">Fuel</p>
-                        <p className="font-bold text-orange-400 text-sm">
+                      <div className="bg-emerald-50 rounded-xl py-3 border border-emerald-100">
+                        <p className="text-[#0F6B4A]/60 font-bold mb-1">Fuel Charge</p>
+                        <p className="font-bold text-[#0F6B4A] text-xs">
                           ₹{routeInfo.breakdown?.fuelCost?.toLocaleString()}
                         </p>
                       </div>
-                      <div className="bg-purple-500/10 rounded-xl py-3 border border-purple-500/10">
-                        <p className="text-white/40 font-bold mb-1">Toll</p>
-                        <p className="font-bold text-purple-400 text-sm">
+                      <div className="bg-blue-50 rounded-xl py-3 border border-blue-100">
+                        <p className="text-[#2F80ED]/60 font-bold mb-1">Toll Rate</p>
+                        <p className="font-bold text-[#2F80ED] text-xs">
                           ₹{routeInfo.breakdown?.tollCost?.toLocaleString()}
                         </p>
                       </div>
-                      <div className="bg-white/5 rounded-xl py-3 border border-white/5">
-                        <p className="text-white/40 font-bold mb-1">Loading</p>
-                        <p className="font-bold text-white/60 text-sm">
+                      <div className="bg-white rounded-xl py-3 border border-slate-250">
+                        <p className="text-slate-400 font-bold mb-1">Labor/Load</p>
+                        <p className="font-bold text-slate-600 text-xs">
                           ₹{routeInfo.breakdown?.loadingCost?.toLocaleString()}
                         </p>
                       </div>
                     </div>
 
-                    <p className="text-xs text-white/40 text-center mt-4 font-medium">
-                      🚛 {routeInfo.truckType} truck · based on real road distance
+                    <p className="text-[10px] font-bold text-slate-400 text-center mt-4 uppercase tracking-widest">
+                      🚛 {routeInfo.truckType} truck · real-road routing computation
                     </p>
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              {/* Selected mandi label */}
+              {/* Selected Mandi confirm label */}
               {selectedMandi && (
-                <div className="mt-4 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-center">
-                  <p className="text-sm font-semibold text-emerald-400">
-                    ✅ Selected: <span className="font-bold text-emerald-300">{selectedMandi.name}</span>
+                <div className="mt-4 p-4 bg-[#E6F5EE] border border-emerald-200/50 rounded-2xl text-center">
+                  <p className="text-xs font-bold text-[#0F6B4A]">
+                    ✅ Active Target Market: <span className="font-black text-[#0F6B4A]">{selectedMandi.name}</span>
                   </p>
                 </div>
               )}
@@ -396,8 +397,8 @@ const BestMandi = () => {
           </motion.div>
         </div>
 
-        <p className="text-center text-xs text-white/30 pb-4 mt-12 font-medium">
-          🌾 AgriSense · Route Optimization via OpenRouteService
+        <p className="text-center text-[10px] text-slate-400 pb-4 mt-12 font-bold uppercase tracking-widest">
+          🌾 AgriSense Logistics Core · Calculations via OpenRouteService API
         </p>
       </main>
     </div>

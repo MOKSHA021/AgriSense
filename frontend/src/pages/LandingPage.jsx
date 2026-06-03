@@ -1,278 +1,762 @@
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Wheat, Sprout, TrendingUp, CloudSun, ArrowRight, Cpu, ShieldCheck, BarChart3, Zap } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { motion, useScroll, useTransform } from "framer-motion";
+import {
+  MapPin, Cpu, TrendingUp, FlaskConical, Sprout, CloudSun,
+  ShieldAlert, ArrowRight, Leaf, ChevronRight, Activity, Wallet,
+  ScanSearch, Landmark, Heart, ShieldCheck, CheckCircle2, Star
+} from "lucide-react";
 
-const stats = [
-  { value: "7", label: "AI Models", icon: Cpu },
-  { value: "22+", label: "Crop Types", icon: Sprout },
-  { value: "Live", label: "Mandi Prices", icon: TrendingUp },
-  { value: "100%", label: "Free to Use", icon: ShieldCheck },
-];
-
-const features = [
-  {
-    icon: "🧪",
-    title: "Soil Analysis",
-    desc: "Upload a soil photo — our EfficientNet-B0 deep learning model instantly classifies your soil type with 90%+ accuracy.",
-    badge: "AI Vision",
-  },
-  {
-    icon: "🌾",
-    title: "Crop Recommendation",
-    desc: "Enter soil NPK, pH and climate data. Our Random Forest ML model ranks crops by suitability and predicted profitability.",
-    badge: "Random Forest",
-  },
-  {
-    icon: "📈",
-    title: "Price Prediction",
-    desc: "Prophet time-series models trained on years of mandi data forecast harvest prices up to 3 years ahead.",
-    badge: "Prophet ML",
-  },
-  {
-    icon: "🌦️",
-    title: "Weather & Risk",
-    desc: "5-day forecasts with farming-specific advice, flood/drought/heat alerts and safe crop suggestions.",
-    badge: "Real-time",
-  },
-  {
-    icon: "🏪",
-    title: "Best Mandi Finder",
-    desc: "Find top-paying mandis near you with real Agmarknet prices, road distances and transport cost calculations.",
-    badge: "Live Data",
-  },
-  {
-    icon: "💰",
-    title: "Expense Tracker",
-    desc: "Log your farming costs and compare against predicted revenue to see real profit margins season by season.",
-    badge: "Finance",
-  },
-];
-
-// Animation Variants
-const staggerContainer = {
+/* ─────────────────────────── Animation Constants ─────────────────────────── */
+const containerVariants = {
   hidden: { opacity: 0 },
-  show: {
+  visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.1 }
+    transition: { staggerChildren: 0.15, delayChildren: 0.1 }
   }
 };
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 50, damping: 15 } }
+const itemVariants = {
+  hidden: { y: 30, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { type: "spring", stiffness: 100, damping: 15 }
+  }
 };
 
-const fadeScale = {
-  hidden: { opacity: 0, scale: 0.9 },
-  show: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 50, damping: 15 } }
+const hoverScaleVariants = {
+  hover: {
+    y: -8,
+    boxShadow: "0 20px 40px -15px rgba(15, 107, 74, 0.12)",
+    borderColor: "rgba(30, 142, 90, 0.3)",
+    transition: { duration: 0.3, ease: "easeOut" }
+  }
 };
 
-const LandingPage = () => {
+export default function LandingPage() {
   const navigate = useNavigate();
+  const [scrolled, setScrolled] = useState(false);
+  const [activeWorkflowStep, setActiveWorkflowStep] = useState(0);
+
+  // Monitor scroll for sticky navbar styles
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 40);
+    };
+    window.addEventListener("scroll", handleScroll);
+    window.scrollTo(0, 0);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const workflowSteps = [
+    {
+      title: "Soil Scanner & Type Classification",
+      desc: "Instant image recognition mapping to rich pH, nitrogen, and potassium presets using EfficientNet-B0 ML.",
+      icon: FlaskConical,
+      color: "text-[#2BB673]",
+      bg: "bg-[#E6F5EE]"
+    },
+    {
+      title: "Climatic AI Recommendations",
+      desc: "Top 5 crop recommendations dynamically calculated using Random Forest models over current and historical rainfall indices.",
+      icon: Sprout,
+      color: "text-[#1E8E5A]",
+      bg: "bg-emerald-50"
+    },
+    {
+      title: "Risk Radar & Mitigations",
+      desc: "Rule-based analysis parsing real-time meteorological forecasts to emit flood, frost, and dry-stress mitigation advisories.",
+      icon: ShieldAlert,
+      color: "text-red-500",
+      bg: "bg-red-50"
+    },
+    {
+      title: "Mandi Cost & Route Optimizer",
+      desc: "Live Agmarknet prices overlaid against road mileage fuel-tolls to geocode the absolute highest net profit mandi routes.",
+      icon: MapPin,
+      color: "text-[#2F80ED]",
+      bg: "bg-blue-50"
+    }
+  ];
+
+  const features = [
+    {
+      icon: FlaskConical,
+      title: "Soil Intelligence",
+      desc: "EfficientNet deep learning classifies soil samples instantly from photos, identifying key characteristics.",
+      path: "/dashboard/soil",
+      badge: "AI Vision"
+    },
+    {
+      icon: Sprout,
+      title: "Crop Recommendation",
+      desc: "Random Forest machine learning models match soil presets and rainfall forecasts to output high-yield crops.",
+      path: "/dashboard/recommend",
+      badge: "Random Forest"
+    },
+    {
+      icon: CloudSun,
+      title: "Weather Advisories",
+      desc: "Hyper-local current conditions and 5-day forecasts mapped to proactive agricultural advice on spray timings and harvesting.",
+      path: "/dashboard/weather",
+      badge: "Real-Time GPS"
+    },
+    {
+      icon: Activity,
+      title: "Live Mandi Rates",
+      desc: "Real-time rates scraped from mandis all over India to prevent middleman margin erosion.",
+      path: "/dashboard/live-prices",
+      badge: "Live Scraping"
+    },
+    {
+      icon: Bot,
+      title: "Price Forecasting",
+      desc: "Prophet ML models projecting future agricultural rates up to 3 years ahead for smarter crop planning.",
+      path: "/dashboard/price-forecast",
+      badge: "Time-Series AI"
+    },
+    {
+      icon: ShieldAlert,
+      title: "Risk Alerts",
+      desc: "Early warning parameters mapping severe weather indicators to actionable flood, heat, and frost mitigation guides.",
+      path: "/dashboard/risk",
+      badge: "Critical Alert"
+    }
+  ];
 
   return (
-    <div className="min-h-screen bg-transparent text-white overflow-hidden selection:bg-emerald-500/30">
+    <div className="font-sans text-slate-800 bg-[#F7F9FA] min-h-screen selection:bg-emerald-100 selection:text-green-dark">
       
-      {/* ── Floating Navbar ── */}
-      <motion.nav 
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 md:px-12 py-5 bg-transparent backdrop-blur-3xl border-b border-white/5"
-      >
-        <div className="flex items-center gap-2.5 group cursor-pointer">
-          <div className="w-9 h-9 bg-gradient-to-br from-emerald-400 to-green-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-900/40 group-hover:scale-105 transition-transform">
-            <Wheat className="w-5 h-5 text-white" />
-          </div>
-          <span className="text-xl font-bold tracking-tight text-white">
-            AgriSense
+      {/* ══════════════════ 1. STICKY TRANSPARENT NAVBAR ══════════════════ */}
+      <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 px-6 md:px-16 py-4 flex items-center justify-between ${
+        scrolled 
+          ? "bg-white/85 backdrop-blur-md shadow-md border-b border-slate-200/50 py-3" 
+          : "bg-transparent py-5"
+      }`}>
+        <Link to="/" className="flex items-center gap-3">
+          <Leaf className={`w-7 h-7 transition-colors ${scrolled ? "text-[#1E8E5A]" : "text-white lg:text-[#2BB673]"}`} />
+          <span className={`font-black text-2xl tracking-tight font-heading ${scrolled ? "text-[#0F6B4A]" : "text-white"}`}>
+            Agri<span className="text-[#2BB673]">Sense</span>
           </span>
-        </div>
-        <div className="flex gap-4">
-          <button
-            onClick={() => navigate("/login")}
-            className="px-5 py-2.5 text-white/70 rounded-xl text-sm font-semibold hover:text-white transition-colors"
+        </Link>
+
+        {/* Desktop Links */}
+        <div className="hidden md:flex items-center gap-8 text-sm font-semibold">
+          <a href="#platform" className={`transition-colors ${scrolled ? "text-slate-600 hover:text-[#1E8E5A]" : "text-white/80 hover:text-white"}`}>
+            Platform
+          </a>
+          <a href="#intelligence" className={`transition-colors ${scrolled ? "text-slate-600 hover:text-[#1E8E5A]" : "text-white/80 hover:text-white"}`}>
+            AI Models
+          </a>
+          <a href="#features" className={`transition-colors ${scrolled ? "text-slate-600 hover:text-[#1E8E5A]" : "text-white/80 hover:text-white"}`}>
+            Features
+          </a>
+          <a href="#workflow" className={`transition-colors ${scrolled ? "text-slate-600 hover:text-[#1E8E5A]" : "text-white/80 hover:text-white"}`}>
+            Workflow
+          </a>
+          <div className="h-4 w-px bg-slate-300/30" />
+          <Link to="/login" className={`transition-colors ${scrolled ? "text-slate-700 hover:text-[#1E8E5A]" : "text-white/95 hover:text-white"}`}>
+            Sign In
+          </Link>
+          <Link
+            to="/register"
+            className="bg-[#1E8E5A] hover:bg-[#0F6B4A] text-white px-5 py-2.5 rounded-full text-xs font-bold transition-all shadow-md shadow-[#1E8E5A]/10 active:scale-95"
           >
-            Login
-          </button>
-          <button
-            onClick={() => navigate("/register")}
-            className="px-6 py-2.5 bg-white text-black rounded-xl text-sm font-bold hover:bg-gray-100 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.2)]"
+            Get Started Free
+          </Link>
+        </div>
+
+        {/* Mobile menu trigger links */}
+        <div className="flex md:hidden items-center gap-4">
+          <Link to="/login" className="text-white text-xs font-bold bg-[#1E8E5A]/20 border border-white/20 px-3 py-1.5 rounded-full">
+            Sign In
+          </Link>
+          <Link to="/register" className="bg-[#1E8E5A] text-white text-xs font-bold px-3 py-1.5 rounded-full">
+            Register
+          </Link>
+        </div>
+      </nav>
+
+      {/* ══════════════════ 2. LARGE ENTERPRISE HERO SECTION ══════════════════ */}
+      <section className="relative bg-gradient-to-br from-[#0F6B4A] via-[#10563b] to-[#124230] min-h-screen pt-28 flex flex-col justify-center overflow-hidden">
+        {/* Background blobs */}
+        <div className="absolute top-1/4 -left-10 w-96 h-96 rounded-full bg-[#2BB673]/10 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-10 right-0 w-80 h-80 rounded-full bg-[#2F80ED]/10 blur-3xl pointer-events-none" />
+        
+        <div className="max-w-7xl mx-auto px-6 md:px-16 py-12 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10 w-full">
+          
+          {/* Left Text details */}
+          <motion.div 
+            className="lg:col-span-6 space-y-6 text-left"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            Get Started
-          </button>
-        </div>
-      </motion.nav>
+            <div className="inline-flex items-center gap-2 bg-[#2BB673]/15 border border-[#2BB673]/30 text-[#2BB673] text-[10px] font-bold px-4 py-2 rounded-full tracking-widest uppercase">
+              <Cpu className="w-3.5 h-3.5" />
+              Next-Gen AgTech Intelligence Cloud
+            </div>
 
-      {/* ── Cinematic Hero Section ── */}
-      <section className="relative min-h-screen flex flex-col justify-center items-center text-center px-6 pt-20">
-        
-        {/* Abstract Glowing Background */}
-        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-          <motion.div 
-            animate={{ 
-              scale: [1, 1.2, 1],
-              opacity: [0.1, 0.15, 0.1],
-              rotate: [0, 90, 0]
-            }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="absolute -top-[20%] left-[20%] w-[800px] h-[800px] bg-emerald-500/20 rounded-full blur-[120px]" 
-          />
-          <motion.div 
-            animate={{ 
-              scale: [1, 1.1, 1],
-              opacity: [0.05, 0.1, 0.05],
-              rotate: [0, -90, 0]
-            }}
-            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-            className="absolute bottom-[10%] right-[10%] w-[600px] h-[600px] bg-teal-500/20 rounded-full blur-[100px]" 
-          />
-          {/* Noise overlay for texture */}
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
-        </div>
+            <h1 className="text-white text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight font-heading">
+              OPTIMIZE YOUR FIELD.
+              <span className="block text-[#2BB673] mt-2">MAXIMIZE YOUR HARVEST.</span>
+            </h1>
 
-        <motion.div 
-          variants={staggerContainer}
-          initial="hidden"
-          animate="show"
-          className="relative z-10 flex flex-col items-center w-full max-w-5xl"
-        >
-          {/* Badge */}
-          <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 backdrop-blur-md rounded-full mb-8 shadow-2xl">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-white/80 text-xs font-semibold tracking-wide uppercase">Powered by Advanced Machine Learning</span>
-          </motion.div>
-
-          {/* Headline */}
-          <motion.h1 variants={fadeUp} className="text-6xl md:text-8xl font-extrabold text-white mb-6 tracking-tighter leading-[1.1]">
-            Intelligence for the <br className="hidden md:block" />
-            <span className="bg-gradient-to-r from-emerald-300 via-green-400 to-teal-400 bg-clip-text text-transparent">
-              Modern Farmer.
-            </span>
-          </motion.h1>
-
-          <motion.p variants={fadeUp} className="text-white/50 text-lg md:text-xl mb-12 max-w-2xl leading-relaxed font-medium">
-            AgriSense combines deep learning soil analysis, machine learning crop recommendations, 
-            and Prophet price forecasting to maximise your harvest and profit.
-          </motion.p>
-
-          <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 mb-24">
-            <button
-              onClick={() => navigate("/register")}
-              className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-black text-sm font-bold rounded-2xl transition-all shadow-[0_0_40px_rgba(255,255,255,0.1)] hover:shadow-[0_0_60px_rgba(255,255,255,0.2)] hover:scale-105"
-            >
-              Start for Free <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button
-              onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })}
-              className="px-8 py-4 border border-white/10 bg-white/5 text-white/80 text-sm font-semibold rounded-2xl hover:bg-white/10 backdrop-blur-md transition-all hover:scale-105"
-            >
-              Explore Platform
-            </button>
-          </motion.div>
-
-          {/* Stats strip */}
-          <motion.div variants={fadeScale} className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-4xl">
-            {stats.map((s) => {
-              const Icon = s.icon;
-              return (
-                <div
-                  key={s.label}
-                  className="relative group bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-6 text-center hover:bg-white/10 transition-all duration-500 overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <Icon className="w-6 h-6 text-emerald-400 mx-auto mb-3" />
-                  <p className="text-3xl font-bold text-white mb-1 tracking-tight">{s.value}</p>
-                  <p className="text-xs font-medium text-white/40 uppercase tracking-wider">{s.label}</p>
-                </div>
-              );
-            })}
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* ── Bento Grid Features ── */}
-      <section id="features" className="py-32 px-6 md:px-12 relative border-t border-white/5">
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay pointer-events-none" />
-        
-        <motion.div 
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={staggerContainer}
-          className="relative max-w-7xl mx-auto"
-        >
-          <motion.div variants={fadeUp} className="text-center mb-20">
-            <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight">
-              A Complete OS for Agriculture
-            </h2>
-            <p className="text-white/40 text-lg md:text-xl max-w-2xl mx-auto font-medium">
-              Six powerful AI-powered modules seamlessly integrated into one beautiful interface.
+            <p className="text-white/80 text-base sm:text-lg leading-relaxed max-w-lg">
+              AgriSense unifies crop recommendations, real-time weather risk advisories, and mandate transport cost geocoding into an enterprise platform powered by Random Forest & EfficientNet ML models.
             </p>
+
+            <div className="flex flex-wrap items-center gap-4 pt-4">
+              <button
+                onClick={() => navigate("/register")}
+                className="group inline-flex items-center gap-2 bg-[#1E8E5A] hover:bg-[#0F6B4A] text-white font-bold px-7 py-4 rounded-full text-xs transition-all shadow-xl shadow-green-950/30 hover:scale-105"
+              >
+                START YOUR FREE ANALYSIS
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </button>
+
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-2 text-white/90 hover:text-white text-xs font-bold bg-white/5 hover:bg-white/10 border border-white/15 px-6 py-4 rounded-full transition-all"
+              >
+                Sign In to Dashboard
+              </Link>
+            </div>
+
+            {/* Trust Badges */}
+            <div className="pt-8 flex items-center gap-8 border-t border-white/10">
+              <div>
+                <p className="text-white text-2xl font-black font-heading leading-none">87.8%</p>
+                <p className="text-white/50 text-[10px] uppercase font-bold tracking-wider mt-1.5">Model Accuracy</p>
+              </div>
+              <div className="w-px h-8 bg-white/15" />
+              <div className="flex items-center gap-3">
+                <div className="flex -space-x-2">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="w-8 h-8 rounded-full bg-green-light border-2 border-[#0F6B4A] flex items-center justify-center text-white text-[10px] font-bold">
+                      {String.fromCharCode(64 + i)}
+                    </div>
+                  ))}
+                </div>
+                <p className="text-white/60 text-xs font-medium">Trusted by agricultural analysts and farmers.</p>
+              </div>
+            </div>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((f, i) => (
-              <motion.div
-                key={f.title}
-                variants={fadeUp}
-                className={`group relative bg-white/[0.02] border border-white/5 rounded-3xl p-8 hover:bg-white/[0.04] transition-colors duration-500`}
-              >
-                {/* Glow effect on hover */}
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                
-                <div className="flex items-start justify-between mb-6">
-                  <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-3xl border border-white/10 group-hover:scale-110 transition-transform duration-500 shadow-xl">
-                    {f.icon}
+          {/* Right Side: Interactive Mockup */}
+          <motion.div 
+            className="lg:col-span-6 relative flex justify-center"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          >
+            {/* Dashboard Container Mockup */}
+            <div className="w-full max-w-lg bg-white rounded-3xl shadow-[0_30px_70px_rgba(0,0,0,0.25)] border border-slate-200 overflow-hidden relative group">
+              {/* Inner Mockup Header */}
+              <div className="bg-slate-50 border-b border-slate-100 px-5 py-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-400" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                  <div className="w-3 h-3 rounded-full bg-green-400" />
+                </div>
+                <div className="bg-slate-200/60 text-slate-500 text-[10px] font-bold px-3 py-1 rounded-md">
+                  cloud.agrisense.co/dashboard
+                </div>
+                <div className="w-4 h-4" />
+              </div>
+
+              {/* Inner Mockup Body */}
+              <div className="p-6 space-y-5 bg-[#F7F9FA]">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Live Soil Telemetry</p>
+                    <h4 className="text-slate-800 font-bold text-base mt-0.5">Alluvial Soil Zone</h4>
                   </div>
-                  <span className="text-[10px] font-bold tracking-widest uppercase bg-white/5 border border-white/10 text-emerald-300/80 px-3 py-1.5 rounded-full">
-                    {f.badge}
+                  <span className="bg-emerald-100 text-green-dark border border-emerald-200/50 rounded-full px-2.5 py-0.5 text-[10px] font-bold">
+                    Active
                   </span>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3 tracking-tight">{f.title}</h3>
-                <p className="text-sm text-white/50 leading-relaxed font-medium">{f.desc}</p>
+
+                {/* Simulated Chart/Visual */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm relative overflow-hidden">
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-xs font-bold text-slate-700">NPK Nitrogen Indices</p>
+                    <span className="text-[10px] font-bold text-[#2F80ED]">Optimal (65 kg/ha)</span>
+                  </div>
+                  {/* Graph visualization */}
+                  <div className="flex items-end gap-2.5 h-20 pt-4">
+                    {[40, 60, 45, 90, 75, 110, 85, 120].map((h, i) => (
+                      <div key={i} className="flex-1 bg-slate-100 rounded-t-md h-full relative">
+                        <motion.div 
+                          className="bg-[#1E8E5A] rounded-t-md absolute bottom-0 inset-x-0"
+                          initial={{ height: 0 }}
+                          animate={{ height: `${h / 1.3}%` }}
+                          transition={{ delay: 1 + i * 0.05, duration: 0.8 }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Floating telemetry metrics */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-sm">
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Moisture</p>
+                    <div className="flex items-baseline gap-1 mt-1.5">
+                      <span className="text-slate-800 text-xl font-black font-heading">58%</span>
+                      <span className="text-green-500 text-xs font-bold">+2.4%</span>
+                    </div>
+                  </div>
+                  <div className="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-sm">
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">pH Level</p>
+                    <div className="flex items-baseline gap-1 mt-1.5">
+                      <span className="text-slate-800 text-xl font-black font-heading">6.8</span>
+                      <span className="text-slate-500 text-xs font-medium">Neutral</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Overlap badge cards */}
+            <motion.div 
+              className="absolute -top-6 -right-6 bg-white border border-slate-200 rounded-2xl p-4 shadow-2xl flex items-center gap-3 hidden sm:flex"
+              animate={{ y: [0, -10, 0] }}
+              transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+            >
+              <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center">
+                <Activity className="w-5 h-5 text-blue-500" />
+              </div>
+              <div>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Market Rate</p>
+                <p className="text-sm font-black text-slate-800 font-heading">Wheat: ₹2,350/qtl</p>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              className="absolute -bottom-6 -left-6 bg-white border border-slate-200 rounded-2xl p-4 shadow-2xl flex items-center gap-3 hidden sm:flex"
+              animate={{ y: [0, 8, 0] }}
+              transition={{ repeat: Infinity, duration: 4, delay: 1, ease: "easeInOut" }}
+            >
+              <div className="w-10 h-10 rounded-xl bg-[#E6F5EE] border border-emerald-100 flex items-center justify-center">
+                <CheckCircle2 className="w-5 h-5 text-green-mid" />
+              </div>
+              <div>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Advisory Status</p>
+                <p className="text-sm font-black text-slate-800 font-heading">Spraying Safe</p>
+              </div>
+            </motion.div>
+          </motion.div>
+
+        </div>
+      </section>
+
+      {/* ══════════════════ 3. PRODUCT PLATFORM OVERVIEW ══════════════════ */}
+      <section id="platform" className="py-24 bg-white relative">
+        <div className="max-w-7xl mx-auto px-6 md:px-16 text-center">
+          <div className="max-w-3xl mx-auto space-y-4 mb-16">
+            <span className="section-label">Enterprise Architecture</span>
+            <h2 className="text-[#0F6B4A] text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight font-heading">
+              A Unified Agriculture Intelligence Cloud
+            </h2>
+            <p className="text-slate-500 text-base md:text-lg">
+              AgriSense connects disparate field inputs with machine learning backends to optimize the crop cycle from soil testing to final mandi sale.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: ScanSearch,
+                title: "Computer Vision Imagery",
+                desc: "Analyzes uploaded crop leaves and soil photographs via neural layers, mapping features back to localized diagnostic indices.",
+              },
+              {
+                icon: Sprout,
+                title: "Agronomy Decision Trees",
+                desc: "Applies Random Forest and Prophet models to recommend high-yield crop schedules matching geographical limits.",
+              },
+              {
+                icon: Landmark,
+                title: "Logistics Optimization",
+                desc: "Scrapes and evaluates regional mandi pricing datasets, correcting margins for travel and fuel tollage.",
+              }
+            ].map((card, i) => (
+              <motion.div
+                key={i}
+                className="bg-[#F7F9FA] border border-slate-200/60 rounded-3xl p-8 text-left shadow-sm hover:shadow-md transition-all duration-300"
+                whileHover={{ y: -6 }}
+              >
+                <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center mb-6">
+                  <card.icon className="w-6 h-6 text-[#1E8E5A]" />
+                </div>
+                <h3 className="text-[#0F6B4A] font-bold text-lg mb-3 tracking-tight">{card.title}</h3>
+                <p className="text-slate-500 text-sm leading-relaxed">{card.desc}</p>
               </motion.div>
             ))}
           </div>
-        </motion.div>
-      </section>
-
-      {/* ── Minimalist CTA ── */}
-      <section className="py-32 px-6 text-center relative border-t border-white/5">
-        <motion.div 
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true }}
-          variants={fadeUp}
-          className="relative max-w-3xl mx-auto bg-gradient-to-b from-white/5 to-transparent border border-white/10 rounded-[3rem] p-12 md:p-20 backdrop-blur-xl overflow-hidden"
-        >
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
-          
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">Stop guessing.<br/>Start knowing.</h2>
-          <p className="text-white/40 mb-10 text-lg md:text-xl font-medium">
-            Join the next generation of farmers using data to drive profitability.
-          </p>
-          <button
-            onClick={() => navigate("/register")}
-            className="inline-flex items-center gap-2 px-10 py-5 bg-white text-black text-sm font-bold rounded-2xl hover:scale-105 transition-all shadow-[0_0_40px_rgba(255,255,255,0.1)]"
-          >
-            Create Free Account <ArrowRight className="w-4 h-4" />
-          </button>
-        </motion.div>
-      </section>
-
-      {/* ── Footer ── */}
-      <footer className="border-t border-white/5 py-12 text-center">
-        <div className="flex items-center justify-center gap-2 mb-4 opacity-50 hover:opacity-100 transition-opacity">
-          <Wheat className="w-4 h-4 text-emerald-400" />
-          <span className="font-bold text-white tracking-tight">AgriSense</span>
         </div>
-        <p className="text-xs text-white/30 font-medium">
-          © {new Date().getFullYear()} AgriSense. Designed for the future of agriculture.
-        </p>
+      </section>
+
+      {/* ══════════════════ 4. INTELLIGENCE & AI SECTION ══════════════════ */}
+      <section id="intelligence" className="py-24 bg-[#F7F9FA] border-t border-b border-slate-200/50">
+        <div className="max-w-7xl mx-auto px-6 md:px-16 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          
+          <motion.div 
+            className="space-y-6 text-left"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={containerVariants}
+          >
+            <span className="section-label">Predictive ML Models</span>
+            <h2 className="text-[#0F6B4A] text-3xl sm:text-4xl font-extrabold tracking-tight font-heading">
+              Powered by Advanced Neural & Statistical Modeling
+            </h2>
+            <p className="text-slate-500 text-sm sm:text-base leading-relaxed">
+              AgriSense integrates state-of-the-art Python ML service nodes directly into the frontend user workflow. All prediction runs happen instantly.
+            </p>
+
+            <div className="space-y-4 pt-4">
+              {[
+                {
+                  model: "EfficientNet-B0 Image Classifier",
+                  desc: "Trained on massive botanical visual logs to classify soil and leaf samples with over 87% accuracy.",
+                  metric: "Deep Learning"
+                },
+                {
+                  model: "Random Forest Recommendations",
+                  desc: "Analyzes NPK, rainfall and temperature parameters to generate ranked lists of optimal crop varieties.",
+                  metric: "Ensemble ML"
+                },
+                {
+                  model: "Facebook Prophet Time Series",
+                  desc: "Analyzes historic commodities market metrics to project rates up to 3 years ahead.",
+                  metric: "Prophet ML"
+                }
+              ].map((model, i) => (
+                <motion.div 
+                  key={i} 
+                  variants={itemVariants}
+                  className="bg-white border border-slate-200 rounded-2xl p-4 flex items-start gap-4 shadow-sm"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#1E8E5A] font-bold text-xs shrink-0">
+                    0{i+1}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-3">
+                      <h4 className="text-sm font-bold text-slate-800">{model.model}</h4>
+                      <span className="bg-[#2BB673]/10 text-[#0F6B4A] text-[9px] font-bold px-2 py-0.5 rounded-full">{model.metric}</span>
+                    </div>
+                    <p className="text-slate-500 text-xs mt-1 leading-relaxed">{model.desc}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          <div className="flex justify-center relative">
+            {/* Visual representation card */}
+            <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-8 shadow-xl text-left relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-green-light/5 rounded-full blur-2xl" />
+              
+              <div className="flex items-center gap-3 mb-8">
+                <Cpu className="w-6 h-6 text-[#1E8E5A]" />
+                <h4 className="font-bold text-slate-800 text-sm">Decision Engine Node</h4>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between text-xs font-bold text-slate-600 mb-1">
+                    <span>Soil Classification</span>
+                    <span>94.8% Match</span>
+                  </div>
+                  <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-green-light rounded-full" style={{ width: "94.8%" }} />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-xs font-bold text-slate-600 mb-1">
+                    <span>Crop Yield Confidence</span>
+                    <span>89.2% Score</span>
+                  </div>
+                  <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-green-mid rounded-full" style={{ width: "89.2%" }} />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-xs font-bold text-slate-600 mb-1">
+                    <span>Mandi Cost Savings</span>
+                    <span>+12.6% Margin</span>
+                  </div>
+                  <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-[#2F80ED] rounded-full" style={{ width: "75%" }} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-[#F7F9FA] rounded-2xl p-4 border border-slate-200 mt-8 text-xs text-slate-500 leading-relaxed flex items-start gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-green-light shrink-0 mt-0.5" />
+                <span>All modeling operations are computed on secured backend server instances and streamed via encrypted endpoints.</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ══════════════════ 5. FEATURE SHOWCASE ══════════════════ */}
+      <section id="features" className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-6 md:px-16 text-center">
+          <div className="max-w-3xl mx-auto space-y-4 mb-16">
+            <span className="section-label">Comprehensive Toolset</span>
+            <h2 className="text-[#0F6B4A] text-3xl sm:text-4xl font-extrabold tracking-tight font-heading">
+              Complete Feature Suite for Precision Agriculture
+            </h2>
+            <p className="text-slate-500 text-sm sm:text-base">
+              Explore how each feature converts complex field conditions into profit-maximizing insights.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((f, i) => (
+              <motion.div
+                key={i}
+                variants={hoverScaleVariants}
+                whileHover="hover"
+                className="bg-[#F7F9FA] border border-slate-200 rounded-3xl p-8 text-left transition-all duration-300 relative overflow-hidden group cursor-pointer"
+                onClick={() => navigate(f.path)}
+              >
+                <div className="flex items-start justify-between mb-6">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-slate-200">
+                    <f.icon className="w-6 h-6 text-[#1E8E5A] group-hover:scale-110 transition-transform" />
+                  </div>
+                  <span className="text-[10px] font-bold bg-[#E6F5EE] text-[#0F6B4A] border border-[#2BB673]/15 px-2.5 py-1 rounded-full">
+                    {f.badge}
+                  </span>
+                </div>
+                <h3 className="text-[#0F6B4A] font-bold text-lg mb-2 tracking-tight group-hover:text-[#1E8E5A] transition-colors">{f.title}</h3>
+                <p className="text-slate-500 text-xs sm:text-sm leading-relaxed mb-6">{f.desc}</p>
+                <span className="text-xs font-bold text-[#1E8E5A] flex items-center gap-1 group-hover:translate-x-1 transition-all">
+                  Open Feature <ChevronRight className="w-3.5 h-3.5" />
+                </span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════ 6. WORKFLOW SECTION ══════════════════ */}
+      <section id="workflow" className="py-24 bg-[#F7F9FA] border-t border-slate-200/50">
+        <div className="max-w-7xl mx-auto px-6 md:px-16 text-center">
+          <div className="max-w-3xl mx-auto space-y-4 mb-16">
+            <span className="section-label">Operational Workflow</span>
+            <h2 className="text-[#0F6B4A] text-3xl sm:text-4xl font-extrabold tracking-tight font-heading">
+              From Soil Analysis to Mandi Sale
+            </h2>
+            <p className="text-slate-500 text-sm sm:text-base">
+              A step-by-step cycle designed to keep your agriculture pipeline completely optimized.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            {/* Left selector */}
+            <div className="lg:col-span-5 space-y-3 text-left">
+              {workflowSteps.map((step, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => setActiveWorkflowStep(idx)}
+                  className={`p-5 rounded-2xl border transition-all duration-300 cursor-pointer flex items-start gap-4 ${
+                    activeWorkflowStep === idx 
+                      ? "bg-white border-[#1E8E5A] shadow-lg shadow-slate-100" 
+                      : "bg-transparent border-transparent hover:bg-white/50"
+                  }`}
+                >
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                    activeWorkflowStep === idx ? step.bg : "bg-slate-200/60"
+                  }`}>
+                    <step.icon className={`w-5 h-5 ${activeWorkflowStep === idx ? step.color : "text-slate-500"}`} />
+                  </div>
+                  <div>
+                    <h4 className={`text-sm font-bold transition-colors ${
+                      activeWorkflowStep === idx ? "text-[#0F6B4A]" : "text-slate-700"
+                    }`}>
+                      {step.title}
+                    </h4>
+                    {activeWorkflowStep === idx && (
+                      <p className="text-slate-500 text-xs mt-1.5 leading-relaxed">
+                        {step.desc}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Right side illustration */}
+            <div className="lg:col-span-7 bg-white border border-slate-200 rounded-[2.5rem] p-8 shadow-xl text-left relative overflow-hidden min-h-[350px] flex flex-col justify-center">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-[#2BB673]/5 rounded-full blur-2xl" />
+              <div className="relative z-10 space-y-6">
+                <span className="text-3xl font-black text-[#0F6B4A]">Step 0{activeWorkflowStep + 1}</span>
+                <h3 className="text-slate-800 font-extrabold text-2xl font-heading tracking-tight">
+                  {workflowSteps[activeWorkflowStep].title}
+                </h3>
+                <p className="text-slate-500 text-sm leading-relaxed">
+                  {workflowSteps[activeWorkflowStep].desc}
+                </p>
+                <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-light" />
+                  <span className="text-xs text-[#1E8E5A] font-semibold">Integrates dynamically with core farm profiles.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════ 7. STATISTICS SECTION ══════════════════ */}
+      <section className="py-20 bg-gradient-to-br from-[#0F6B4A] to-[#124230]">
+        <div className="max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+          {[
+            { value: "87.8%", label: "ML Model Accuracy" },
+            { value: "7 Types", label: "Soil Classes Supported" },
+            { value: "20+ Crops", label: "Variety Database" },
+            { value: "1,000+", label: "Farmers Registered" }
+          ].map((stat, i) => (
+            <div key={i} className="space-y-2">
+              <p className="text-[#2BB673] text-4xl sm:text-5xl font-black tracking-tight font-heading leading-none">
+                {stat.value}
+              </p>
+              <p className="text-white/60 text-xs sm:text-sm font-semibold uppercase tracking-wider">
+                {stat.label}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ══════════════════ 8. BENEFITS SECTION ══════════════════ */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-6 md:px-16 text-center">
+          <div className="max-w-3xl mx-auto space-y-4 mb-16">
+            <span className="section-label">Real Value</span>
+            <h2 className="text-[#0F6B4A] text-3xl sm:text-4xl font-extrabold tracking-tight font-heading">
+              Deliver Quantifiable Farming Success
+            </h2>
+            <p className="text-slate-500 text-sm sm:text-base">
+              Why smart farming enterprises select AgriSense to monitor and forecast their agricultural investments.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: Sprout,
+                title: "Maximize Farm Yield",
+                desc: "Mitigate planting failures by backing crop selections with multi-parameter Random Forest intelligence tailored to regional pH levels."
+              },
+              {
+                icon: Wallet,
+                title: "Reduce Operating Cost",
+                desc: "Track expenses accurately per crop season. Estimate seeds, fertilizers, and pesticide margins to avoid budget spillages."
+              },
+              {
+                icon: ShieldCheck,
+                title: "Minimize Climate Risk",
+                desc: "Stay ahead of flood, frost, or intense heatwaves. Real-time geocoded meteorological warnings are pushed to your dashboard dynamically."
+              }
+            ].map((b, i) => (
+              <div key={i} className="bg-[#F7F9FA] border border-slate-200/60 rounded-3xl p-8 text-left shadow-sm">
+                <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center mb-6">
+                  <b.icon className="w-5 h-5 text-[#1E8E5A]" />
+                </div>
+                <h4 className="text-slate-800 font-bold text-base mb-3">{b.title}</h4>
+                <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">{b.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════ 9. CTA SECTION ══════════════════ */}
+      <section className="py-20 bg-[#F7F9FA] border-t border-slate-200/50">
+        <div className="max-w-5xl mx-auto px-6 text-center bg-white border border-slate-200 rounded-[2.5rem] p-12 md:p-16 shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-32 h-32 bg-[#2BB673]/5 rounded-full blur-2xl" />
+          <div className="absolute bottom-0 right-0 w-48 h-48 bg-[#2F80ED]/5 rounded-full blur-2xl" />
+          
+          <div className="relative z-10 space-y-6">
+            <h2 className="text-[#0F6B4A] text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight font-heading leading-tight">
+              Begin Optimizing Your Harvest Today.
+            </h2>
+            <p className="text-slate-500 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+              Create a free account to test soil photos, receive climate crop suggestions, monitor live commodity indexes, and geocode route profits.
+            </p>
+            <div className="pt-4">
+              <button
+                onClick={() => navigate("/register")}
+                className="inline-flex items-center gap-2 bg-[#1E8E5A] hover:bg-[#0F6B4A] text-white font-bold px-8 py-4 rounded-full text-xs transition-all shadow-xl shadow-green-950/20 hover:scale-105 active:scale-95"
+              >
+                CREATE YOUR FREE ACCOUNT
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════ 10. ENTERPRISE FOOTER ══════════════════ */}
+      <footer className="bg-green-dark text-white/70 pt-16 pb-8 border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-6 md:px-16">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            
+            {/* Column 1 - Brand info */}
+            <div className="space-y-4 md:col-span-2 text-left">
+              <div className="flex items-center gap-2.5">
+                <Leaf className="w-6 h-6 text-green-light" />
+                <span className="text-white font-extrabold text-xl tracking-tight font-heading">
+                  Agri<span className="text-[#2BB673]">Sense</span>
+                </span>
+              </div>
+              <p className="text-xs leading-relaxed max-w-sm">
+                AgriSense is an enterprise AgTech decision-engine cloud delivering local classification, predictive recommendation, time-series forecasting, and logistics routing.
+              </p>
+            </div>
+
+            {/* Column 2 - Platform links */}
+            <div className="text-left">
+              <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-4">Platform Core</h4>
+              <ul className="space-y-2 text-xs">
+                <li><Link to="/login" className="hover:text-white transition-colors">Dashboard Portal</Link></li>
+                <li><Link to="/register" className="hover:text-white transition-colors">Register Account</Link></li>
+                <li><a href="#platform" className="hover:text-white transition-colors">Intelligence Systems</a></li>
+              </ul>
+            </div>
+
+            {/* Column 3 - Enterprise info */}
+            <div className="text-left">
+              <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-4">Verification APIs</h4>
+              <ul className="space-y-2 text-xs">
+                <li><span className="text-white/50">EfficientNet-B0 Model</span></li>
+                <li><span className="text-white/50">Random Forest Ensemble</span></li>
+                <li><span className="text-white/50">Open-Meteo & Nominatim</span></li>
+              </ul>
+            </div>
+
+          </div>
+
+          <div className="border-t border-white/5 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] text-white/45">
+            <p>© {new Date().getFullYear()} AgriSense Operations Inc. All rights reserved.</p>
+            <div className="flex gap-6">
+              <span className="hover:text-white cursor-pointer transition-colors">Privacy Policy</span>
+              <span className="hover:text-white cursor-pointer transition-colors">Terms of Service</span>
+            </div>
+          </div>
+        </div>
       </footer>
+
     </div>
   );
-};
-
-export default LandingPage;
+}

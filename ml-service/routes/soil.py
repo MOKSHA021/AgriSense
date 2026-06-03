@@ -25,6 +25,8 @@ CLASSES = [
     'Laterite_Soil', 'Mountain_Soil', 'Red_Soil', 'Yellow_Soil'
 ]
 MAX_FILE_SIZE_MB = 10
+# Minimum confidence to return a result (below this → low_confidence flag)
+CONFIDENCE_THRESHOLD = 0.55
 
 
 # ── Build model with correct head (must match train_soil.py) ──────────────────
@@ -38,9 +40,7 @@ def _build_and_load_model(model_path: str) -> nn.Module:
     )
 
     if not os.path.exists(model_path):
-        logger.warning(f"[soil] Model file not found: {model_path}. Using mock mode.")
-        net.is_mock = True
-        return net
+        raise RuntimeError(f"[soil] Model file not found: {model_path}")
 
     ckpt = torch.load(model_path, map_location='cpu', weights_only=False)
 
@@ -58,15 +58,27 @@ def _build_and_load_model(model_path: str) -> nn.Module:
     return net
 
 
-_model_path = os.path.join(BASE_DIR, 'models', 'soil_model.pt')
+# ── Use best checkpoint (highest val_acc) instead of final epoch ──────────────
+_model_path = os.path.join(BASE_DIR, 'models', 'soil_model_best.pt')
 soil_model  = _build_and_load_model(_model_path)
 
-# ── Inference transform (no augmentation — validation-style only) ─────────────
-_transform = T.Compose([
-    T.Resize((224, 224)),
+# ── TTA: 5-crop test-time augmentation for better real-world robustness ───────
+# Base inference transform
+_base_transform = T.Compose([
+    T.Resize((256, 256)),
+    T.CenterCrop(224),
     T.ToTensor(),
     T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
+
+# TTA transforms: 5 crops of 224 from 256 resized image
+_tta_transforms = [
+    T.Compose([T.Resize((256, 256)), T.CenterCrop(224),    T.ToTensor(), T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+    T.Compose([T.Resize((256, 256)), T.RandomCrop(224),    T.ToTensor(), T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+    T.Compose([T.Resize((256, 256)), T.CenterCrop(224), T.RandomHorizontalFlip(p=1.0), T.ToTensor(), T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+    T.Compose([T.Resize((240, 240)), T.CenterCrop(224),    T.ToTensor(), T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+    T.Compose([T.Resize((224, 224)),                        T.ToTensor(), T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+]
 
 
 # ── Schema ────────────────────────────────────────────────────────────────────
@@ -101,27 +113,29 @@ async def predict_soil(file: UploadFile = File(...)):
     except UnidentifiedImageError:
         raise HTTPException(status_code=422, detail="Could not decode image file.")
 
-    # ── Inference ─────────────────────────────────────────────────────────
-    if getattr(soil_model, 'is_mock', False):
-        logger.warning("[soil] Returning mock data since model is missing.")
-        idx = 0
-        confidence = 0.99
-        all_scores = {c: 0.1 for c in CLASSES}
-    else:
-        try:
-            tensor = _transform(img).unsqueeze(0)   # (1, 3, 224, 224)
-            with torch.no_grad():
+    # ── TTA Inference: average over 5 transforms ──────────────────────────
+    try:
+        probs_accum = None
+        with torch.no_grad():
+            for tfm in _tta_transforms:
+                tensor = tfm(img).unsqueeze(0)  # (1, 3, 224, 224)
                 logits = soil_model(tensor)
-                probs  = torch.softmax(logits, dim=1)[0]
-        except Exception as e:
-            logger.error(f"[soil] Inference error: {e}", exc_info=True)
-            raise HTTPException(status_code=500, detail="Model inference failed")
+                p = torch.softmax(logits, dim=1)[0]
+                if probs_accum is None:
+                    probs_accum = p
+                else:
+                    probs_accum = probs_accum + p
+        probs = probs_accum / len(_tta_transforms)  # mean over TTA
+    except Exception as e:
+        logger.error(f"[soil] TTA inference error: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Model inference failed")
 
-        idx        = probs.argmax().item()
-        confidence = round(probs[idx].item(), 4)
-        all_scores = {cls: round(probs[i].item(), 4) for i, cls in enumerate(CLASSES)}
+    idx        = probs.argmax().item()
+    confidence = round(probs[idx].item(), 4)
+    all_scores = {cls: round(probs[i].item(), 4) for i, cls in enumerate(CLASSES)}
+    low_confidence = confidence < CONFIDENCE_THRESHOLD
 
-    logger.info(f"[soil] → {CLASSES[idx]} ({confidence:.2%}) | "
+    logger.info(f"[soil] TTA→ {CLASSES[idx]} ({confidence:.2%}) low_conf={low_confidence} | "
                 f"file={file.filename} size={len(raw)//1024}KB")
 
     return SoilPrediction(
@@ -129,3 +143,4 @@ async def predict_soil(file: UploadFile = File(...)):
         confidence=confidence,
         all_scores=all_scores
     )
+

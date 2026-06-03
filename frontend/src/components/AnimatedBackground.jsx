@@ -1,67 +1,136 @@
 import { motion } from "framer-motion";
 
+/**
+ * AnimatedBackground — Light Farm Theme
+ *
+ * A calm, professional background for AgriSense:
+ *  • Warm cream (#F7F4EE) base
+ *  • Subtle SVG wheat / leaf tile pattern (very low opacity)
+ *  • 3 soft green gradient orbs that drift slowly
+ *  • No flashy colors — suitable for a professional AgriTech platform
+ */
+
+// Base64-encoded tiny SVG tile — a minimal wheat stalk + leaf shape
+// rendered at 64×64px, repeated as a CSS background pattern
+const WHEAT_TILE_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Wheat stalk -->
+  <line x1="32" y1="56" x2="32" y2="12" stroke="%232D6A4F" stroke-width="1.2" stroke-linecap="round" opacity="0.35"/>
+  <!-- Grain head left -->
+  <ellipse cx="27" cy="16" rx="4.5" ry="2.2" fill="%2352B788" opacity="0.28" transform="rotate(-35 27 16)"/>
+  <!-- Grain head right -->
+  <ellipse cx="37" cy="18" rx="4.5" ry="2.2" fill="%2352B788" opacity="0.28" transform="rotate(35 37 18)"/>
+  <!-- Grain head center -->
+  <ellipse cx="32" cy="12" rx="3.5" ry="1.8" fill="%232D6A4F" opacity="0.22"/>
+  <!-- Small leaf -->
+  <path d="M32 38 Q22 32 24 24 Q30 30 32 38Z" fill="%2352B788" opacity="0.18"/>
+</svg>
+`;
+
+const encodedTile = `data:image/svg+xml,${WHEAT_TILE_SVG.trim().replace(/\n\s*/g, " ")}`;
+
+// Orb configuration — very subtle greens
+const ORBS = [
+  {
+    id: "orb-1",
+    color: "rgba(45, 106, 79, 0.10)",   // green-mid
+    size: "60vw",
+    height: "55vh",
+    initial: { top: "-10%", left: "-8%" },
+    animate: {
+      x: ["0%", "18%", "-12%", "0%"],
+      y: ["0%", "22%", "-15%", "0%"],
+      scale: [1, 1.12, 0.92, 1],
+    },
+    duration: 28,
+    borderRadius: "60% 40% 55% 45% / 45% 55% 45% 55%",
+  },
+  {
+    id: "orb-2",
+    color: "rgba(82, 183, 136, 0.08)",  // green-light
+    size: "55vw",
+    height: "65vh",
+    initial: { top: "20%", right: "-5%" },
+    animate: {
+      x: ["0%", "-20%", "10%", "0%"],
+      y: ["0%", "-18%", "25%", "0%"],
+      scale: [1, 0.9, 1.1, 1],
+    },
+    duration: 34,
+    borderRadius: "45% 55% 40% 60% / 55% 40% 60% 45%",
+  },
+  {
+    id: "orb-3",
+    color: "rgba(27, 67, 50, 0.07)",    // green-dark, very faint
+    size: "70vw",
+    height: "50vh",
+    initial: { bottom: "-8%", left: "15%" },
+    animate: {
+      x: ["0%", "15%", "-10%", "0%"],
+      y: ["0%", "-20%", "12%", "0%"],
+      scale: [0.95, 1.08, 1, 0.95],
+    },
+    duration: 40,
+    borderRadius: "50% 50% 60% 40% / 40% 60% 40% 60%",
+  },
+];
+
 const AnimatedBackground = () => {
   return (
-    <div className="fixed inset-0 z-[-1] overflow-hidden bg-[#020617]">
-      
-      {/* Blob 1 */}
-      <motion.div
-        animate={{
-          x: ["0%", "30%", "-20%", "0%"],
-          y: ["0%", "-30%", "20%", "0%"],
-          rotate: [0, 120, 240, 360],
-          scale: [1, 1.3, 0.8, 1],
-          backgroundColor: ["#064e3b", "#4c0519", "#0f172a", "#0f3460", "#064e3b"],
+    <div
+      className="fixed inset-0 z-[-1] overflow-hidden"
+      style={{ backgroundColor: "#F7F4EE" }}
+    >
+      {/* ── Subtle wheat/leaf tile pattern ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage: `url("${encodedTile}")`,
+          backgroundRepeat: "repeat",
+          backgroundSize: "64px 64px",
+          opacity: 0.45,
+          pointerEvents: "none",
         }}
-        transition={{ duration: 11, repeat: Infinity, ease: "linear" }}
-        className="absolute -top-[20%] -left-[10%] w-[70vw] h-[70vh] blur-[150px] opacity-80"
-        style={{ borderRadius: "40% 60% 70% 30% / 40% 50% 60% 50%" }}
-      />
-      
-      {/* Blob 2 */}
-      <motion.div
-        animate={{
-          x: ["-20%", "20%", "0%", "-20%"],
-          y: ["20%", "0%", "-30%", "20%"],
-          rotate: [360, 240, 120, 0],
-          scale: [0.9, 1.2, 1, 0.9],
-          backgroundColor: ["#1e1b4b", "#0f3460", "#311b92", "#4c0519", "#1e1b4b"],
-        }}
-        transition={{ duration: 17, repeat: Infinity, ease: "linear" }}
-        className="absolute top-[10%] right-[0%] w-[60vw] h-[80vh] blur-[160px] opacity-80"
-        style={{ borderRadius: "60% 40% 30% 70% / 50% 60% 40% 50%" }}
       />
 
-      {/* Blob 3 */}
-      <motion.div
-        animate={{
-          x: ["20%", "-20%", "10%", "20%"],
-          y: ["-10%", "30%", "-20%", "-10%"],
-          rotate: [0, 180, 360],
-          scale: [1.1, 0.9, 1.2, 1.1],
-          backgroundColor: ["#4c0519", "#311b92", "#064e3b", "#1e1b4b", "#4c0519"],
-        }}
-        transition={{ duration: 19, repeat: Infinity, ease: "linear" }}
-        className="absolute bottom-[-10%] left-[20%] w-[80vw] h-[60vh] blur-[140px] opacity-70"
-        style={{ borderRadius: "30% 70% 50% 50% / 60% 40% 60% 40%" }}
-      />
+      {/* ── Soft gradient orbs ── */}
+      {ORBS.map((orb) => (
+        <motion.div
+          key={orb.id}
+          aria-hidden="true"
+          animate={orb.animate}
+          transition={{
+            duration: orb.duration,
+            repeat: Infinity,
+            ease: "easeInOut",
+            repeatType: "loop",
+          }}
+          style={{
+            position: "absolute",
+            ...orb.initial,
+            width: orb.size,
+            height: orb.height,
+            background: `radial-gradient(ellipse at center, ${orb.color} 0%, transparent 72%)`,
+            borderRadius: orb.borderRadius,
+            filter: "blur(80px)",
+            pointerEvents: "none",
+          }}
+        />
+      ))}
 
-      {/* Blob 4 */}
-      <motion.div
-        animate={{
-          x: ["-10%", "10%", "-30%", "-10%"],
-          y: ["-30%", "10%", "20%", "-30%"],
-          rotate: [0, -180, -360],
-          scale: [0.8, 1.1, 0.9, 0.8],
-          backgroundColor: ["#311b92", "#064e3b", "#4c0519", "#0f3460", "#311b92"],
+      {/* ── Very faint vignette at edges to ground the page ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(27, 67, 50, 0.04) 100%)",
+          pointerEvents: "none",
         }}
-        transition={{ duration: 13, repeat: Infinity, ease: "linear" }}
-        className="absolute bottom-[10%] right-[-10%] w-[70vw] h-[70vh] blur-[150px] opacity-60"
-        style={{ borderRadius: "50% 50% 70% 30% / 40% 60% 40% 60%" }}
       />
-
-      {/* Grain overlay for that premium texture */}
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-30 mix-blend-overlay pointer-events-none" />
     </div>
   );
 };

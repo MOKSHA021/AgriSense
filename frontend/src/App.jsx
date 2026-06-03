@@ -9,6 +9,7 @@ import Register from "./pages/Register";
 import VerifyOTP from "./pages/VerifyOTP";
 import Dashboard from "./pages/Dashboard";
 
+import SoilAnalysis from "./pages/SoilAnalysis";       // ← NEW: dedicated soil page
 import CropRecommend from "./pages/CropRecommend";
 import BestMandi from "./pages/BestMandi";
 import LivePricesDashboard from "./pages/LivePricesDashboard";
@@ -23,19 +24,28 @@ function App() {
       <AnimatedBackground />
       <BrowserRouter>
         <Routes>
+          {/* ── Public ── */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/verify-otp" element={<VerifyOTP />} />
+
+          {/* ── Protected Dashboard ── */}
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
-          <Route path="/dashboard/recommend" element={<ProtectedRoute><CropRecommend /></ProtectedRoute>} />
-          <Route path="/dashboard/best-mandi" element={<ProtectedRoute><BestMandi /></ProtectedRoute>} />
-          <Route path="/dashboard/live-prices" element={<ProtectedRoute><LivePricesDashboard /></ProtectedRoute>} />
-          <Route path="/dashboard/price-forecast" element={<ProtectedRoute><PriceForecast /></ProtectedRoute>} />
-          <Route path="/dashboard/weather" element={<ProtectedRoute><Weather /></ProtectedRoute>} />
-          <Route path="/dashboard/risk" element={<ProtectedRoute><RiskAssessment /></ProtectedRoute>} />
-          <Route path="/dashboard/expenses" element={<ProtectedRoute><ExpenseTracker /></ProtectedRoute>} />
+          {/* ── ML Feature Pages ── */}
+          <Route path="/dashboard/soil"          element={<ProtectedRoute><SoilAnalysis /></ProtectedRoute>} />
+          <Route path="/dashboard/recommend"     element={<ProtectedRoute><CropRecommend /></ProtectedRoute>} />
+          <Route path="/dashboard/weather"       element={<ProtectedRoute><Weather /></ProtectedRoute>} />
+          <Route path="/dashboard/risk"          element={<ProtectedRoute><RiskAssessment /></ProtectedRoute>} />
+
+          {/* ── Market Pages ── */}
+          <Route path="/dashboard/best-mandi"    element={<ProtectedRoute><BestMandi /></ProtectedRoute>} />
+          <Route path="/dashboard/live-prices"   element={<ProtectedRoute><LivePricesDashboard /></ProtectedRoute>} />
+          <Route path="/dashboard/price-forecast"element={<ProtectedRoute><PriceForecast /></ProtectedRoute>} />
+
+          {/* ── Finance ── */}
+          <Route path="/dashboard/expenses"      element={<ProtectedRoute><ExpenseTracker /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

@@ -1,245 +1,432 @@
-import { useContext, useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
-import Navbar from "../components/Navbar";
 import { motion } from "framer-motion";
 import {
-  FlaskConical, Sprout, CloudSun, TrendingUp,
-  ShieldAlert, Wallet, ArrowRight, Droplets, Wind, Cpu, Map, Activity, Bot
+  FlaskConical, Sprout, CloudSun, Map, Activity, Bot, ShieldAlert,
+  Wallet, Droplets, Wind, ArrowRight, Sun, Sunset, Moon, Sparkles,
+  TrendingUp, AlertCircle
 } from "lucide-react";
+import Navbar from "../components/Navbar";
+import { AuthContext } from "../context/AuthContext";
 
-const features = [
+/* ─────────────────────────── helpers ─────────────────────────── */
+const getGreeting = () => {
+  const h = new Date().getHours();
+  if (h < 12) return { label: "Good morning", Icon: Sun };
+  if (h < 17) return { label: "Good afternoon", Icon: Sunset };
+  return { label: "Good evening", Icon: Moon };
+};
+
+const colorMap = {
+  amber: {
+    border: "border-l-4 border-l-amber-500",
+    icon: "text-amber-600",
+    bg: "bg-amber-50",
+    badge: "bg-amber-100 text-amber-800",
+  },
+  green: {
+    border: "border-l-4 border-l-[#1E8E5A]",
+    icon: "text-[#1E8E5A]",
+    bg: "bg-[#E6F5EE]",
+    badge: "bg-[#E6F5EE] text-[#0F6B4A]",
+  },
+  blue: {
+    border: "border-l-4 border-l-[#2F80ED]",
+    icon: "text-[#2F80ED]",
+    bg: "bg-blue-50",
+    badge: "bg-blue-100 text-blue-800",
+  },
+  teal: {
+    border: "border-l-4 border-l-teal-500",
+    icon: "text-teal-600",
+    bg: "bg-teal-50",
+    badge: "bg-teal-100 text-teal-800",
+  },
+  pink: {
+    border: "border-l-4 border-l-rose-500",
+    icon: "text-rose-600",
+    bg: "bg-rose-50",
+    badge: "bg-rose-100 text-rose-800",
+  },
+  purple: {
+    border: "border-l-4 border-l-purple-500",
+    icon: "text-purple-600",
+    bg: "bg-purple-50",
+    badge: "bg-purple-100 text-purple-800",
+  },
+  red: {
+    border: "border-l-4 border-l-red-500",
+    icon: "text-red-600",
+    bg: "bg-red-50",
+    badge: "bg-red-100 text-red-800",
+  },
+  indigo: {
+    border: "border-l-4 border-l-indigo-500",
+    icon: "text-indigo-600",
+    bg: "bg-indigo-50",
+    badge: "bg-indigo-100 text-indigo-800",
+  },
+};
+
+/* ─────────────────────────── data ─────────────────────────── */
+const featureCards = [
   {
-    icon: FlaskConical,
     title: "Soil Analysis",
-    desc: "Detect soil type from photo using AI vision models",
+    desc: "Classify soil types instantly from photos using EfficientNet-B0 ML model.",
     path: "/dashboard/soil",
+    icon: FlaskConical,
+    color: "amber",
     badge: "AI Vision",
   },
   {
-    icon: Sprout,
     title: "Crop Recommendation",
-    desc: "ML model finds the best crops for your specific land",
+    desc: "Predict optimal crop types matching soil presets and local rainfall forecasts.",
     path: "/dashboard/recommend",
+    icon: Sprout,
+    color: "green",
     badge: "Random Forest",
   },
   {
-    icon: CloudSun,
-    title: "Weather Forecast",
-    desc: "Live climate data with farming-specific advice",
+    title: "Weather Radar",
+    desc: "Check hyper-local atmospheric forecasts and get real-time crop advisories.",
     path: "/dashboard/weather",
-    badge: "Real-time",
+    icon: CloudSun,
+    color: "blue",
+    badge: "Real-time GPS",
   },
   {
-    icon: Map,
     title: "Best Mandi Finder",
-    desc: "Find nearest profitable market routes and costs",
+    desc: "Calculate transportation tolls and geocode high-profit mandi market routes.",
     path: "/dashboard/best-mandi",
-    badge: "Best Route",
+    icon: Map,
+    color: "teal",
+    badge: "Route Optimizer",
   },
   {
-    icon: Activity,
-    title: "Live Prices",
-    desc: "Current live mandi rates across all of India",
+    title: "Live Market Prices",
+    desc: "Monitor current commodity rates direct from active Agmarknet markets.",
     path: "/dashboard/live-prices",
-    badge: "Live Data",
+    icon: Activity,
+    color: "pink",
+    badge: "Live Scraping",
   },
   {
-    icon: Bot,
     title: "Price Forecast",
-    desc: "Prophet ML future price predictions up to 3 years",
+    desc: "Project commodity market price trends up to 3 years using Prophet ML.",
     path: "/dashboard/price-forecast",
-    badge: "Prophet ML",
+    icon: Bot,
+    color: "purple",
+    badge: "Time-Series AI",
   },
   {
-    icon: ShieldAlert,
     title: "Risk Assessment",
-    desc: "Auto-detected flood, drought & heat wave alerts",
+    desc: "Analyze extreme weather risk factors including flood, dry spells, and frost.",
     path: "/dashboard/risk",
-    badge: "Live Data",
+    icon: ShieldAlert,
+    color: "red",
+    badge: "Climate Alert",
   },
   {
-    icon: Wallet,
     title: "Expense Tracker",
-    desc: "Track operating costs vs predicted profit margins",
+    desc: "Log seasonal expenses and calculate net margins against predicted revenues.",
     path: "/dashboard/expenses",
-    badge: "Finance",
-  }
+    icon: Wallet,
+    color: "indigo",
+    badge: "Farm Finance",
+  },
 ];
 
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.05 }
-  }
-};
+const tips = [
+  {
+    emoji: "💧",
+    text: "Irrigation yields are optimized when applied during early morning hours to minimize water evaporation rates.",
+  },
+  {
+    emoji: "🌱",
+    text: "Rotating leguminous pulse crops back into sandy soil restores nitrogen reserves naturally by up to 25%.",
+  },
+  {
+    emoji: "📈",
+    text: "Commodity rates generally peak 4 to 6 weeks after major harvest flushes. Time sales accordingly.",
+  },
+];
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 50, damping: 15 } }
-};
-
-const getGreeting = () => {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 17) return "Good afternoon";
-  return "Good evening";
-};
-
-const Dashboard = () => {
-  const { user } = useContext(AuthContext);
-  const navigate = useNavigate();
-  const userName = user?.user?.name || user?.name || "Farmer";
-
+/* ─────────────────────────── weather widget ─────────────────────────── */
+function WeatherWidget() {
   const [weather, setWeather] = useState(null);
-  const [weatherCity, setWeatherCity] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition(async (pos) => {
+    const fetchWeather = async (lat, lon) => {
       try {
-        const { latitude, longitude } = pos.coords;
-        const [wr, gd] = await Promise.all([
-          fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=auto`),
-          fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`, { headers: { "Accept-Language": "en-US,en;q=0.9" } })
-            .then(res => res.ok ? res.json() : {})
-            .catch(() => ({})),
-        ]);
-        const wd = await wr.json();
-        setWeather(wd.current);
-        setWeatherCity(gd.address?.city || gd.address?.town || gd.address?.village || "Hyderabad");
-      } catch { /* ignore */ }
-    }, () => {});
+        const res = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&wind_speed_unit=kmh&timezone=auto`
+        );
+        if (!res.ok) throw new Error("API error");
+        const data = await res.json();
+        const c = data.current;
+        setWeather({
+          temp: Math.round(c.temperature_2m),
+          humidity: c.relative_humidity_2m,
+          wind: Math.round(c.wind_speed_10m),
+          code: c.weather_code,
+        });
+      } catch (e) {
+        setError("Unable to load weather");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        ({ coords }) => fetchWeather(coords.latitude, coords.longitude),
+        () => {
+          // fallback: New Delhi
+          fetchWeather(28.6139, 77.209);
+        },
+        { timeout: 6000 }
+      );
+    } else {
+      fetchWeather(28.6139, 77.209);
+    }
   }, []);
 
-  const today = new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  if (loading) {
+    return (
+      <div className="bg-white border border-slate-200 rounded-2xl px-6 py-4 shadow-sm flex items-center gap-3 animate-pulse min-w-[260px]">
+        <div className="w-10 h-10 bg-slate-100 rounded-full" />
+        <div className="flex-1 space-y-2">
+          <div className="h-3 bg-slate-100 rounded w-24" />
+          <div className="h-3 bg-slate-100 rounded w-16" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm flex items-center gap-2 text-slate-500 text-sm min-w-[220px]">
+        <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+        {error}
+      </div>
+    );
+  }
+
+  const getWeatherIcon = (code) => {
+    if (code === 0) return "☀️";
+    if (code <= 3) return "⛅";
+    if (code <= 67) return "🌧️";
+    if (code <= 77) return "❄️";
+    return "⛈️";
+  };
+
+  const getWeatherLabel = (code) => {
+    if (code === 0) return "Clear Sky";
+    if (code <= 3) return "Partly Cloudy";
+    if (code <= 48) return "Foggy";
+    if (code <= 67) return "Rainy";
+    if (code <= 77) return "Snowy";
+    return "Thunderstorm";
+  };
 
   return (
-    <div className="min-h-screen bg-transparent text-white selection:bg-emerald-500/30">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.4 }}
+      className="bg-white border border-slate-200 rounded-2xl px-6 py-4 shadow-sm flex items-center gap-5 min-w-[280px]"
+    >
+      <div className="text-4xl leading-none select-none">
+        {getWeatherIcon(weather.code)}
+      </div>
+      <div>
+        <p className="text-2xl font-black text-slate-800 font-heading">
+          {weather.temp}°C
+          <span className="text-xs font-semibold text-slate-400 ml-2">
+            {getWeatherLabel(weather.code)}
+          </span>
+        </p>
+        <div className="flex items-center gap-4 mt-1 text-xs text-slate-500 font-semibold">
+          <span className="flex items-center gap-1">
+            <Droplets className="w-3 h-3 text-blue-500" />
+            {weather.humidity}%
+          </span>
+          <span className="flex items-center gap-1">
+            <Wind className="w-3 h-3 text-slate-400" />
+            {weather.wind} km/h
+          </span>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ─────────────────────────── feature card ─────────────────────────── */
+function FeatureCard({ card, index }) {
+  const navigate = useNavigate();
+  const c = colorMap[card.color];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 25 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.05, ease: "easeOut" }}
+      whileHover={{
+        y: -4,
+        boxShadow: "0 12px 30px -4px rgba(0, 0, 0, 0.06), 0 4px 12px -2px rgba(0, 0, 0, 0.03)",
+        borderColor: "rgba(30, 142, 90, 0.2)"
+      }}
+      onClick={() => navigate(card.path)}
+      className={`bg-white border border-slate-200 ${c.border} rounded-2xl p-6 shadow-sm cursor-pointer group flex flex-col justify-between`}
+    >
+      <div>
+        {/* Header */}
+        <div className="flex items-start justify-between mb-5">
+          <div className={`w-11 h-11 ${c.bg} rounded-xl flex items-center justify-center shrink-0 border border-slate-100 shadow-sm`}>
+            <card.icon className={`w-5.5 h-5.5 ${c.icon}`} />
+          </div>
+          <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${c.badge}`}>
+            {card.badge}
+          </span>
+        </div>
+
+        {/* Content */}
+        <h3 className="text-slate-800 font-bold text-base mb-2 group-hover:text-[#1E8E5A] transition-colors leading-tight tracking-tight">
+          {card.title}
+        </h3>
+        <p className="text-slate-500 text-xs sm:text-sm leading-relaxed mb-6">{card.desc}</p>
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center text-xs font-bold text-[#1E8E5A] group-hover:text-[#0F6B4A] transition-colors pt-2 border-t border-slate-100/50">
+        Launch Tool
+        <ArrowRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
+      </div>
+    </motion.div>
+  );
+}
+
+/* ─────────────────────────── main component ─────────────────────────── */
+export default function Dashboard() {
+  const { user } = useContext(AuthContext);
+  const { label: greeting, Icon: GreetingIcon } = getGreeting();
+
+  const displayName =
+    user?.name || user?.user?.name || user?.username || user?.email?.split("@")[0] || "Farmer";
+
+  return (
+    <div className="min-h-screen bg-[#F7F9FA]">
       <Navbar />
 
-      <main className="relative z-10 max-w-7xl mx-auto px-6 py-12">
-        
-        {/* ── Header Section ── */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12"
-        >
-          <div>
-            <p className="text-white/40 text-xs font-semibold tracking-widest uppercase mb-3">{today}</p>
-            <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight">
-              {getGreeting()},{" "}
-              <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-                {userName}
-              </span>
+      <main className="dashboard-main-content max-w-7xl mx-auto px-6 py-8">
+
+        {/* ── Header Row ── */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-10 pt-4">
+          {/* Greeting */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="flex items-center gap-2 mb-1.5">
+              <GreetingIcon className="w-4 h-4 text-[#2BB673]" />
+              <p className="text-slate-400 text-xs font-bold uppercase tracking-wider">{greeting}</p>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-800 leading-none tracking-tight font-heading">
+              Welcome, {displayName}
             </h1>
-            <p className="text-white/40 text-lg mt-3 font-medium">Your farm's intelligence hub.</p>
-          </div>
+            <p className="text-slate-500 text-sm mt-2 font-medium">
+              AgriSense intelligence console and ML dashboard.
+            </p>
+          </motion.div>
 
-          {/* Minimalist Weather Widget */}
-          {weather && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              whileHover={{ scale: 1.02 }}
-              onClick={() => navigate("/dashboard/weather")}
-              className="cursor-pointer flex items-center gap-5 bg-white/[0.02] border border-white/5 rounded-2xl px-6 py-5 hover:bg-white/[0.04] transition-colors shadow-2xl backdrop-blur-md min-w-[260px]"
-            >
-              <div className="text-4xl filter drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-                {weather.weather_code === 0 ? "☀️" : weather.weather_code <= 3 ? "⛅" : weather.weather_code <= 67 ? "🌧️" : "☁️"}
-              </div>
-              <div>
-                <p className="text-3xl font-bold text-white tracking-tighter">{Math.round(weather.temperature_2m)}°C</p>
-                <p className="text-xs text-emerald-400/80 font-medium tracking-wide truncate max-w-[140px]">{weatherCity}</p>
-                <div className="flex items-center gap-4 mt-2 text-xs text-white/40 font-medium">
-                  <span className="flex items-center gap-1.5"><Droplets className="w-3.5 h-3.5" />{weather.relative_humidity_2m}%</span>
-                  <span className="flex items-center gap-1.5"><Wind className="w-3.5 h-3.5" />{Math.round(weather.wind_speed_10m)} km/h</span>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </motion.div>
+          {/* Weather Widget */}
+          <WeatherWidget />
+        </div>
 
-        {/* ── ML Status Banner ── */}
-        <motion.div 
+        {/* ── Live Operational Status Chips ── */}
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="flex items-center gap-3 bg-white/[0.02] border border-white/5 rounded-full px-5 py-3 mb-10 w-fit backdrop-blur-sm"
-        >
-          <div className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-          </div>
-          <Cpu className="w-4 h-4 text-emerald-400" />
-          <span className="text-xs text-white/60 font-medium tracking-wide">ML Service Connected — Models are loaded and ready</span>
-        </motion.div>
-
-        {/* ── Bento Grid Feature Cards ── */}
-        <motion.div 
-          variants={staggerContainer}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-        >
-          {features.map((f) => {
-            const Icon = f.icon;
-            return (
-              <motion.div
-                variants={fadeUp}
-                key={f.title}
-                onClick={() => navigate(f.path)}
-                className="group relative bg-white/[0.02] border border-white/5 rounded-3xl p-6 cursor-pointer hover:bg-white/[0.05] transition-all duration-300 overflow-hidden min-h-[180px] flex flex-col justify-between"
-              >
-                {/* Glow overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-
-                <div className="relative z-10 flex items-start justify-between">
-                  <div className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:bg-emerald-500/20 group-hover:text-emerald-400 transition-all duration-300">
-                    <Icon className="w-5 h-5 text-white/70 group-hover:text-emerald-400 transition-colors" />
-                  </div>
-                  <span className="text-[9px] font-bold tracking-widest uppercase bg-white/5 border border-white/10 text-white/40 group-hover:text-emerald-400 px-2.5 py-1 rounded-full transition-colors">
-                    {f.badge}
-                  </span>
-                </div>
-
-                <div className="relative z-10 mt-6">
-                  <h3 className="font-bold text-white text-base mb-1 tracking-tight group-hover:text-emerald-300 transition-colors">{f.title}</h3>
-                  <p className="text-xs text-white/40 leading-relaxed font-medium group-hover:text-white/60 transition-colors">{f.desc}</p>
-                </div>
-                
-                <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">
-                  <ArrowRight className="w-5 h-5 text-emerald-400" />
-                </div>
-              </motion.div>
-            );
-          })}
-        </motion.div>
-
-        {/* ── Quick Tips Footer ── */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-4"
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="flex flex-wrap gap-3 mb-10"
         >
           {[
-            { icon: "🌱", tip: "Upload a soil photo to get instant ML-powered soil classification and crop recommendations." },
-            { icon: "💹", tip: "Check the Market tab — Prophet AI can forecast crop prices up to 3 years ahead." },
-            { icon: "⚠️", tip: "Risk Assessment auto-detects your location and checks flood, drought and heat conditions." },
-          ].map((t, i) => (
-            <div key={i} className="bg-white/[0.01] border border-white/5 rounded-2xl px-5 py-4 flex items-start gap-4 hover:bg-white/[0.02] transition-colors">
-              <span className="text-xl shrink-0 opacity-80">{t.icon}</span>
-              <p className="text-xs text-white/40 leading-relaxed font-medium">{t.tip}</p>
+            { icon: TrendingUp, label: "Agmarknet Scraping Online", color: "text-[#1E8E5A] bg-[#E6F5EE] border-emerald-200/50" },
+            { icon: CloudSun, label: "Open-Meteo GPS Active", color: "text-[#2F80ED] bg-blue-50 border-blue-200/50" },
+            { icon: Sparkles, label: "Neural Model Inferences Operational", color: "text-purple-600 bg-purple-50 border-purple-200/50" },
+          ].map((chip) => (
+            <div
+              key={chip.label}
+              className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider px-3.5 py-2 rounded-full border ${chip.color} shadow-sm`}
+            >
+              <chip.icon className="w-3.5 h-3.5" />
+              {chip.label}
             </div>
           ))}
         </motion.div>
 
+        {/* ── Section Divider ── */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
+          className="flex items-center gap-3 mb-6"
+        >
+          <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Platform Services</h2>
+          <div className="flex-1 h-px bg-slate-200" />
+          <span className="text-xs text-slate-400 font-bold">
+            {featureCards.length} Tools Available
+          </span>
+        </motion.div>
+
+        {/* ── Feature Cards Grid ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+          {featureCards.map((card, i) => (
+            <FeatureCard key={card.path} card={card} index={i} />
+          ))}
+        </div>
+
+        {/* ── Today's Tips Section ── */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          aria-label="Farming Insights"
+          className="pt-4"
+        >
+          <div className="flex items-center gap-2 mb-5">
+            <Sparkles className="w-4 h-4 text-[#1E8E5A]" />
+            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+              Today's Agronomy Insights
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {tips.map((tip, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.45 + i * 0.05 }}
+                className="bg-[#E6F5EE] border border-emerald-200/50 border-l-4 border-l-[#1E8E5A] rounded-2xl px-5 py-4 flex items-start gap-4 shadow-sm"
+              >
+                <span className="text-2xl leading-none select-none shrink-0">
+                  {tip.emoji}
+                </span>
+                <p className="text-[#0F6B4A] text-xs sm:text-sm leading-relaxed font-bold">
+                  {tip.text}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.section>
+
+        {/* ── Bottom Spacing ── */}
+        <div className="h-16" />
       </main>
     </div>
   );
-};
-
-export default Dashboard;
+}

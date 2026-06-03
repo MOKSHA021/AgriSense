@@ -1,54 +1,23 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import {
-  Wallet,
-  Plus,
-  Trash2,
-  TrendingUp,
-  IndianRupee,
-  BarChart3,
-  Save,
-  CheckCircle2,
-  Download,
-  FileText,
+  Wallet, Plus, Trash2, TrendingUp, IndianRupee, BarChart3, Save, CheckCircle2, Download, FileText
 } from "lucide-react";
 import API from "../services/api";
 import { motion, AnimatePresence } from "framer-motion";
 
 const CATEGORIES = [
-  "Seeds",
-  "Fertilizer",
-  "Pesticide",
-  "Labour",
-  "Irrigation",
-  "Equipment",
-  "Transport",
-  "Other",
+  "Seeds", "Fertilizer", "Pesticide", "Labour", "Irrigation", "Equipment", "Transport", "Other"
 ];
 
 const PLAN_CROPS = [
-  "Wheat",
-  "Rice",
-  "Maize",
-  "Cotton",
-  "Sugarcane",
-  "Potato",
-  "Soybean",
-  "Groundnut",
-  "Millets",
-  "Sorghum",
-  "Banana",
-  "Jute",
+  "Wheat", "Rice", "Maize", "Cotton", "Sugarcane", "Potato", "Soybean", "Groundnut", "Millets", "Sorghum", "Banana", "Jute"
 ];
 
 const SEASONS = ["Kharif", "Rabi", "Zaid"];
 
 const DEFAULT_PLAN = {
-  crop: "Wheat",
-  season: "Rabi",
-  area: "2",
-  expectedYield: "22",
-  expectedPrice: "2300",
+  crop: "Wheat", season: "Rabi", area: "2", expectedYield: "22", expectedPrice: "2300"
 };
 
 const currency = (value) => Number(value || 0).toLocaleString("en-IN");
@@ -145,16 +114,16 @@ const ExpenseTracker = () => {
   let statusLabel, statusColor, statusBorder;
   if (profitRatio > 0.3) {
     statusLabel = "On Track";
-    statusColor = "text-emerald-400 bg-emerald-500/10";
-    statusBorder = "border-emerald-500/30";
+    statusColor = "text-[#0F6B4A] bg-[#E6F5EE]";
+    statusBorder = "border-[#2BB673]/20";
   } else if (profitRatio > 0.1) {
-    statusLabel = "Tight";
-    statusColor = "text-amber-400 bg-amber-500/10";
-    statusBorder = "border-amber-500/30";
+    statusLabel = "Tight Budget";
+    statusColor = "text-amber-700 bg-amber-50";
+    statusBorder = "border-amber-250";
   } else {
     statusLabel = "Over Budget";
-    statusColor = "text-red-400 bg-red-500/10";
-    statusBorder = "border-red-500/30";
+    statusColor = "text-red-700 bg-red-50";
+    statusBorder = "border-red-200";
   }
 
   const categoryTotals = categories.reduce((acc, cat) => {
@@ -201,10 +170,7 @@ const ExpenseTracker = () => {
     try {
       setSavingExpense(true);
       const { data } = await API.post("/expenses", {
-        category,
-        amount: parsed,
-        date,
-        notes,
+        category, amount: parsed, date, notes
       });
       setExpenses(data.expenses || []);
       setAmount("");
@@ -255,10 +221,7 @@ const ExpenseTracker = () => {
     ];
 
     const expenseRows = sortedExpenses.map((expense) => [
-      expense.date,
-      expense.category,
-      expense.amount,
-      expense.notes || "",
+      expense.date, expense.category, expense.amount, expense.notes || "",
     ]);
 
     const csv = [...summaryRows, ...expenseRows]
@@ -334,23 +297,25 @@ const ExpenseTracker = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-transparent text-white selection:bg-emerald-500/30">
-      
-      <div className="relative z-10">
-        <Navbar />
-      <main className="mx-auto max-w-5xl px-6 py-12">
-        {/* Page title */}
+    <div className="min-h-screen bg-[#F7F9FA] text-slate-800 selection:bg-emerald-100">
+      <Navbar />
+
+      <main className="dashboard-main-content max-w-5xl mx-auto px-6 py-8">
+        
+        {/* Page Title */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-10 flex items-center gap-4"
+          className="mb-8 flex items-center gap-4 pt-4"
         >
-          <div className="w-12 h-12 bg-emerald-500/20 rounded-2xl flex items-center justify-center border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.15)]">
-            <Wallet className="h-6 w-6 text-emerald-400" />
+          <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center border border-emerald-100 shadow-sm">
+            <Wallet className="h-6 w-6 text-[#1E8E5A]" />
           </div>
           <div>
-            <h1 className="text-3xl font-black text-white tracking-tight">Expense Tracker</h1>
-            <p className="text-white/40 text-sm mt-1 font-medium">Track farm spending against your current crop revenue forecast.</p>
+            <h1 className="text-3xl font-extrabold text-[#0F6B4A] tracking-tight font-heading">Expense Tracker</h1>
+            <p className="text-slate-400 text-xs sm:text-sm mt-1 font-semibold">
+              Track seasonal farm expenditure next to predicted crop revenue indexes.
+            </p>
           </div>
         </motion.div>
 
@@ -360,98 +325,84 @@ const ExpenseTracker = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="mb-8 rounded-xl border border-red-500/20 bg-red-500/10 px-5 py-4 text-sm font-medium text-red-400 flex items-center gap-3"
+              className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-xs font-bold text-red-650 flex items-center gap-3 shadow-sm"
             >
-              <Trash2 className="w-5 h-5" /> {error}
+              <Trash2 className="w-4 h-4" /> {error}
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Summary cards */}
-        <div className="mb-10 grid grid-cols-2 gap-5 lg:grid-cols-4">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-6 shadow-xl backdrop-blur-2xl"
-          >
-            <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-white/40">Total Spent</p>
-            <div className="flex items-center gap-1.5 text-3xl font-black text-white tracking-tighter">
-              <span className="text-white/30 text-xl">₹</span>
-              {totalSpent.toLocaleString("en-IN")}
-            </div>
-          </motion.div>
+        {/* Summary Metric Cards */}
+        <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {[
+            { label: "Total Spent", val: totalSpent, color: "text-slate-800" },
+            { label: "Predicted Revenue", val: predictedRevenue, color: "text-[#1E8E5A]" },
+            { label: "Estimated Net Margin", val: estimatedProfit, color: "text-[#0F6B4A]" }
+          ].map((stat, i) => (
+            <motion.div 
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 * i }}
+              className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm"
+            >
+              <p className="mb-2 text-[9px] font-bold uppercase tracking-widest text-slate-400">{stat.label}</p>
+              <div className={`flex items-baseline gap-0.5 text-2xl font-black tracking-tight font-heading ${stat.color}`}>
+                <span className="text-sm font-bold opacity-60 mr-0.5">₹</span>
+                {stat.val.toLocaleString("en-IN")}
+              </div>
+            </motion.div>
+          ))}
+
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-6 shadow-xl backdrop-blur-2xl"
+            className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm flex flex-col justify-between"
           >
-            <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-white/40">Predicted Revenue</p>
-            <div className="flex items-center gap-1.5 text-3xl font-black text-emerald-400 tracking-tighter">
-              <span className="text-emerald-500/30 text-xl">₹</span>
-              {predictedRevenue.toLocaleString("en-IN")}
-            </div>
-          </motion.div>
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-6 shadow-xl backdrop-blur-2xl"
-          >
-            <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-white/40">Estimated Profit</p>
-            <div className="flex items-center gap-1.5 text-3xl font-black text-white tracking-tighter">
-              <span className="text-white/30 text-xl">₹</span>
-              {estimatedProfit.toLocaleString("en-IN")}
-            </div>
-          </motion.div>
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-            className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-6 shadow-xl backdrop-blur-2xl flex flex-col justify-between"
-          >
-            <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-white/40">Status</p>
+            <p className="mb-2 text-[9px] font-bold uppercase tracking-widest text-slate-400">Budget Status</p>
             <div>
-              <span className={`inline-block rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-wider shadow-inner ${statusColor} ${statusBorder}`}>
+              <span className={`inline-block rounded-full border px-3 py-1.5 text-[9px] font-black uppercase tracking-wider shadow-sm ${statusColor} ${statusBorder}`}>
                 {statusLabel}
               </span>
             </div>
           </motion.div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
-          {/* Add expense form */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+          {/* Left: Add expense form */}
           <motion.form
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.2 }}
             onSubmit={handleAdd}
-            className="lg:col-span-5 rounded-[2rem] border border-white/5 bg-white/[0.02] p-8 shadow-2xl backdrop-blur-2xl h-fit"
+            className="lg:col-span-5 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm h-fit"
           >
-            <h2 className="mb-6 flex items-center gap-2 text-lg font-bold text-white tracking-tight">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
-                <Plus className="h-4 w-4 text-emerald-400" />
+            <h2 className="mb-5 flex items-center gap-2 text-sm font-bold text-slate-800 tracking-tight font-heading uppercase">
+              <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center border border-emerald-100 shadow-sm shrink-0">
+                <Plus className="h-4 w-4 text-[#1E8E5A]" />
               </div>
-              Add Expense
+              Record Expense
             </h2>
-            <div className="grid grid-cols-1 gap-5">
+            
+            <div className="space-y-4">
               <div>
-                <label className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-white/40">Category</label>
+                <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Category</label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white outline-none focus:border-emerald-500 transition-colors appearance-none"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 transition-colors focus:border-[#1E8E5A] focus:outline-none appearance-none"
                 >
                   {categories.map((cat) => (
-                    <option key={cat} value={cat} className="bg-zinc-900 text-white">
+                    <option key={cat} value={cat} className="bg-white text-slate-800">
                       {cat}
                     </option>
                   ))}
                 </select>
               </div>
+
               <div>
-                <label className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-white/40">Amount</label>
+                <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Amount (INR)</label>
                 <input
                   type="number"
                   min="0"
@@ -460,93 +411,97 @@ const ExpenseTracker = () => {
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   required
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white placeholder:text-white/20 outline-none focus:border-emerald-500 transition-colors"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 placeholder:text-slate-450 focus:border-[#1E8E5A] focus:outline-none"
                 />
               </div>
+
               <div>
-                <label className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-white/40">Date</label>
+                <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Transaction Date</label>
                 <input
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   required
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white outline-none focus:border-emerald-500 transition-colors"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 focus:border-[#1E8E5A] focus:outline-none"
                 />
               </div>
+
               <div>
-                <label className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-white/40">Notes</label>
+                <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Notes / Dealer</label>
                 <input
                   type="text"
-                  placeholder="Optional"
+                  placeholder="e.g. Seed Purchase"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white placeholder:text-white/20 outline-none focus:border-emerald-500 transition-colors"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 placeholder:text-slate-400 focus:border-[#1E8E5A] focus:outline-none"
                 />
               </div>
             </div>
+
             <button
               type="submit"
               disabled={savingExpense}
-              className="mt-6 w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-green-500 px-4 py-4 text-sm font-bold uppercase tracking-wider text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all hover:from-emerald-400 hover:to-green-400 disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-6 w-full flex items-center justify-center gap-2 rounded-full bg-[#1E8E5A] hover:bg-[#0F6B4A] py-3 text-xs font-bold uppercase tracking-wider text-white shadow-md shadow-[#1E8E5A]/10 transition-all disabled:opacity-50 active:scale-95"
             >
               <Plus className="h-4 w-4" />
-              {savingExpense ? "Adding..." : "Add Expense"}
+              {savingExpense ? "Saving..." : "Add Transaction"}
             </button>
           </motion.form>
 
-          <div className="lg:col-span-7 space-y-8">
-            {/* Crop plan */}
+          {/* Right: Crop plan & Forecast */}
+          <div className="lg:col-span-7 space-y-6">
             <motion.form
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.25 }}
               onSubmit={handleSavePlan}
-              className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-8 shadow-2xl backdrop-blur-2xl"
+              className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm"
             >
-              <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-                <h2 className="flex items-center gap-2 text-lg font-bold text-white tracking-tight">
-                  <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center border border-blue-500/30">
-                    <TrendingUp className="h-4 w-4 text-blue-400" />
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+                <h2 className="flex items-center gap-2 text-sm font-bold text-slate-800 tracking-tight font-heading uppercase">
+                  <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100 shadow-sm shrink-0">
+                    <TrendingUp className="h-4 w-4 text-[#2F80ED]" />
                   </div>
-                  Current Forecast
+                  Crop Budget Forecast
                 </h2>
-                <span className="rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-blue-300">
+                <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-[#2F80ED]">
                   {plan.crop || "Crop"} / {plan.season || "Season"}
                 </span>
               </div>
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                 <div>
-                  <label className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-white/40">Crop</label>
+                  <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Crop Type</label>
                   <select
                     name="crop"
                     value={plan.crop}
                     onChange={handlePlanChange}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white outline-none focus:border-blue-500 transition-colors appearance-none"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-800 focus:border-blue-500 focus:outline-none appearance-none"
                   >
                     {planCrops.map((crop) => (
-                      <option key={crop} value={crop} className="bg-zinc-900 text-white">
+                      <option key={crop} value={crop} className="bg-white text-slate-800">
                         {crop}
                       </option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-white/40">Season</label>
+                  <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Season</label>
                   <select
                     name="season"
                     value={plan.season}
                     onChange={handlePlanChange}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white outline-none focus:border-blue-500 transition-colors appearance-none"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-semibold text-slate-800 focus:border-blue-500 focus:outline-none appearance-none"
                   >
                     {seasons.map((season) => (
-                      <option key={season} value={season} className="bg-zinc-900 text-white">
+                      <option key={season} value={season} className="bg-white text-slate-800">
                         {season}
                       </option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-white/40">Area</label>
+                  <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Area (Acres)</label>
                   <input
                     name="area"
                     type="number"
@@ -554,11 +509,11 @@ const ExpenseTracker = () => {
                     step="0.01"
                     value={plan.area}
                     onChange={handlePlanChange}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white outline-none focus:border-blue-500 transition-colors"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 focus:border-blue-500 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-white/40">Yield/acre</label>
+                  <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Yield/Acre (Qtl)</label>
                   <input
                     name="expectedYield"
                     type="number"
@@ -566,11 +521,11 @@ const ExpenseTracker = () => {
                     step="0.01"
                     value={plan.expectedYield}
                     onChange={handlePlanChange}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white outline-none focus:border-blue-500 transition-colors"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 focus:border-blue-500 focus:outline-none"
                   />
                 </div>
-                <div>
-                  <label className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-white/40">Price/qtl</label>
+                <div className="col-span-2 sm:col-span-1">
+                  <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Price/Qtl (INR)</label>
                   <input
                     name="expectedPrice"
                     type="number"
@@ -578,66 +533,67 @@ const ExpenseTracker = () => {
                     step="0.01"
                     value={plan.expectedPrice}
                     onChange={handlePlanChange}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white outline-none focus:border-blue-500 transition-colors"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 focus:border-blue-500 focus:outline-none"
                   />
                 </div>
               </div>
-              <div className="mt-6 flex flex-wrap items-center gap-4">
+
+              <div className="mt-6 flex flex-wrap items-center gap-4 border-t border-slate-100 pt-4">
                 <button
                   type="submit"
                   disabled={savingPlan || !hasPlanChanges}
-                  className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-500 px-5 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all hover:from-blue-500 hover:to-indigo-400 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+                  className="flex items-center gap-2 rounded-full bg-[#2F80ED] hover:bg-[#1B6AD1] px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-md shadow-[#2F80ED]/10 transition-all disabled:opacity-50 active:scale-95"
                 >
                   <Save className="h-4 w-4" />
                   {savingPlan ? "Updating..." : "Update Forecast"}
                 </button>
                 {planStatus && (
                   <p
-                    className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest ${
+                    className={`flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest ${
                       planStatus === "Save failed"
-                        ? "text-red-400"
+                        ? "text-red-500"
                         : hasPlanChanges
-                          ? "text-amber-400"
-                          : "text-emerald-400"
-                  }`}
-                >
-                  <CheckCircle2 className="h-4 w-4" />
-                  {planStatus}
+                          ? "text-amber-500"
+                          : "text-[#0F6B4A]"
+                    }`}
+                  >
+                    <CheckCircle2 className="h-4 w-4" />
+                    {planStatus}
                   </p>
                 )}
               </div>
             </motion.form>
 
-            {/* Category breakdown */}
+            {/* Category breakdown progress indicators */}
             {!loading && expenses.length > 0 && (
               <motion.div 
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5 }}
-                className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-8 shadow-2xl backdrop-blur-2xl"
+                transition={{ delay: 0.3 }}
+                className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm"
               >
-                <h2 className="mb-6 flex items-center gap-2 text-lg font-bold text-white tracking-tight">
-                  <div className="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center border border-orange-500/30">
-                    <BarChart3 className="h-4 w-4 text-orange-400" />
+                <h2 className="mb-5 flex items-center gap-2 text-sm font-bold text-slate-800 tracking-tight font-heading uppercase">
+                  <div className="w-8 h-8 rounded-xl bg-orange-50 flex items-center justify-center border border-orange-100 shadow-sm shrink-0">
+                    <BarChart3 className="h-4 w-4 text-orange-600" />
                   </div>
-                  Category Breakdown
+                  Category Expenditures
                 </h2>
                 <div className="space-y-4">
                   {categories.filter((cat) => categoryTotals[cat] > 0).map(
                     (cat) => (
                       <div key={cat}>
-                        <div className="mb-2 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-white/50">
+                        <div className="mb-2 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400">
                           <span>{cat}</span>
-                          <span className="text-white">
+                          <span className="text-slate-800">
                             ₹{categoryTotals[cat].toLocaleString("en-IN")}
                           </span>
                         </div>
-                        <div className="h-2 w-full rounded-full bg-white/5 shadow-inner overflow-hidden">
+                        <div className="h-2 w-full rounded-full bg-slate-100 border border-slate-200/20 shadow-inner overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${(categoryTotals[cat] / maxCategoryTotal) * 100}%` }}
                             transition={{ duration: 1, ease: "easeOut" }}
-                            className="h-full bg-gradient-to-r from-orange-500 to-amber-400 rounded-full"
+                            className="h-full bg-[#1E8E5A] rounded-full"
                           />
                         </div>
                       </div>
@@ -649,47 +605,48 @@ const ExpenseTracker = () => {
           </div>
         </div>
 
-        {/* Expense list */}
+        {/* Expense transactions list */}
         {!loading && expenses.length > 0 && (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="rounded-[2rem] border border-white/5 bg-white/[0.02] p-8 shadow-2xl backdrop-blur-2xl"
+            transition={{ delay: 0.35 }}
+            className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm"
           >
             <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-              <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-                All Expenses 
-                <span className="bg-white/10 text-white/70 text-xs px-2.5 py-1 rounded-md">{expenses.length}</span>
+              <h2 className="text-base font-bold text-slate-800 tracking-tight font-heading flex items-center gap-2">
+                All Transactions 
+                <span className="bg-slate-100 text-slate-500 text-xs px-2.5 py-1 rounded-md border border-slate-200/50">{expenses.length}</span>
               </h2>
               <div className="flex flex-wrap items-center gap-3">
                 <button
                   onClick={handleExportCsv}
-                  className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white/70 transition-all hover:bg-white/10 hover:text-white"
+                  className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 transition-all hover:bg-slate-50 hover:text-slate-800"
                 >
-                  <Download className="h-4 w-4" />
+                  <Download className="h-3.5 w-3.5" />
                   CSV
                 </button>
                 <button
                   onClick={handleExportPdf}
-                  className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white/70 transition-all hover:bg-white/10 hover:text-white"
+                  className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 transition-all hover:bg-slate-50 hover:text-slate-800"
                 >
-                  <FileText className="h-4 w-4" />
+                  <FileText className="h-3.5 w-3.5" />
                   PDF
                 </button>
                 <button
                   onClick={handleClearAll}
-                  className="flex items-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-red-400 transition-all hover:bg-red-500/20 hover:text-red-300"
+                  className="flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-red-650 transition-all hover:bg-red-100"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-3.5 w-3.5" />
                   Clear All
                 </button>
               </div>
             </div>
-            <div className="overflow-x-auto rounded-xl border border-white/5 bg-white/[0.01]">
+
+            <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-slate-50/50">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-white/5 bg-white/[0.02] text-[10px] font-bold uppercase tracking-widest text-white/40">
+                  <tr className="border-b border-slate-200 bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-400">
                     <th className="p-4 pl-6">Date</th>
                     <th className="p-4">Category</th>
                     <th className="p-4">Amount</th>
@@ -697,42 +654,40 @@ const ExpenseTracker = () => {
                     <th className="p-4 pr-6" />
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-slate-100">
                   <AnimatePresence>
-                    {[...expenses]
-                      .sort((a, b) => b.id - a.id)
-                      .map((expense) => (
-                        <motion.tr
-                          initial={{ opacity: 0, backgroundColor: "rgba(255,255,255,0.05)" }}
-                          animate={{ opacity: 1, backgroundColor: "transparent" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          key={expense.id}
-                          className="text-white/70 hover:bg-white/[0.02] transition-colors"
-                        >
-                          <td className="p-4 pl-6 whitespace-nowrap font-medium">
-                            {expense.date}
-                          </td>
-                          <td className="p-4">
-                            <span className="inline-block px-2.5 py-1 rounded-md bg-white/5 text-[10px] font-bold uppercase tracking-wider text-white/60">
-                              {expense.category}
-                            </span>
-                          </td>
-                          <td className="p-4 whitespace-nowrap font-bold text-white">
-                            ₹{expense.amount.toLocaleString("en-IN")}
-                          </td>
-                          <td className="p-4 text-white/40 font-medium">
-                            {expense.notes || "-"}
-                          </td>
-                          <td className="p-4 pr-6 text-right">
-                            <button
-                              onClick={() => handleDelete(expense.id)}
-                              className="rounded-lg p-2 text-white/30 transition-colors hover:bg-red-500/10 hover:text-red-400"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </td>
-                        </motion.tr>
-                      ))}
+                    {sortedExpenses.map((expense) => (
+                      <motion.tr
+                        initial={{ opacity: 0, backgroundColor: "rgba(240,247,244,0.3)" }}
+                        animate={{ opacity: 1, backgroundColor: "transparent" }}
+                        exit={{ opacity: 0 }}
+                        key={expense.id}
+                        className="text-slate-650 hover:bg-slate-50/60 transition-colors"
+                      >
+                        <td className="p-4 pl-6 whitespace-nowrap font-bold text-slate-700">
+                          {expense.date}
+                        </td>
+                        <td className="p-4">
+                          <span className="inline-block px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200/50 text-[9px] font-black uppercase tracking-wider text-slate-500">
+                            {expense.category}
+                          </span>
+                        </td>
+                        <td className="p-4 whitespace-nowrap font-black text-slate-800">
+                          ₹{expense.amount.toLocaleString("en-IN")}
+                        </td>
+                        <td className="p-4 text-slate-400 font-semibold truncate max-w-[150px]">
+                          {expense.notes || "-"}
+                        </td>
+                        <td className="p-4 pr-6 text-right">
+                          <button
+                            onClick={() => handleDelete(expense.id)}
+                            className="rounded-lg p-2 text-slate-350 transition-colors hover:bg-red-50 hover:text-red-500"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </td>
+                      </motion.tr>
+                    ))}
                   </AnimatePresence>
                 </tbody>
               </table>
@@ -740,19 +695,18 @@ const ExpenseTracker = () => {
           </motion.div>
         )}
 
-        {/* Empty state */}
+        {/* Empty state panel */}
         {!loading && expenses.length === 0 && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="rounded-[2rem] border border-white/5 bg-white/[0.02] py-16 text-center shadow-xl backdrop-blur-2xl flex flex-col items-center"
+            className="bg-white border border-slate-200 rounded-3xl py-16 text-center shadow-sm flex flex-col items-center justify-center"
           >
-            <Wallet className="w-12 h-12 text-white/10 mb-4" />
-            <p className="text-white/40 font-medium">No expenses recorded yet.<br/>Add one above to get started.</p>
+            <Wallet className="w-10 h-10 text-slate-300 mb-4" />
+            <p className="text-slate-400 font-semibold text-sm">No recorded transactions for this forecast cycle.<br/>Input a transaction above to log metrics.</p>
           </motion.div>
         )}
       </main>
-      </div>
     </div>
   );
 };
