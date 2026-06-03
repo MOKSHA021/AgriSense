@@ -1,45 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
 import {
-  MapPin, Cpu, TrendingUp, FlaskConical, Sprout, CloudSun,
-  ShieldAlert, ArrowRight, Leaf, ChevronRight, Activity, Wallet,
-  ScanSearch, Landmark, Heart, ShieldCheck, CheckCircle2, Star
+  MapPin, Cpu, FlaskConical, Sprout, CloudSun,
+  ShieldAlert, ArrowRight, Leaf, ChevronRight, Activity,
+  ScanSearch, Landmark, CheckCircle2, Bot
 } from "lucide-react";
-
-/* ─────────────────────────── Animation Constants ─────────────────────────── */
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.15, delayChildren: 0.1 }
-  }
-};
-
-const itemVariants = {
-  hidden: { y: 30, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: { type: "spring", stiffness: 100, damping: 15 }
-  }
-};
-
-const hoverScaleVariants = {
-  hover: {
-    y: -8,
-    boxShadow: "0 20px 40px -15px rgba(15, 107, 74, 0.12)",
-    borderColor: "rgba(30, 142, 90, 0.3)",
-    transition: { duration: 0.3, ease: "easeOut" }
-  }
-};
+import LanguageSwitcher from "../components/LanguageSwitcher";
+import { useTranslation } from "../translations";
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [scrolled, setScrolled] = useState(false);
-  const [activeWorkflowStep, setActiveWorkflowStep] = useState(0);
+  const [hoveredFeature, setHoveredFeature] = useState(null);
+  
+  const heroRef = useRef(null);
+  const platformRef = useRef(null);
+  const featuresRef = useRef(null);
+  const workflowRef = useRef(null);
+  const benefitsRef = useRef(null);
+  
+  const heroInView = useInView(heroRef, { once: true, amount: 0.3 });
+  const platformInView = useInView(platformRef, { once: true, amount: 0.3 });
+  const featuresInView = useInView(featuresRef, { once: true, amount: 0.3 });
+  const workflowInView = useInView(workflowRef, { once: true, amount: 0.3 });
+  const benefitsInView = useInView(benefitsRef, { once: true, amount: 0.3 });
 
-  // Monitor scroll for sticky navbar styles
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 40);
@@ -126,9 +114,9 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="font-sans text-slate-800 bg-[#F7F9FA] min-h-screen selection:bg-emerald-100 selection:text-green-dark">
+    <div className="font-sans text-slate-800 bg-[#F7F9FA] min-h-screen">
       
-      {/* ══════════════════ 1. STICKY TRANSPARENT NAVBAR ══════════════════ */}
+      {/* Navbar */}
       <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 px-6 md:px-16 py-4 flex items-center justify-between ${
         scrolled 
           ? "bg-white/85 backdrop-blur-md shadow-md border-b border-slate-200/50 py-3" 
@@ -141,8 +129,7 @@ export default function LandingPage() {
           </span>
         </Link>
 
-        {/* Desktop Links */}
-        <div className="hidden md:flex items-center gap-8 text-sm font-semibold">
+        <div className="hidden md:flex items-center gap-6 text-sm font-semibold">
           <a href="#platform" className={`transition-colors ${scrolled ? "text-slate-600 hover:text-[#1E8E5A]" : "text-white/80 hover:text-white"}`}>
             Platform
           </a>
@@ -156,19 +143,20 @@ export default function LandingPage() {
             Workflow
           </a>
           <div className="h-4 w-px bg-slate-300/30" />
+          <LanguageSwitcher variant="navbar" />
           <Link to="/login" className={`transition-colors ${scrolled ? "text-slate-700 hover:text-[#1E8E5A]" : "text-white/95 hover:text-white"}`}>
             Sign In
           </Link>
           <Link
             to="/register"
-            className="bg-[#1E8E5A] hover:bg-[#0F6B4A] text-white px-5 py-2.5 rounded-full text-xs font-bold transition-all shadow-md shadow-[#1E8E5A]/10 active:scale-95"
+            className="bg-[#1E8E5A] hover:bg-[#0F6B4A] text-white px-5 py-2.5 rounded-full text-xs font-bold transition-all shadow-md shadow-[#1E8E5A]/10"
           >
             Get Started Free
           </Link>
         </div>
 
-        {/* Mobile menu trigger links */}
-        <div className="flex md:hidden items-center gap-4">
+        <div className="flex md:hidden items-center gap-3">
+          <LanguageSwitcher variant="navbar" />
           <Link to="/login" className="text-white text-xs font-bold bg-[#1E8E5A]/20 border border-white/20 px-3 py-1.5 rounded-full">
             Sign In
           </Link>
@@ -178,19 +166,18 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* ══════════════════ 2. LARGE ENTERPRISE HERO SECTION ══════════════════ */}
-      <section className="relative bg-gradient-to-br from-[#0F6B4A] via-[#10563b] to-[#124230] min-h-screen pt-28 flex flex-col justify-center overflow-hidden">
-        {/* Background blobs */}
+      {/* Hero Section */}
+      <section ref={heroRef} className="relative bg-gradient-to-br from-[#0F4C3A] via-[#0F6B4A] to-[#124230] min-h-screen pt-28 flex flex-col justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1920&q=80')] bg-cover bg-center opacity-10" />
         <div className="absolute top-1/4 -left-10 w-96 h-96 rounded-full bg-[#2BB673]/10 blur-3xl pointer-events-none" />
         <div className="absolute bottom-10 right-0 w-80 h-80 rounded-full bg-[#2F80ED]/10 blur-3xl pointer-events-none" />
         
         <div className="max-w-7xl mx-auto px-6 md:px-16 py-12 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10 w-full">
           
-          {/* Left Text details */}
           <motion.div 
             className="lg:col-span-6 space-y-6 text-left"
             initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
+            animate={heroInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <div className="inline-flex items-center gap-2 bg-[#2BB673]/15 border border-[#2BB673]/30 text-[#2BB673] text-[10px] font-bold px-4 py-2 rounded-full tracking-widest uppercase">
@@ -224,7 +211,6 @@ export default function LandingPage() {
               </Link>
             </div>
 
-            {/* Trust Badges */}
             <div className="pt-8 flex items-center gap-8 border-t border-white/10">
               <div>
                 <p className="text-white text-2xl font-black font-heading leading-none">87.8%</p>
@@ -244,16 +230,13 @@ export default function LandingPage() {
             </div>
           </motion.div>
 
-          {/* Right Side: Interactive Mockup */}
           <motion.div 
             className="lg:col-span-6 relative flex justify-center"
             initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
+            animate={heroInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
           >
-            {/* Dashboard Container Mockup */}
             <div className="w-full max-w-lg bg-white rounded-3xl shadow-[0_30px_70px_rgba(0,0,0,0.25)] border border-slate-200 overflow-hidden relative group">
-              {/* Inner Mockup Header */}
               <div className="bg-slate-50 border-b border-slate-100 px-5 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-red-400" />
@@ -266,7 +249,6 @@ export default function LandingPage() {
                 <div className="w-4 h-4" />
               </div>
 
-              {/* Inner Mockup Body */}
               <div className="p-6 space-y-5 bg-[#F7F9FA]">
                 <div className="flex justify-between items-center">
                   <div>
@@ -278,13 +260,11 @@ export default function LandingPage() {
                   </span>
                 </div>
 
-                {/* Simulated Chart/Visual */}
                 <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm relative overflow-hidden">
                   <div className="flex items-center justify-between mb-4">
                     <p className="text-xs font-bold text-slate-700">NPK Nitrogen Indices</p>
                     <span className="text-[10px] font-bold text-[#2F80ED]">Optimal (65 kg/ha)</span>
                   </div>
-                  {/* Graph visualization */}
                   <div className="flex items-end gap-2.5 h-20 pt-4">
                     {[40, 60, 45, 90, 75, 110, 85, 120].map((h, i) => (
                       <div key={i} className="flex-1 bg-slate-100 rounded-t-md h-full relative">
@@ -299,7 +279,6 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                {/* Floating telemetry metrics */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-sm">
                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Moisture</p>
@@ -319,7 +298,6 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Overlap badge cards */}
             <motion.div 
               className="absolute -top-6 -right-6 bg-white border border-slate-200 rounded-2xl p-4 shadow-2xl flex items-center gap-3 hidden sm:flex"
               animate={{ y: [0, -10, 0] }}
@@ -352,11 +330,12 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ══════════════════ 3. PRODUCT PLATFORM OVERVIEW ══════════════════ */}
-      <section id="platform" className="py-24 bg-white relative">
+      {/* Platform Section */}
+      <section id="platform" ref={platformRef} className="py-24 bg-white relative">
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=1920&q=80')] bg-cover bg-center opacity-5" />
         <div className="max-w-7xl mx-auto px-6 md:px-16 text-center">
           <div className="max-w-3xl mx-auto space-y-4 mb-16">
-            <span className="section-label">Enterprise Architecture</span>
+            <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Enterprise Architecture</span>
             <h2 className="text-[#0F6B4A] text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight font-heading">
               A Unified Agriculture Intelligence Cloud
             </h2>
@@ -365,52 +344,65 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
             {[
               {
                 icon: ScanSearch,
                 title: "Computer Vision Imagery",
                 desc: "Analyzes uploaded crop leaves and soil photographs via neural layers, mapping features back to localized diagnostic indices.",
+                image: "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?w=400&q=80"
               },
               {
                 icon: Sprout,
                 title: "Agronomy Decision Trees",
                 desc: "Applies Random Forest and Prophet models to recommend high-yield crop schedules matching geographical limits.",
+                image: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&q=80"
               },
               {
                 icon: Landmark,
                 title: "Logistics Optimization",
                 desc: "Scrapes and evaluates regional mandi pricing datasets, correcting margins for travel and fuel tollage.",
+                image: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&q=80"
               }
             ].map((card, i) => (
               <motion.div
                 key={i}
-                className="bg-[#F7F9FA] border border-slate-200/60 rounded-3xl p-8 text-left shadow-sm hover:shadow-md transition-all duration-300"
-                whileHover={{ y: -6 }}
+                className="group bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
+                initial={{ opacity: 0, y: 30 }}
+                animate={platformInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                whileHover={{ y: -8 }}
               >
-                <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center mb-6">
-                  <card.icon className="w-6 h-6 text-[#1E8E5A]" />
+                <div className="h-48 overflow-hidden relative">
+                  <img src={card.image} alt={card.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  <div className="absolute bottom-4 left-4">
+                    <div className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-lg flex items-center justify-center mb-2">
+                      <card.icon className="w-5 h-5 text-[#1E8E5A]" />
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-[#0F6B4A] font-bold text-lg mb-3 tracking-tight">{card.title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{card.desc}</p>
+                <div className="p-6">
+                  <h3 className="text-slate-800 font-bold text-lg mb-3 tracking-tight">{card.title}</h3>
+                  <p className="text-slate-500 text-sm leading-relaxed">{card.desc}</p>
+                </div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ══════════════════ 4. INTELLIGENCE & AI SECTION ══════════════════ */}
+      {/* Intelligence Section */}
       <section id="intelligence" className="py-24 bg-[#F7F9FA] border-t border-b border-slate-200/50">
         <div className="max-w-7xl mx-auto px-6 md:px-16 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           
           <motion.div 
             className="space-y-6 text-left"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={containerVariants}
+            initial={{ opacity: 0, y: 30 }}
+            animate={platformInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            transition={{ duration: 0.5 }}
           >
-            <span className="section-label">Predictive ML Models</span>
+            <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Predictive ML Models</span>
             <h2 className="text-[#0F6B4A] text-3xl sm:text-4xl font-extrabold tracking-tight font-heading">
               Powered by Advanced Neural & Statistical Modeling
             </h2>
@@ -437,8 +429,10 @@ export default function LandingPage() {
                 }
               ].map((model, i) => (
                 <motion.div 
-                  key={i} 
-                  variants={itemVariants}
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={platformInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                  transition={{ duration: 0.5, delay: 0.2 + i * 0.1 }}
                   className="bg-white border border-slate-200 rounded-2xl p-4 flex items-start gap-4 shadow-sm"
                 >
                   <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#1E8E5A] font-bold text-xs shrink-0">
@@ -457,7 +451,6 @@ export default function LandingPage() {
           </motion.div>
 
           <div className="flex justify-center relative">
-            {/* Visual representation card */}
             <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-8 shadow-xl text-left relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-green-light/5 rounded-full blur-2xl" />
               
@@ -508,12 +501,12 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ══════════════════ 5. FEATURE SHOWCASE ══════════════════ */}
-      <section id="features" className="py-24 bg-white">
+      {/* Features Section */}
+      <section id="features" ref={featuresRef} className="py-24 bg-[#F8FAFC]">
         <div className="max-w-7xl mx-auto px-6 md:px-16 text-center">
           <div className="max-w-3xl mx-auto space-y-4 mb-16">
-            <span className="section-label">Comprehensive Toolset</span>
-            <h2 className="text-[#0F6B4A] text-3xl sm:text-4xl font-extrabold tracking-tight font-heading">
+            <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Comprehensive Toolset</span>
+            <h2 className="text-[#0F4C3A] text-3xl sm:text-4xl font-extrabold tracking-tight font-heading">
               Complete Feature Suite for Precision Agriculture
             </h2>
             <p className="text-slate-500 text-sm sm:text-base">
@@ -525,35 +518,94 @@ export default function LandingPage() {
             {features.map((f, i) => (
               <motion.div
                 key={i}
-                variants={hoverScaleVariants}
-                whileHover="hover"
-                className="bg-[#F7F9FA] border border-slate-200 rounded-3xl p-8 text-left transition-all duration-300 relative overflow-hidden group cursor-pointer"
+                className="group bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer relative"
+                initial={{ opacity: 0, y: 30 }}
+                animate={featuresInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                onMouseEnter={() => setHoveredFeature(i)}
+                onMouseLeave={() => setHoveredFeature(null)}
                 onClick={() => navigate(f.path)}
+                whileHover={{ y: -8 }}
               >
-                <div className="flex items-start justify-between mb-6">
-                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-slate-200">
-                    <f.icon className="w-6 h-6 text-[#1E8E5A] group-hover:scale-110 transition-transform" />
+                <div className="h-40 overflow-hidden relative">
+                  <div className={`absolute inset-0 bg-gradient-to-br ${
+                    i === 0 ? 'from-amber-100 to-orange-100' :
+                    i === 1 ? 'from-green-100 to-emerald-100' :
+                    i === 2 ? 'from-blue-100 to-cyan-100' :
+                    i === 3 ? 'from-purple-100 to-pink-100' :
+                    i === 4 ? 'from-indigo-100 to-violet-100' :
+                    'from-red-100 to-rose-100'
+                  }`} />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <f.icon className={`w-16 h-16 ${
+                      i === 0 ? 'text-amber-600' :
+                      i === 1 ? 'text-green-600' :
+                      i === 2 ? 'text-blue-600' :
+                      i === 3 ? 'text-purple-600' :
+                      i === 4 ? 'text-indigo-600' :
+                      'text-red-600'
+                    } opacity-20 group-hover:opacity-40 group-hover:scale-110 transition-all duration-500`} />
                   </div>
-                  <span className="text-[10px] font-bold bg-[#E6F5EE] text-[#0F6B4A] border border-[#2BB673]/15 px-2.5 py-1 rounded-full">
-                    {f.badge}
-                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
-                <h3 className="text-[#0F6B4A] font-bold text-lg mb-2 tracking-tight group-hover:text-[#1E8E5A] transition-colors">{f.title}</h3>
-                <p className="text-slate-500 text-xs sm:text-sm leading-relaxed mb-6">{f.desc}</p>
-                <span className="text-xs font-bold text-[#1E8E5A] flex items-center gap-1 group-hover:translate-x-1 transition-all">
-                  Open Feature <ChevronRight className="w-3.5 h-3.5" />
-                </span>
+                
+                <div className="p-6 relative">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                      i === 0 ? 'bg-amber-50' :
+                      i === 1 ? 'bg-green-50' :
+                      i === 2 ? 'bg-blue-50' :
+                      i === 3 ? 'bg-purple-50' :
+                      i === 4 ? 'bg-indigo-50' :
+                      'bg-red-50'
+                    }`}>
+                      <f.icon className={`w-6 h-6 ${
+                        i === 0 ? 'text-amber-600' :
+                        i === 1 ? 'text-green-600' :
+                        i === 2 ? 'text-blue-600' :
+                        i === 3 ? 'text-purple-600' :
+                        i === 4 ? 'text-indigo-600' :
+                        'text-red-600'
+                      }`} />
+                    </div>
+                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${
+                      i === 0 ? 'bg-amber-100 text-amber-700' :
+                      i === 1 ? 'bg-green-100 text-green-700' :
+                      i === 2 ? 'bg-blue-100 text-blue-700' :
+                      i === 3 ? 'bg-purple-100 text-purple-700' :
+                      i === 4 ? 'bg-indigo-100 text-indigo-700' :
+                      'bg-red-100 text-red-700'
+                    }`}>
+                      {f.badge}
+                    </span>
+                  </div>
+                  <h3 className="text-slate-800 font-bold text-lg mb-2 tracking-tight">{f.title}</h3>
+                  <p className="text-slate-500 text-xs sm:text-sm leading-relaxed mb-4">{f.desc}</p>
+                  
+                  <motion.div 
+                    className="overflow-hidden"
+                    initial={{ height: 0 }}
+                    animate={{ height: hoveredFeature === i ? 'auto' : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="pt-2">
+                      <span className="text-xs font-bold text-[#1E8E5A] flex items-center gap-1">
+                        Open Feature <ChevronRight className="w-3.5 h-3.5" />
+                      </span>
+                    </div>
+                  </motion.div>
+                </div>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ══════════════════ 6. WORKFLOW SECTION ══════════════════ */}
-      <section id="workflow" className="py-24 bg-[#F7F9FA] border-t border-slate-200/50">
+      {/* Workflow Section */}
+      <section id="workflow" ref={workflowRef} className="py-24 bg-[#F7F9FA] border-t border-slate-200/50">
         <div className="max-w-7xl mx-auto px-6 md:px-16 text-center">
           <div className="max-w-3xl mx-auto space-y-4 mb-16">
-            <span className="section-label">Operational Workflow</span>
+            <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Operational Workflow</span>
             <h2 className="text-[#0F6B4A] text-3xl sm:text-4xl font-extrabold tracking-tight font-heading">
               From Soil Analysis to Mandi Sale
             </h2>
@@ -563,86 +615,58 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            {/* Left selector */}
             <div className="lg:col-span-5 space-y-3 text-left">
               {workflowSteps.map((step, idx) => (
                 <div
                   key={idx}
-                  onClick={() => setActiveWorkflowStep(idx)}
-                  className={`p-5 rounded-2xl border transition-all duration-300 cursor-pointer flex items-start gap-4 ${
-                    activeWorkflowStep === idx 
-                      ? "bg-white border-[#1E8E5A] shadow-lg shadow-slate-100" 
-                      : "bg-transparent border-transparent hover:bg-white/50"
+                  className={`p-4 rounded-xl border cursor-pointer transition-all ${
+                    idx === 0 ? 'bg-white border-emerald-200 shadow-md' : 'bg-white/50 border-slate-200 hover:border-emerald-200'
                   }`}
                 >
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                    activeWorkflowStep === idx ? step.bg : "bg-slate-200/60"
-                  }`}>
-                    <step.icon className={`w-5 h-5 ${activeWorkflowStep === idx ? step.color : "text-slate-500"}`} />
-                  </div>
-                  <div>
-                    <h4 className={`text-sm font-bold transition-colors ${
-                      activeWorkflowStep === idx ? "text-[#0F6B4A]" : "text-slate-700"
-                    }`}>
-                      {step.title}
-                    </h4>
-                    {activeWorkflowStep === idx && (
-                      <p className="text-slate-500 text-xs mt-1.5 leading-relaxed">
-                        {step.desc}
-                      </p>
-                    )}
+                  <div className="flex items-start gap-3">
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${step.bg}`}>
+                      <step.icon className={`w-5 h-5 ${step.color}`} />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-800">{step.title}</h4>
+                      <p className="text-xs text-slate-500 mt-1">{step.desc}</p>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Right side illustration */}
-            <div className="lg:col-span-7 bg-white border border-slate-200 rounded-[2.5rem] p-8 shadow-xl text-left relative overflow-hidden min-h-[350px] flex flex-col justify-center">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-[#2BB673]/5 rounded-full blur-2xl" />
-              <div className="relative z-10 space-y-6">
-                <span className="text-3xl font-black text-[#0F6B4A]">Step 0{activeWorkflowStep + 1}</span>
-                <h3 className="text-slate-800 font-extrabold text-2xl font-heading tracking-tight">
-                  {workflowSteps[activeWorkflowStep].title}
-                </h3>
-                <p className="text-slate-500 text-sm leading-relaxed">
-                  {workflowSteps[activeWorkflowStep].desc}
-                </p>
-                <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-light" />
-                  <span className="text-xs text-[#1E8E5A] font-semibold">Integrates dynamically with core farm profiles.</span>
+            <div className="lg:col-span-7">
+              <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-xl">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-[#E6F5EE] flex items-center justify-center">
+                    <FlaskConical className="w-6 h-6 text-[#2BB673]" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-800">Soil Scanner & Type Classification</h3>
+                    <p className="text-sm text-slate-500">Step 1 of 4</p>
+                  </div>
                 </div>
+                <p className="text-slate-600 text-sm leading-relaxed">
+                  Instant image recognition mapping to rich pH, nitrogen, and potassium presets using EfficientNet-B0 ML. Upload a photo of your soil sample and get instant classification results.
+                </p>
+                <button
+                  onClick={() => navigate("/dashboard/soil")}
+                  className="mt-6 bg-[#1E8E5A] hover:bg-[#0F6B4A] text-white font-bold px-6 py-3 rounded-xl text-sm transition-all"
+                >
+                  Try Soil Analysis
+                </button>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ══════════════════ 7. STATISTICS SECTION ══════════════════ */}
-      <section className="py-20 bg-gradient-to-br from-[#0F6B4A] to-[#124230]">
-        <div className="max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
-          {[
-            { value: "87.8%", label: "ML Model Accuracy" },
-            { value: "7 Types", label: "Soil Classes Supported" },
-            { value: "20+ Crops", label: "Variety Database" },
-            { value: "1,000+", label: "Farmers Registered" }
-          ].map((stat, i) => (
-            <div key={i} className="space-y-2">
-              <p className="text-[#2BB673] text-4xl sm:text-5xl font-black tracking-tight font-heading leading-none">
-                {stat.value}
-              </p>
-              <p className="text-white/60 text-xs sm:text-sm font-semibold uppercase tracking-wider">
-                {stat.label}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ══════════════════ 8. BENEFITS SECTION ══════════════════ */}
-      <section className="py-24 bg-white">
+      {/* Benefits Section */}
+      <section ref={benefitsRef} className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 md:px-16 text-center">
           <div className="max-w-3xl mx-auto space-y-4 mb-16">
-            <span className="section-label">Real Value</span>
+            <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Real Value</span>
             <h2 className="text-[#0F6B4A] text-3xl sm:text-4xl font-extrabold tracking-tight font-heading">
               Deliver Quantifiable Farming Success
             </h2>
@@ -651,68 +675,33 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              {
-                icon: Sprout,
-                title: "Maximize Farm Yield",
-                desc: "Mitigate planting failures by backing crop selections with multi-parameter Random Forest intelligence tailored to regional pH levels."
-              },
-              {
-                icon: Wallet,
-                title: "Reduce Operating Cost",
-                desc: "Track expenses accurately per crop season. Estimate seeds, fertilizers, and pesticide margins to avoid budget spillages."
-              },
-              {
-                icon: ShieldCheck,
-                title: "Minimize Climate Risk",
-                desc: "Stay ahead of flood, frost, or intense heatwaves. Real-time geocoded meteorological warnings are pushed to your dashboard dynamically."
-              }
-            ].map((b, i) => (
-              <div key={i} className="bg-[#F7F9FA] border border-slate-200/60 rounded-3xl p-8 text-left shadow-sm">
-                <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center mb-6">
-                  <b.icon className="w-5 h-5 text-[#1E8E5A]" />
-                </div>
-                <h4 className="text-slate-800 font-bold text-base mb-3">{b.title}</h4>
-                <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">{b.desc}</p>
-              </div>
+              { value: "87.8%", label: "Model Accuracy", desc: "EfficientNet-B0 classification accuracy" },
+              { value: "3x", label: "Faster Decisions", desc: "AI-powered instant recommendations" },
+              { value: "12.6%", label: "Cost Savings", desc: "Mandi route optimization margins" },
+              { value: "24/7", label: "Monitoring", desc: "Real-time weather and market alerts" }
+            ].map((stat, i) => (
+              <motion.div
+                key={i}
+                className="bg-[#F7F9FA] border border-slate-200 rounded-2xl p-6 text-center"
+                initial={{ opacity: 0, y: 30 }}
+                animate={benefitsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+              >
+                <p className="text-4xl font-black text-[#1E8E5A] font-heading mb-2">{stat.value}</p>
+                <h4 className="text-sm font-bold text-slate-800 mb-2">{stat.label}</h4>
+                <p className="text-xs text-slate-500">{stat.desc}</p>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ══════════════════ 9. CTA SECTION ══════════════════ */}
-      <section className="py-20 bg-[#F7F9FA] border-t border-slate-200/50">
-        <div className="max-w-5xl mx-auto px-6 text-center bg-white border border-slate-200 rounded-[2.5rem] p-12 md:p-16 shadow-xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-32 h-32 bg-[#2BB673]/5 rounded-full blur-2xl" />
-          <div className="absolute bottom-0 right-0 w-48 h-48 bg-[#2F80ED]/5 rounded-full blur-2xl" />
-          
-          <div className="relative z-10 space-y-6">
-            <h2 className="text-[#0F6B4A] text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight font-heading leading-tight">
-              Begin Optimizing Your Harvest Today.
-            </h2>
-            <p className="text-slate-500 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
-              Create a free account to test soil photos, receive climate crop suggestions, monitor live commodity indexes, and geocode route profits.
-            </p>
-            <div className="pt-4">
-              <button
-                onClick={() => navigate("/register")}
-                className="inline-flex items-center gap-2 bg-[#1E8E5A] hover:bg-[#0F6B4A] text-white font-bold px-8 py-4 rounded-full text-xs transition-all shadow-xl shadow-green-950/20 hover:scale-105 active:scale-95"
-              >
-                CREATE YOUR FREE ACCOUNT
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════ 10. ENTERPRISE FOOTER ══════════════════ */}
-      <footer className="bg-green-dark text-white/70 pt-16 pb-8 border-t border-white/5">
+      {/* Footer */}
+      <footer className="bg-[#0F4C3A] text-white py-16">
         <div className="max-w-7xl mx-auto px-6 md:px-16">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-            
-            {/* Column 1 - Brand info */}
             <div className="space-y-4 md:col-span-2 text-left">
               <div className="flex items-center gap-2.5">
                 <Leaf className="w-6 h-6 text-green-light" />
@@ -725,7 +714,6 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {/* Column 2 - Platform links */}
             <div className="text-left">
               <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-4">Platform Core</h4>
               <ul className="space-y-2 text-xs">
@@ -735,7 +723,6 @@ export default function LandingPage() {
               </ul>
             </div>
 
-            {/* Column 3 - Enterprise info */}
             <div className="text-left">
               <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-4">Verification APIs</h4>
               <ul className="space-y-2 text-xs">
@@ -744,7 +731,6 @@ export default function LandingPage() {
                 <li><span className="text-white/50">Open-Meteo & Nominatim</span></li>
               </ul>
             </div>
-
           </div>
 
           <div className="border-t border-white/5 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] text-white/45">

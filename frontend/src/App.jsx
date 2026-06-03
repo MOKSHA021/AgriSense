@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { LanguageProvider } from "./translations";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AnimatedBackground from "./components/AnimatedBackground";
 
@@ -20,35 +21,37 @@ import Weather from "./pages/Weather";
 
 function App() {
   return (
-    <AuthProvider>
-      <AnimatedBackground />
-      <BrowserRouter>
-        <Routes>
-          {/* ── Public ── */}
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/verify-otp" element={<VerifyOTP />} />
+    <LanguageProvider>
+      <AuthProvider>
+        <AnimatedBackground />
+        <BrowserRouter>
+          <Routes>
+            {/* ── Public ── */}
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/verify-otp" element={<VerifyOTP />} />
 
-          {/* ── Protected Dashboard ── */}
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            {/* ── Protected Dashboard ── */}
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
-          {/* ── ML Feature Pages ── */}
-          <Route path="/dashboard/soil"          element={<ProtectedRoute><SoilAnalysis /></ProtectedRoute>} />
-          <Route path="/dashboard/recommend"     element={<ProtectedRoute><CropRecommend /></ProtectedRoute>} />
-          <Route path="/dashboard/weather"       element={<ProtectedRoute><Weather /></ProtectedRoute>} />
-          <Route path="/dashboard/risk"          element={<ProtectedRoute><RiskAssessment /></ProtectedRoute>} />
+            {/* ── ML Feature Pages ── */}
+            <Route path="/dashboard/soil"          element={<ProtectedRoute><SoilAnalysis /></ProtectedRoute>} />
+            <Route path="/dashboard/recommend"     element={<ProtectedRoute><CropRecommend /></ProtectedRoute>} />
+            <Route path="/dashboard/weather"       element={<ProtectedRoute><Weather /></ProtectedRoute>} />
+            <Route path="/dashboard/risk"          element={<ProtectedRoute><RiskAssessment /></ProtectedRoute>} />
 
-          {/* ── Market Pages ── */}
-          <Route path="/dashboard/best-mandi"    element={<ProtectedRoute><BestMandi /></ProtectedRoute>} />
-          <Route path="/dashboard/live-prices"   element={<ProtectedRoute><LivePricesDashboard /></ProtectedRoute>} />
-          <Route path="/dashboard/price-forecast"element={<ProtectedRoute><PriceForecast /></ProtectedRoute>} />
+            {/* ── Market Pages ── */}
+            <Route path="/dashboard/best-mandi"    element={<ProtectedRoute><BestMandi /></ProtectedRoute>} />
+            <Route path="/dashboard/live-prices"   element={<ProtectedRoute><LivePricesDashboard /></ProtectedRoute>} />
+            <Route path="/dashboard/price-forecast"element={<ProtectedRoute><PriceForecast /></ProtectedRoute>} />
 
-          {/* ── Finance ── */}
-          <Route path="/dashboard/expenses"      element={<ProtectedRoute><ExpenseTracker /></ProtectedRoute>} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+            {/* ── Finance ── */}
+            <Route path="/dashboard/expenses"      element={<ProtectedRoute><ExpenseTracker /></ProtectedRoute>} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </LanguageProvider>
   );
 }
 

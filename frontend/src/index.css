@@ -5,40 +5,72 @@
 @import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 
 /* ─────────────────────────────────────────────
-   THEME TOKENS  —  AgriSense Premium SaaS Theme
+   THEME TOKENS  —  AgriSense Enterprise Design System
    ───────────────────────────────────────────── */
 @theme {
   /* Typography */
-  --font-sans:    "Inter",  "system-ui", sans-serif;
+  --font-sans: "Inter", "system-ui", sans-serif;
   --font-heading: "Outfit", "system-ui", sans-serif;
 
-  /* Cropin Brand Greens */
-  --color-green-dark:  #0F6B4A;   /* Primary dark green for navigation, major headings */
-  --color-green-mid:   #1E8E5A;   /* Primary green for actions, main buttons */
-  --color-green-light: #2BB673;   /* Bright green for active highlights, success badges */
-  --color-green-pale:  #E6F5EE;   /* Soft background green for alerts/tints */
+  /* Brand greens - Enterprise palette */
+  --color-green-dark: #0F4C3A;
+  /* primary brand, navbar         */
+  --color-green-mid: #1E8E5A;
+  /* primary actions, buttons      */
+  --color-green-light: #2BB673;
+  /* accents, icons                */
+  --color-green-pale: #D8F3DC;
+  /* card tints, hover states       */
+  --color-green-surface: #E6F5EE;
+  /* surface backgrounds           */
 
-  /* Accent Blue */
-  --color-orange-accent: #2F80ED; /* Mapped to tech blue for modern SaaS feel */
-  --color-orange-light:  #56CCF2; /* Soft cyan accent */
+  /* Accent oranges - Enterprise palette */
+  --color-orange-accent: #D4673A;
+  /* CTAs, highlights              */
+  --color-orange-light: #F4A261;
+  /* secondary orange              */
+  --color-orange-surface: #FEF3E7;
+
+  /* Enterprise blues */
+  --color-blue-primary: #2F80ED;
+  --color-blue-light: #5BA0F5;
+  --color-blue-surface: #E8F2FF;
 
   /* Backgrounds */
-  --color-bg-primary: #FFFFFF;    /* Pure white for panels & containers */
-  --color-bg-card:    #FFFFFF;    
-  --color-bg-light:   #F7F9FA;    /* Off-white page background */
+  --color-bg-primary: #F8FAFC;
+  /* enterprise light gray        */
+  --color-bg-secondary: #F1F5F9;
+  /* secondary backgrounds         */
+  --color-bg-card: #FFFFFF;
+  /* card / panel background       */
 
   /* Text */
-  --color-text-primary: #111827; /* Dark slate */
-  --color-text-muted:   #4B5563; /* Cool gray */
+  --color-text-primary: #0F172A;
+  /* enterprise dark slate        */
+  --color-text-secondary: #475569;
+  /* secondary text                */
+  --color-text-muted: #94A3B8;
+  /* muted text                    */
 
   /* Border */
-  --color-border: #E5E7EB;       /* Light border */
+  --color-border: #E2E8F0;
+  /* enterprise border             */
+  --color-border-light: #F1F5F9;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
 /* ─────────────────────────────────────────────
    GLOBAL RESET & BASE
    ───────────────────────────────────────────── */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -52,118 +84,108 @@ html {
 body {
   margin: 0;
   padding: 0;
-  background-color: #F7F9FA;     /* Cropin dashboard off-white */
-  color: #111827;
-  overflow-x: hidden;
+  background-color: #F8FAFC;
+  color: #0F172A;
 }
 
 /* ─────────────────────────────────────────────
    HEADINGS — Outfit font
    ───────────────────────────────────────────── */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-heading);
-  letter-spacing: -0.02em;
-  color: #0F6B4A;
+  letter-spacing: -0.01em;
+  color: #0F172A;
+  font-weight: 600;
 }
 
 /* ─────────────────────────────────────────────
-   SCROLLBAR — modern, thin
+   SCROLLBAR — enterprise thin
    ───────────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
+
 ::-webkit-scrollbar-track {
-  background: #F7F9FA;
+  background: #F1F5F9;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #1E8E5A;
-  border-radius: 99px;
-  border: 2px solid #F7F9FA;
+  background: #CBD5E1;
+  border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #0F6B4A;
+  background: #94A3B8;
 }
 
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #1E8E5A #F7F9FA;
+  scrollbar-color: #CBD5E1 #F1F5F9;
 }
 
 /* ─────────────────────────────────────────────
-   GLOBAL FORMS & INPUTS — Premium styling
+   INPUTS & FORM ELEMENTS — light mode
    ───────────────────────────────────────────── */
+input[type="date"],
+input[type="number"],
 input[type="text"],
 input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="date"],
 input[type="search"],
-select,
-textarea {
-  background-color: #FFFFFF;
-  border: 1.5px solid #E5E7EB;
-  border-radius: 0.75rem; /* rounded-xl */
-  color: #111827;
-  font-size: 0.875rem;
-  padding: 0.75rem 1rem;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-  width: 100%;
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-  border-color: #1E8E5A;
-  box-shadow: 0 0 0 4px rgba(30, 142, 90, 0.12);
-  outline: none;
-}
-
-input:disabled,
-select:disabled,
-textarea:disabled {
-  background-color: #F3F4F6;
-  color: #9CA3AF;
-  cursor: not-allowed;
-  border-color: #E5E7EB;
+textarea,
+select {
+  color-scheme: light;
 }
 
 /* ─────────────────────────────────────────────
-   LEAFLET MAP OVERRIDES — Light Theme
+   LEAFLET — enterprise theme overrides
    ───────────────────────────────────────────── */
+.leaflet-default-icon-path {
+  background-image: none;
+}
+
 .leaflet-popup-content-wrapper {
   background: #FFFFFF !important;
-  border: 1px solid #E5E7EB !important;
-  color: #111827 !important;
-  border-radius: 1rem !important;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #0F172A !important;
+  border-radius: 12px !important;
+  backdrop-filter: none;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
 }
 
 .leaflet-popup-tip {
   background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+.leaflet-popup-content {
+  color: #0F172A !important;
 }
 
 .leaflet-container {
-  background: #F0F7F4;
-  border-radius: 1.5rem;
-  border: 1px solid #E5E7EB;
+  background: #F1F5F9;
+  border-radius: 12px;
 }
 
 /* ─────────────────────────────────────────────
-   TEXT SELECTION
+   TEXT SELECTION — enterprise green
    ───────────────────────────────────────────── */
 ::selection {
-  background: rgba(43, 182, 115, 0.2);
-  color: #0F6B4A;
+  background: rgba(30, 142, 90, 0.15);
+  color: #0F172A;
 }
 
 /* ─────────────────────────────────────────────
-   PREMIUM CUSTOM UTILITIES
+   CUSTOM UTILITY CLASSES
    ───────────────────────────────────────────── */
 
-/* Primary Button - Cropin Green */
+/* Primary CTA button — enterprise green */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -175,35 +197,34 @@ textarea:disabled {
   font-family: var(--font-sans);
   font-weight: 600;
   font-size: 0.875rem;
-  border-radius: 9999px; /* Pill-shaped modern button */
+  border-radius: 8px;
   border: none;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
   text-decoration: none;
-  line-height: 1.25;
-  box-shadow: 0 4px 12px rgba(30, 142, 90, 0.15);
+  line-height: 1.4;
 }
 
 .btn-primary:hover {
   background-color: #0F6B4A;
-  box-shadow: 0 6px 16px rgba(30, 142, 90, 0.25);
+  box-shadow: 0 4px 12px rgba(30, 142, 90, 0.3);
   transform: translateY(-1px);
 }
 
 .btn-primary:active {
+  background-color: #0A4A32;
   transform: translateY(0);
-  box-shadow: 0 4px 12px rgba(30, 142, 90, 0.15);
+  box-shadow: none;
 }
 
 .btn-primary:disabled {
-  background-color: #D1D5DB;
-  color: #9CA3AF;
-  box-shadow: none;
+  background-color: #94A3B8;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
-/* Secondary Button - Tech Blue */
+/* Secondary button — enterprise blue */
 .btn-secondary {
   display: inline-flex;
   align-items: center;
@@ -215,26 +236,34 @@ textarea:disabled {
   font-family: var(--font-sans);
   font-weight: 600;
   font-size: 0.875rem;
-  border-radius: 9999px;
+  border-radius: 8px;
   border: none;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
   text-decoration: none;
-  line-height: 1.25;
-  box-shadow: 0 4px 12px rgba(47, 128, 237, 0.15);
+  line-height: 1.4;
 }
 
 .btn-secondary:hover {
-  background-color: #1d72db;
-  box-shadow: 0 6px 16px rgba(47, 128, 237, 0.25);
+  background-color: #1E6BC7;
+  box-shadow: 0 4px 12px rgba(47, 128, 237, 0.3);
   transform: translateY(-1px);
 }
 
 .btn-secondary:active {
+  background-color: #1557B0;
   transform: translateY(0);
+  box-shadow: none;
 }
 
-/* Ghost Outline Button */
+.btn-secondary:disabled {
+  background-color: #94A3B8;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Ghost / outline button */
 .btn-ghost {
   display: inline-flex;
   align-items: center;
@@ -246,73 +275,77 @@ textarea:disabled {
   font-family: var(--font-sans);
   font-weight: 600;
   font-size: 0.875rem;
-  border-radius: 9999px;
-  border: 1.5px solid #1E8E5A;
+  border-radius: 8px;
+  border: 1.5px solid #E2E8F0;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
   text-decoration: none;
+  line-height: 1.4;
 }
 
 .btn-ghost:hover {
   background-color: #E6F5EE;
   color: #0F6B4A;
+  border-color: #1E8E5A;
   transform: translateY(-1px);
 }
 
 .btn-ghost:active {
+  background-color: #D8F3DC;
   transform: translateY(0);
 }
 
-/* Premium Card with lift and shadow */
+/* Card — enterprise white */
 .card {
   background-color: #FFFFFF;
-  border: 1px solid #E5E7EB;
-  border-radius: 1.5rem;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.02), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
 .card:hover {
-  box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.06), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
-  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border-color: #CBD5E1;
 }
 
-/* Muted light green card background */
-.card-pale {
+/* Card with green tint */
+.card-green {
   background-color: #E6F5EE;
-  border: 1px solid rgba(43, 182, 115, 0.15);
-  border-radius: 1.5rem;
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.6);
+  border: 1px solid #D8F3DC;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-/* Page container layout */
+/* Page container */
 .page-container {
-  max-width: 85rem;
+  max-width: 80rem;
+  /* 1280px / 7xl */
   margin-left: auto;
   margin-right: auto;
-  padding-left: 2rem;
-  padding-right: 2rem;
-  padding-top: 3rem;
-  padding-bottom: 3rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
 }
 
-/* Section label pills */
+/* Section heading helper */
 .section-label {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
   font-family: var(--font-sans);
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #1E8E5A;
   background-color: #E6F5EE;
-  padding: 0.35rem 0.85rem;
+  padding: 0.375rem 0.875rem;
   border-radius: 9999px;
 }
 
-/* Status badges */
+/* Status badge helpers */
 .badge-green {
   display: inline-flex;
   align-items: center;
@@ -323,7 +356,18 @@ textarea:disabled {
   background-color: #E6F5EE;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
-  border: 1px solid rgba(30, 142, 90, 0.15);
+}
+
+.badge-blue {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #1E6BC7;
+  background-color: #E8F2FF;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
 }
 
 .badge-orange {
@@ -332,40 +376,22 @@ textarea:disabled {
   gap: 0.25rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #2F80ED;
-  background-color: rgba(47, 128, 237, 0.1);
+  color: #B85530;
+  background-color: #FEF3E7;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
-  border: 1px solid rgba(47, 128, 237, 0.15);
 }
 
+/* Divider */
 .divider {
   border: none;
-  border-top: 1px solid #E5E7EB;
+  border-top: 1px solid #E2E8F0;
   margin: 1.5rem 0;
 }
 
+/* Focus ring — accessible green */
 :focus-visible {
-  outline: 2px solid #2BB673;
+  outline: 2px solid #1E8E5A;
   outline-offset: 2px;
-}
-
-/* Light Glassmorphism Card Utility */
-.glass-premium {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(16px) saturate(120%);
-  -webkit-backdrop-filter: blur(16px) saturate(120%);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.03);
-}
-
-/* Layout helpers for pages siblings to Sidebar Navbar */
-.dashboard-main-content {
-  transition: all 0.3s ease;
-}
-@media (min-width: 1024px) {
-  .dashboard-main-content {
-    margin-left: 16rem;
-    padding-top: 5rem;
-  }
+  border-radius: 4px;
 }

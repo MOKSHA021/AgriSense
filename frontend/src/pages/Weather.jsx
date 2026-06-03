@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
-import Navbar from "../components/Navbar";
+import { Link } from "react-router-dom";
+import { motion, AnimatePresence, useInView } from "framer-motion";
+import { useRef as useRefHook } from "react";
+import DashboardNavbar from "../components/DashboardNavbar";
 import {
   CloudSun,
   Search,
@@ -13,9 +16,10 @@ import {
   CloudRain,
   Snowflake,
   Loader,
-  Navigation
+  Navigation,
+  Sparkles
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "../translations";
 
 const mapWmoToOwm = (code, isDay = 1) => {
   const d = isDay ? 'd' : 'n';
@@ -189,12 +193,20 @@ const formatDay = (dateStr) => {
 };
 
 const Weather = () => {
+  const { t } = useTranslation();
   const [city, setCity] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [current, setCurrent] = useState(null);
   const [forecast, setForecast] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  
+  const headerRef = useRefHook(null);
+  const contentRef = useRefHook(null);
+  
+  const headerInView = useInView(headerRef, { once: true, amount: 0.3 });
+  const contentInView = useInView(contentRef, { once: true, amount: 0.3 });
 
   const fetchWeatherByCoords = async (lat, lon, cityNameFallback = null) => {
     setLoading(true);
@@ -303,50 +315,122 @@ const Weather = () => {
   const riskAlerts = getRiskAlerts(current);
 
   return (
-    <div className="relative min-h-screen bg-[#F7F4EE] selection:bg-emerald-200">
+    <div className="min-h-screen bg-[#F8FAFC]">
+      <DashboardNavbar />
       
-      <div className="relative z-10">
-        <Navbar />
+      <main className="pt-24">
+        {/* Hero Section */}
+        <section className="relative bg-gradient-to-br from-[#0F4C3A] via-[#0F6B4A] to-[#124230] py-16 overflow-hidden">
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1592210454359-9043f067919b?w=1920&q=80')] bg-cover bg-center opacity-10" />
+          <div className="absolute top-1/4 -left-20 w-96 h-96 rounded-full bg-[#2F80ED]/10 blur-3xl pointer-events-none" />
+          
+          <div className="max-w-7xl mx-auto px-6 md:px-16 relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
+            >
+              <div className="space-y-6">
+                <div className="inline-flex items-center gap-2 bg-[#2F80ED]/15 border border-[#2F80ED]/30 text-[#2F80ED] text-[11px] font-bold px-4 py-2 rounded-full tracking-widest uppercase">
+                  <CloudSun className="w-4 h-4" />
+                  Real-Time GPS
+                </div>
 
-        <main className="max-w-5xl mx-auto px-6 py-12">
-          {/* Page Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-10 flex items-center gap-4"
-          >
-            <div className="w-12 h-12 bg-sky-100 rounded-2xl flex items-center justify-center border border-sky-200 shadow-sm">
-              <CloudSun className="w-6 h-6 text-sky-500" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-black text-[#1B4332] tracking-tight">Weather</h1>
-              <p className="text-[#6B8C7B] text-sm mt-1 font-medium">Real-time weather data with farming-specific advice.</p>
-            </div>
-          </motion.div>
+                <h1 className="text-white text-4xl md:text-5xl font-extrabold leading-[1.1] tracking-tight font-heading">
+                  Weather Intelligence
+                  <span className="block text-[#2BB673] mt-2">Advisory Platform</span>
+                </h1>
+
+                <p className="text-white/80 text-base md:text-lg leading-relaxed max-w-lg">
+                  Access hyper-local weather forecasts with farming-specific advisories. Get real-time temperature, humidity, wind data, and actionable recommendations for spray timings and harvesting.
+                </p>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="hidden lg:flex justify-center"
+              >
+                <div className="w-full max-w-md bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-8 shadow-2xl">
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 bg-[#2F80ED] rounded-2xl flex items-center justify-center">
+                        <CloudSun className="w-7 h-7 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-white font-bold text-lg">Hyper-Local Data</h3>
+                        <p className="text-white/60 text-sm">GPS-Precision Weather</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Forecast</p>
+                        <p className="text-white text-3xl font-black font-heading">5-Day</p>
+                      </div>
+                      <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Advisories</p>
+                        <p className="text-white text-3xl font-black font-heading">Real</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-white/10 border border-white/10 rounded-2xl p-4 flex items-center gap-3">
+                      <Sparkles className="w-5 h-5 text-[#2BB673]" />
+                      <p className="text-white/80 text-sm">Farming-specific insights</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Main Content */}
+        <section className="max-w-7xl mx-auto px-6 md:px-16 py-12">
+          {/* Header */}
+          <div ref={headerRef} className="mb-8">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={headerInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-12 h-12 bg-[#E6F5EE] rounded-xl flex items-center justify-center border border-emerald-200">
+                  <CloudSun className="w-6 h-6 text-[#1E8E5A]" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-slate-800 font-heading">Weather</h1>
+                  <p className="text-sm text-slate-500">Real-time weather data with farming-specific advice</p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
 
           {/* Search Bar */}
           <motion.form
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            animate={headerInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
             onSubmit={handleSearch}
-            className="flex flex-col sm:flex-row items-center gap-3 mb-10"
+            className="flex flex-col sm:flex-row items-center gap-3 mb-8"
           >
             <div className="relative flex-1 w-full group">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Search className="w-5 h-5 text-[#6B8C7B] group-focus-within:text-sky-500 transition-colors" />
+                <Search className="w-5 h-5 text-slate-400 group-focus-within:text-[#1E8E5A] transition-colors" />
               </div>
               <input
                 type="text"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search city..."
-                className="w-full pl-12 pr-4 py-4 rounded-2xl border border-[#E0EDD9] bg-white text-sm font-medium text-[#1B3A28] placeholder:text-[#6B8C7B]/50 outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition-all shadow-sm"
+                className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#1E8E5A] focus:border-[#1E8E5A] transition-all shadow-sm"
               />
             </div>
             <button
               type="submit"
-              className="w-full sm:w-auto px-8 py-4 bg-[#1B4332] hover:bg-[#2D6A4F] text-white text-sm font-bold uppercase tracking-wider rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-6 py-3 bg-[#1E8E5A] hover:bg-[#0F6B4A] text-white text-sm font-semibold rounded-xl shadow-sm transition-all flex items-center justify-center gap-2"
             >
               <Navigation className="w-4 h-4" />
               Locate
@@ -360,7 +444,7 @@ const Weather = () => {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="flex items-center gap-3 border border-red-200 bg-red-50 text-red-600 text-sm font-medium rounded-2xl px-5 py-4 mb-8"
+                className="flex items-center gap-3 border border-red-200 bg-red-50 text-red-600 text-sm font-semibold rounded-xl px-5 py-4 mb-8"
               >
                 <AlertTriangle className="w-5 h-5 shrink-0" />
                 <span>{error}</span>
@@ -370,36 +454,36 @@ const Weather = () => {
 
           {/* Loading */}
           {loading && (
-            <div className="flex flex-col items-center justify-center py-32 text-[#6B8C7B]">
-              <Loader className="w-10 h-10 animate-spin text-sky-500 mb-4" />
-              <span className="text-sm font-medium tracking-widest uppercase">Fetching Atmosphere...</span>
+            <div className="flex flex-col items-center justify-center py-32 text-slate-500">
+              <Loader className="w-10 h-10 animate-spin text-[#1E8E5A] mb-4" />
+              <span className="text-sm font-semibold tracking-widest uppercase">Fetching Atmosphere...</span>
             </div>
           )}
 
           {/* Current Weather */}
           {!loading && current && (
-            <div className="space-y-8">
+            <div ref={contentRef} className="space-y-8">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 {/* Current conditions hero */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.2 }}
-                  className="lg:col-span-5 bg-white rounded-[2.5rem] border border-[#E0EDD9] p-8 shadow-sm relative overflow-hidden flex flex-col justify-between"
+                  animate={contentInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-8 shadow-sm hover:shadow-md transition-all relative overflow-hidden flex flex-col justify-between"
                 >
                   {/* Dark green accent top strip */}
-                  <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#1B4332] to-[#52B788] rounded-t-[2.5rem]" />
+                  <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#1E8E5A] to-[#2BB673] rounded-t-2xl" />
 
                   <div className="relative z-10 flex items-start justify-between mb-8 mt-2">
                     <div>
-                      <h2 className="text-3xl font-black text-[#1B4332] tracking-tight">
+                      <h2 className="text-3xl font-bold text-slate-800 tracking-tight">
                         {city}
                       </h2>
-                      <p className="text-sm font-medium text-[#2D6A4F] capitalize mt-1">
+                      <p className="text-sm font-semibold text-slate-500 capitalize mt-1">
                         {current.weather[0].description}
                       </p>
                     </div>
-                    <div className="w-20 h-20 bg-[#F0F7EE] rounded-3xl flex items-center justify-center border border-[#E0EDD9] shadow-sm">
+                    <div className="w-20 h-20 bg-[#E6F5EE] rounded-2xl flex items-center justify-center border border-emerald-200 shadow-sm">
                       <img
                         src={`https://openweathermap.org/img/wn/${current.weather[0].icon}@2x.png`}
                         alt={current.weather[0].description}
@@ -409,45 +493,45 @@ const Weather = () => {
                   </div>
 
                   <div className="relative z-10 mt-auto">
-                    <p className="text-[5rem] leading-none font-black text-[#1B4332] tracking-tighter mb-8">
-                      {Math.round(current.main.temp)}<span className="text-[#6B8C7B] text-5xl">&deg;C</span>
+                    <p className="text-[5rem] leading-none font-bold text-slate-800 tracking-tighter mb-8">
+                      {Math.round(current.main.temp)}<span className="text-slate-500 text-5xl">&deg;C</span>
                     </p>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      <div className="flex flex-col gap-1 p-3 rounded-2xl bg-[#F7F4EE] border border-[#E0EDD9]">
-                        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#6B8C7B]">
+                      <div className="flex flex-col gap-1 p-3 rounded-xl bg-slate-50 border border-slate-200">
+                        <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                           <Thermometer className="w-3 h-3" />
                           Feels
                         </div>
-                        <span className="text-sm font-bold text-[#1B4332]">{Math.round(current.main.feels_like)}&deg;C</span>
+                        <span className="text-sm font-semibold text-slate-800">{Math.round(current.main.feels_like)}&deg;C</span>
                       </div>
-                      <div className="flex flex-col gap-1 p-3 rounded-2xl bg-[#F7F4EE] border border-[#E0EDD9]">
-                        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#6B8C7B]">
+                      <div className="flex flex-col gap-1 p-3 rounded-xl bg-slate-50 border border-slate-200">
+                        <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                           <Droplets className="w-3 h-3" />
                           Humid
                         </div>
-                        <span className="text-sm font-bold text-[#1B4332]">{current.main.humidity}%</span>
+                        <span className="text-sm font-semibold text-slate-800">{current.main.humidity}%</span>
                       </div>
-                      <div className="flex flex-col gap-1 p-3 rounded-2xl bg-[#F7F4EE] border border-[#E0EDD9]">
-                        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#6B8C7B]">
+                      <div className="flex flex-col gap-1 p-3 rounded-xl bg-slate-50 border border-slate-200">
+                        <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                           <Wind className="w-3 h-3" />
                           Wind
                         </div>
-                        <span className="text-sm font-bold text-[#1B4332]">{current.wind.speed} m/s</span>
+                        <span className="text-sm font-semibold text-slate-800">{current.wind.speed} m/s</span>
                       </div>
-                      <div className="flex flex-col gap-1 p-3 rounded-2xl bg-[#F7F4EE] border border-[#E0EDD9]">
-                        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#6B8C7B]">
+                      <div className="flex flex-col gap-1 p-3 rounded-xl bg-slate-50 border border-slate-200">
+                        <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                           <Gauge className="w-3 h-3" />
                           Press
                         </div>
-                        <span className="text-sm font-bold text-[#1B4332]">{current.main.pressure} hPa</span>
+                        <span className="text-sm font-semibold text-slate-800">{current.main.pressure} hPa</span>
                       </div>
-                      <div className="flex flex-col gap-1 p-3 rounded-2xl bg-[#F7F4EE] border border-[#E0EDD9] sm:col-span-2">
-                        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#6B8C7B]">
+                      <div className="flex flex-col gap-1 p-3 rounded-xl bg-slate-50 border border-slate-200 sm:col-span-2">
+                        <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                           <Eye className="w-3 h-3" />
                           Visibility
                         </div>
-                        <span className="text-sm font-bold text-[#1B4332]">{(current.visibility / 1000).toFixed(1)} km</span>
+                        <span className="text-sm font-semibold text-slate-800">{(current.visibility / 1000).toFixed(1)} km</span>
                       </div>
                     </div>
                   </div>
@@ -458,24 +542,24 @@ const Weather = () => {
                   {forecast.length > 0 && (
                     <motion.div
                       initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.3 }}
-                      className="bg-white rounded-[2.5rem] border border-[#E0EDD9] p-8 shadow-sm"
+                      animate={contentInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
+                      transition={{ duration: 0.5, delay: 0.3 }}
+                      className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm hover:shadow-md transition-all"
                     >
-                      <h2 className="text-sm font-bold uppercase tracking-widest text-[#6B8C7B] mb-6 flex items-center gap-2">
-                        <CloudSun className="w-4 h-4 text-[#2D6A4F]" />
+                      <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-6 flex items-center gap-2">
+                        <CloudSun className="w-4 h-4 text-[#1E8E5A]" />
                         5-Day Forecast
                       </h2>
                       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                         {forecast.map((day, idx) => (
                           <motion.div
                             initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.4 + (idx * 0.1) }}
+                            animate={contentInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                            transition={{ duration: 0.3, delay: 0.4 + (idx * 0.1) }}
                             key={day.date}
-                            className="flex flex-col items-center border border-[#E0EDD9] bg-[#F7F4EE] rounded-2xl p-4 transition-colors hover:bg-[#EBF5EE] hover:border-[#C3E6CB]"
+                            className="flex flex-col items-center border border-slate-200 bg-slate-50 rounded-xl p-4 transition-colors hover:bg-[#E6F5EE] hover:border-emerald-200"
                           >
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#2D6A4F] mb-2">
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-600 mb-2">
                               {formatDay(day.date)}
                             </p>
                             <div className="w-12 h-12 flex items-center justify-center mb-2">
@@ -485,19 +569,19 @@ const Weather = () => {
                                 className="w-16 h-16 object-contain"
                               />
                             </div>
-                            <p className="text-base font-bold text-[#1B4332]">
+                            <p className="text-base font-semibold text-slate-800">
                               {day.tempMax}&deg;C
-                              <span className="text-[#6B8C7B] text-xs font-medium ml-1">
+                              <span className="text-slate-500 text-xs font-medium ml-1">
                                 {day.tempMin}&deg;C
                               </span>
                             </p>
-                            <div className="flex items-center gap-3 mt-3 pt-3 border-t border-[#E0EDD9] w-full justify-center text-[10px] font-bold text-[#6B8C7B]">
+                            <div className="flex items-center gap-3 mt-3 pt-3 border-t border-slate-200 w-full justify-center text-[10px] font-semibold text-slate-500">
                               <span className="flex items-center gap-1">
                                 <Droplets className="w-3 h-3 text-blue-400" />
                                 {day.humidity}%
                               </span>
                               <span className="flex items-center gap-1">
-                                <Wind className="w-3 h-3 text-[#6B8C7B]" />
+                                <Wind className="w-3 h-3 text-slate-500" />
                                 {day.wind} m/s
                               </span>
                             </div>
@@ -512,12 +596,12 @@ const Weather = () => {
                     {riskAlerts.length > 0 && (
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5 }}
-                        className="bg-white rounded-[2rem] border border-red-200 p-6 shadow-sm relative overflow-hidden"
+                        animate={contentInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                        transition={{ duration: 0.5, delay: 0.5 }}
+                        className="bg-white rounded-2xl border border-red-200 p-6 shadow-sm relative overflow-hidden"
                       >
-                        <div className="absolute top-0 left-0 bottom-0 w-1 bg-red-500 rounded-l-[2rem]" />
-                        <h2 className="text-sm font-bold uppercase tracking-widest text-red-600 mb-5 flex items-center gap-2 pl-2">
+                        <div className="absolute top-0 left-0 bottom-0 w-1 bg-red-500 rounded-l-2xl" />
+                        <h2 className="text-sm font-semibold uppercase tracking-wider text-red-600 mb-5 flex items-center gap-2 pl-2">
                           <AlertTriangle className="w-4 h-4" />
                           Risk Alerts
                         </h2>
@@ -531,7 +615,7 @@ const Weather = () => {
                               >
                                 <div className="flex items-center gap-2 text-red-600">
                                   <Icon className="w-4 h-4 shrink-0" />
-                                  <span className="text-xs font-bold uppercase tracking-wider">{alert.label}</span>
+                                  <span className="text-xs font-semibold uppercase tracking-wider">{alert.label}</span>
                                 </div>
                                 <p className="text-sm font-medium text-red-700">
                                   {alert.text}
@@ -547,13 +631,13 @@ const Weather = () => {
                     {advice.length > 0 && (
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.6 }}
-                        className="bg-white rounded-[2rem] border border-[#E0EDD9] p-6 shadow-sm relative overflow-hidden sm:col-span-1"
+                        animate={contentInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                        transition={{ duration: 0.5, delay: 0.6 }}
+                        className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm relative overflow-hidden sm:col-span-1"
                         style={{ gridColumn: riskAlerts.length === 0 ? 'span 2' : undefined }}
                       >
-                        <div className="absolute top-0 left-0 bottom-0 w-1 bg-[#2D6A4F] rounded-l-[2rem]" />
-                        <h2 className="text-sm font-bold uppercase tracking-widest text-[#2D6A4F] mb-5 flex items-center gap-2 pl-2">
+                        <div className="absolute top-0 left-0 bottom-0 w-1 bg-[#1E8E5A] rounded-l-2xl" />
+                        <h2 className="text-sm font-semibold uppercase tracking-wider text-[#1E8E5A] mb-5 flex items-center gap-2 pl-2">
                           <CloudSun className="w-4 h-4" />
                           Farming Advice
                         </h2>
@@ -582,8 +666,8 @@ const Weather = () => {
               </div>
             </div>
           )}
-        </main>
-      </div>
+        </section>
+      </main>
     </div>
   );
 };

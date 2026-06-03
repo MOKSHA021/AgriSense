@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
-import Navbar from "../components/Navbar";
+import { Link } from "react-router-dom";
+import { motion, AnimatePresence, useInView } from "framer-motion";
+import { useRef as useRefHook } from "react";
+import DashboardNavbar from "../components/DashboardNavbar";
 import API from "../services/api";
 import {
   ShieldAlert, Search, AlertTriangle, Droplets, Sun,
-  Thermometer, Snowflake, Loader, MapPin, Sprout, Clock, CheckCircle, Target
+  Thermometer, Snowflake, Loader, MapPin, Sprout, Clock, CheckCircle, Target, Sparkles
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "../translations";
 
 const SEASONS = ["Kharif", "Rabi", "Zaid"];
 
@@ -44,6 +47,7 @@ const LEVEL_CONFIG = {
 };
 
 const RiskAssessment = () => {
+  const { t } = useTranslation();
   const [cityInput, setCityInput] = useState("");
   const [season, setSeason] = useState("Kharif");
   const [loading, setLoading] = useState(false);
@@ -52,6 +56,13 @@ const RiskAssessment = () => {
   const [cityName, setCityName] = useState("");
   const [detecting, setDetecting] = useState(false);
   const [safeCrops, setSafeCrops] = useState([]);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  
+  const headerRef = useRefHook(null);
+  const contentRef = useRefHook(null);
+  
+  const headerInView = useInView(headerRef, { once: true, amount: 0.3 });
+  const contentInView = useInView(contentRef, { once: true, amount: 0.3 });
 
   const fetchAndAssess = async (query) => {
     setLoading(true); setError(""); setRisks(null);
@@ -134,64 +145,138 @@ const RiskAssessment = () => {
   const showDelayedSowing = highCount >= 2;
 
   return (
-    <div className="min-h-screen bg-[#F7F4EE] selection:bg-orange-200">
-      <Navbar />
+    <div className="min-h-screen bg-[#F8FAFC]">
+      <DashboardNavbar />
+      
+      <main className="pt-24">
+        {/* Hero Section */}
+        <section className="relative bg-gradient-to-br from-[#0F4C3A] via-[#0F6B4A] to-[#124230] py-16 overflow-hidden">
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1598110844738-ccaa804e8dc6?w=1920&q=80')] bg-cover bg-center opacity-10" />
+          <div className="absolute top-1/4 -left-20 w-96 h-96 rounded-full bg-red-500/10 blur-3xl pointer-events-none" />
+          
+          <div className="max-w-7xl mx-auto px-6 md:px-16 relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
+            >
+              <div className="space-y-6">
+                <div className="inline-flex items-center gap-2 bg-red-500/15 border border-red-500/30 text-red-400 text-[11px] font-bold px-4 py-2 rounded-full tracking-widest uppercase">
+                  <ShieldAlert className="w-4 h-4" />
+                  Critical Alert
+                </div>
 
-      <main className="relative z-10 max-w-5xl mx-auto px-6 py-12">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-10 flex items-center gap-4"
-        >
-          <div className="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center border border-orange-200 shadow-sm">
-            <ShieldAlert className="w-6 h-6 text-orange-500" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-black text-[#1B4332] tracking-tight">Risk Assessment</h1>
-            <p className="text-[#6B8C7B] text-sm mt-1 font-medium">Analyze weather data to identify farming risks and get crop safety recommendations.</p>
-          </div>
-        </motion.div>
+                <h1 className="text-white text-4xl md:text-5xl font-extrabold leading-[1.1] tracking-tight font-heading">
+                  Risk Assessment
+                  <span className="block text-[#2BB673] mt-2">Mitigation Platform</span>
+                </h1>
 
-        {/* Input Form */}
-        <motion.form
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          onSubmit={handleAssess}
-          className="bg-white border border-[#E0EDD9] rounded-[2rem] p-8 mb-8 shadow-sm"
-        >
-          <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
-            <div className="relative flex-1 w-full">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B8C7B]" />
-              <input
-                type="text" value={cityInput} onChange={(e) => setCityInput(e.target.value)}
-                placeholder="Enter city name..."
-                className="w-full pl-12 pr-4 py-4 rounded-xl border border-[#E0EDD9] bg-[#F7F4EE] text-sm font-medium text-[#1B3A28] placeholder-[#6B8C7B]/60 focus:outline-none focus:border-[#2D6A4F] focus:ring-2 focus:ring-[#2D6A4F]/20 transition-colors"
-              />
-            </div>
-            <button type="button" onClick={handleAutoDetect} disabled={detecting}
-              className="flex items-center justify-center gap-2 px-6 py-4 border border-[#E0EDD9] bg-[#F0F7EE] rounded-xl text-sm font-bold uppercase tracking-wider text-[#2D6A4F] hover:bg-[#D8F3DC] hover:border-[#C3E6CB] disabled:opacity-50 transition-all w-full sm:w-auto h-full">
-              {detecting ? <Loader className="w-4 h-4 animate-spin" /> : <MapPin className="w-4 h-4" />}
-              <span>Detect</span>
-            </button>
+                <p className="text-white/80 text-base md:text-lg leading-relaxed max-w-lg">
+                  Analyze extreme weather risk factors including flood, dry spells, and frost. Get proactive mitigation advisories to protect your crops and maximize yield safety.
+                </p>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="hidden lg:flex justify-center"
+              >
+                <div className="w-full max-w-md bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-8 shadow-2xl">
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 bg-red-500 rounded-2xl flex items-center justify-center">
+                        <ShieldAlert className="w-7 h-7 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-white font-bold text-lg">Risk Radar</h3>
+                        <p className="text-white/60 text-sm">Climate Alert System</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Risks</p>
+                        <p className="text-white text-3xl font-black font-heading">4</p>
+                      </div>
+                      <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Alerts</p>
+                        <p className="text-white text-3xl font-black font-heading">Real</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-white/10 border border-white/10 rounded-2xl p-4 flex items-center gap-3">
+                      <Sparkles className="w-5 h-5 text-[#2BB673]" />
+                      <p className="text-white/80 text-sm">Proactive mitigation guides</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Main Content */}
+        <section className="max-w-7xl mx-auto px-6 md:px-16 py-12">
+          {/* Header */}
+          <div ref={headerRef} className="mb-8">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={headerInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center border border-orange-200">
+                  <ShieldAlert className="w-6 h-6 text-orange-500" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-slate-800 font-heading">Risk Assessment</h1>
+                  <p className="text-sm text-slate-500">Analyze weather data to identify farming risks and get crop safety recommendations</p>
+                </div>
+              </div>
+            </motion.div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 mb-6">
-            <label className="text-xs font-bold uppercase tracking-wider text-[#6B8C7B] mr-2">Season:</label>
-            {SEASONS.map((s) => (
-              <button key={s} type="button" onClick={() => setSeason(s)}
-                className={`px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${season === s ? "bg-[#D4673A] text-white shadow-sm border border-[#D4673A]" : "bg-[#F7F4EE] text-[#6B8C7B] border border-[#E0EDD9] hover:bg-[#F0F7EE] hover:text-[#1B3A28]"}`}>
-                {s}
+          {/* Input Form */}
+          <motion.form
+            initial={{ opacity: 0, y: 20 }}
+            animate={headerInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            onSubmit={handleAssess}
+            className="bg-white border border-slate-200 rounded-2xl p-8 mb-8 shadow-sm hover:shadow-md transition-all"
+          >
+            <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
+              <div className="relative flex-1 w-full">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
+                  type="text" value={cityInput} onChange={(e) => setCityInput(e.target.value)}
+                  placeholder="Enter city name..."
+                  className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#1E8E5A] focus:ring-2 focus:ring-[#1E8E5A]/20 transition-colors"
+                />
+              </div>
+              <button type="button" onClick={handleAutoDetect} disabled={detecting}
+                className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-200 bg-slate-50 rounded-xl text-sm font-semibold uppercase tracking-wider text-slate-600 hover:bg-slate-100 disabled:opacity-50 transition-all w-full sm:w-auto h-full">
+                {detecting ? <Loader className="w-4 h-4 animate-spin" /> : <MapPin className="w-4 h-4" />}
+                <span>Detect</span>
               </button>
-            ))}
-          </div>
+            </div>
 
-          <button type="submit" disabled={loading || !cityInput.trim()}
-            className="w-full py-4 bg-[#1B4332] hover:bg-[#2D6A4F] text-white text-sm font-bold uppercase tracking-wider rounded-xl disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all flex items-center justify-center gap-2">
-            {loading ? <><Loader className="w-5 h-5 animate-spin" /> Assessing Environment...</> : <><Target className="w-5 h-5" /> Evaluate Risks</>}
-          </button>
-        </motion.form>
+            <div className="flex flex-wrap items-center gap-3 mb-6">
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-500 mr-2">Season:</label>
+              {SEASONS.map((s) => (
+                <button key={s} type="button" onClick={() => setSeason(s)}
+                  className={`px-5 py-2.5 rounded-full text-[10px] font-semibold uppercase tracking-wider transition-all ${season === s ? "bg-[#1E8E5A] text-white shadow-sm border border-[#1E8E5A]" : "bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 hover:text-slate-800"}`}>
+                  {s}
+                </button>
+              ))}
+            </div>
+
+            <button type="submit" disabled={loading || !cityInput.trim()}
+              className="w-full py-3 bg-[#1E8E5A] hover:bg-[#0F6B4A] text-white text-sm font-semibold uppercase tracking-wider rounded-xl disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all flex items-center justify-center gap-2">
+              {loading ? <><Loader className="w-5 h-5 animate-spin" /> Assessing Environment...</> : <><Target className="w-5 h-5" /> Evaluate Risks</>}
+            </button>
+          </motion.form>
 
         <AnimatePresence mode="wait">
           {error && (
@@ -329,6 +414,7 @@ const RiskAssessment = () => {
             </motion.div>
           )}
         </AnimatePresence>
+        </section>
       </main>
     </div>
   );

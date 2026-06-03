@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
-import Navbar from "../components/Navbar";
+import { motion, AnimatePresence, useInView } from "framer-motion";
+import { useRef as useRefHook } from "react";
+import DashboardNavbar from "../components/DashboardNavbar";
 import {
-  Wallet, Plus, Trash2, TrendingUp, IndianRupee, BarChart3, Save, CheckCircle2, Download, FileText
+  Wallet, Plus, Trash2, TrendingUp, BarChart3, Save, CheckCircle2, Download, FileText, Sparkles
 } from "lucide-react";
 import API from "../services/api";
-import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "../translations";
 
 const CATEGORIES = [
   "Seeds", "Fertilizer", "Pesticide", "Labour", "Irrigation", "Equipment", "Transport", "Other"
@@ -36,6 +38,7 @@ const escapeHtml = (value) =>
     .replaceAll("'", "&#039;");
 
 const ExpenseTracker = () => {
+  const { t } = useTranslation();
   const [expenses, setExpenses] = useState([]);
   const [plan, setPlan] = useState(DEFAULT_PLAN);
   const [savedPlan, setSavedPlan] = useState(DEFAULT_PLAN);
@@ -51,6 +54,10 @@ const ExpenseTracker = () => {
   const [savingExpense, setSavingExpense] = useState(false);
   const [error, setError] = useState("");
   const [planStatus, setPlanStatus] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  
+  const headerRef = useRefHook(null);
+  const headerInView = useInView(headerRef, { once: true, amount: 0.3 });
 
   useEffect(() => {
     let active = true;
@@ -297,27 +304,98 @@ const ExpenseTracker = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F9FA] text-slate-800 selection:bg-emerald-100">
-      <Navbar />
+    <div className="min-h-screen bg-[#F8FAFC]">
+      <DashboardNavbar />
+      
+      <main className="pt-24">
+        {/* Hero Section */}
+        <section className="relative bg-gradient-to-br from-[#0F4C3A] via-[#0F6B4A] to-[#124230] py-16 overflow-hidden">
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1920&q=80')] bg-cover bg-center opacity-10" />
+          <div className="absolute top-1/4 -left-20 w-96 h-96 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
+          
+          <div className="max-w-7xl mx-auto px-6 md:px-16 relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
+            >
+              <div className="space-y-6">
+                <div className="inline-flex items-center gap-2 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold px-4 py-2 rounded-full tracking-widest uppercase">
+                  <Wallet className="w-4 h-4" />
+                  Financial Management
+                </div>
 
-      <main className="dashboard-main-content max-w-5xl mx-auto px-6 py-8">
-        
-        {/* Page Title */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8 flex items-center gap-4 pt-4"
-        >
-          <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center border border-emerald-100 shadow-sm">
-            <Wallet className="h-6 w-6 text-[#1E8E5A]" />
+                <h1 className="text-white text-4xl md:text-5xl font-extrabold leading-[1.1] tracking-tight font-heading">
+                  Expense Tracker
+                  <span className="block text-[#2BB673] mt-2">Budget Intelligence</span>
+                </h1>
+
+                <p className="text-white/80 text-base md:text-lg leading-relaxed max-w-lg">
+                  Track seasonal farm expenditure next to predicted crop revenue indexes. Smart budgeting with profit margin analysis and export-ready reports.
+                </p>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="hidden lg:flex justify-center"
+              >
+                <div className="w-full max-w-md bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-8 shadow-2xl">
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center">
+                        <Wallet className="w-7 h-7 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-white font-bold text-lg">Budget AI</h3>
+                        <p className="text-white/60 text-sm">Financial Analytics</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Categories</p>
+                        <p className="text-white text-3xl font-black font-heading">8</p>
+                      </div>
+                      <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Reports</p>
+                        <p className="text-white text-3xl font-black font-heading">PDF</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-white/10 border border-white/10 rounded-2xl p-4 flex items-center gap-3">
+                      <Sparkles className="w-5 h-5 text-[#2BB673]" />
+                      <p className="text-white/80 text-sm">Profit margin analysis</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
           </div>
-          <div>
-            <h1 className="text-3xl font-extrabold text-[#0F6B4A] tracking-tight font-heading">Expense Tracker</h1>
-            <p className="text-slate-400 text-xs sm:text-sm mt-1 font-semibold">
-              Track seasonal farm expenditure next to predicted crop revenue indexes.
-            </p>
+        </section>
+
+        {/* Main Content */}
+        <section className="max-w-7xl mx-auto px-6 md:px-16 py-12">
+          {/* Header */}
+          <div ref={headerRef} className="mb-8">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={headerInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-200">
+                  <Wallet className="h-6 w-6 text-[#1E8E5A]" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-slate-800 font-heading">Expense Tracker</h1>
+                  <p className="text-sm text-slate-500">Track seasonal farm expenditure next to predicted crop revenue indexes</p>
+                </div>
+              </div>
+            </motion.div>
           </div>
-        </motion.div>
 
         <AnimatePresence>
           {error && (
@@ -706,6 +784,7 @@ const ExpenseTracker = () => {
             <p className="text-slate-400 font-semibold text-sm">No recorded transactions for this forecast cycle.<br/>Input a transaction above to log metrics.</p>
           </motion.div>
         )}
+        </section>
       </main>
     </div>
   );

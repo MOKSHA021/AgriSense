@@ -1,12 +1,16 @@
 import { useState, useRef, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import Navbar from "../components/Navbar";
+import { Link } from "react-router-dom";
+import { motion, AnimatePresence, useInView } from "framer-motion";
+import { useRef as useRefHook } from "react";
+import DashboardNavbar from "../components/DashboardNavbar";
 import API from "../services/api";
 import {
   Upload, FlaskConical, CheckCircle2, AlertTriangle,
   Loader2, X, RefreshCw, Camera, Info,
   Wheat, Droplets, Sun, Thermometer, ChevronDown,
+  Leaf, Sparkles
 } from "lucide-react";
+import { useTranslation } from "../translations";
 
 // ── Confidence threshold ─────────────────────────────────────────────────────
 const CONFIDENCE_THRESHOLD = 0.65; // Below this → show low-confidence warning
@@ -126,6 +130,7 @@ const ConfidenceBar = ({ label, value, isTop }) => {
 
 // ── Main Component ───────────────────────────────────────────────────────────
 const SoilAnalysis = () => {
+  const { t } = useTranslation();
   const fileInputRef = useRef(null);
   const [preview, setPreview] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
@@ -134,6 +139,13 @@ const SoilAnalysis = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [showTips, setShowTips] = useState(false);
   const [showAllScores, setShowAllScores] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  
+  const headerRef = useRefHook(null);
+  const contentRef = useRefHook(null);
+  
+  const headerInView = useInView(headerRef, { once: true, amount: 0.3 });
+  const contentInView = useInView(contentRef, { once: true, amount: 0.3 });
 
   const processFile = useCallback(async (file) => {
     if (!file) return;
@@ -206,80 +218,147 @@ const SoilAnalysis = () => {
   const topKey = sortedScores[0]?.key;
 
   return (
-    <div className="min-h-screen bg-[#F7F9FA] selection:bg-emerald-100">
-      <Navbar />
+    <div className="min-h-screen bg-[#F8FAFC]">
+      <DashboardNavbar />
+      
+      <main className="pt-24">
+        {/* Hero Section */}
+        <section className="relative bg-gradient-to-br from-[#0F4C3A] via-[#0F6B4A] to-[#124230] py-16 overflow-hidden">
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1586771107445-d3ca888129ff?w=1920&q=80')] bg-cover bg-center opacity-10" />
+          <div className="absolute top-1/4 -left-20 w-96 h-96 rounded-full bg-[#2BB673]/10 blur-3xl pointer-events-none" />
+          
+          <div className="max-w-7xl mx-auto px-6 md:px-16 relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
+            >
+              <div className="space-y-6">
+                <div className="inline-flex items-center gap-2 bg-[#2BB673]/15 border border-[#2BB673]/30 text-[#2BB673] text-[11px] font-bold px-4 py-2 rounded-full tracking-widest uppercase">
+                  <FlaskConical className="w-4 h-4" />
+                  AI Vision Technology
+                </div>
 
-      <main className="dashboard-main-content max-w-5xl mx-auto px-6 py-8">
+                <h1 className="text-white text-4xl md:text-5xl font-extrabold leading-[1.1] tracking-tight font-heading">
+                  Soil Intelligence
+                  <span className="block text-[#2BB673] mt-2">Analysis Platform</span>
+                </h1>
 
-        {/* ── Header ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4 pt-4"
-        >
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-100 shadow-sm">
-              <FlaskConical className="w-7 h-7 text-[#1E8E5A]" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-extrabold text-[#0F6B4A] tracking-tight font-heading">
-                AI Soil Analysis
-              </h1>
-              <p className="text-xs sm:text-sm text-[#1E8E5A] mt-1 font-semibold">
-                EfficientNet-B0 Deep Learning Model · 7 Soil Type Classification
-              </p>
-            </div>
+                <p className="text-white/80 text-base md:text-lg leading-relaxed max-w-lg">
+                  Upload a photo of your soil sample and let our EfficientNet-B0 deep learning model instantly classify soil type with 87% accuracy. Get actionable insights for optimal crop selection.
+                </p>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="hidden lg:flex justify-center"
+              >
+                <div className="w-full max-w-md bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-8 shadow-2xl">
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 bg-[#2BB673] rounded-2xl flex items-center justify-center">
+                        <FlaskConical className="w-7 h-7 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-white font-bold text-lg">EfficientNet-B0</h3>
+                        <p className="text-white/60 text-sm">Deep Learning Model</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Accuracy</p>
+                        <p className="text-white text-3xl font-black font-heading">87%</p>
+                      </div>
+                      <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Types</p>
+                        <p className="text-white text-3xl font-black font-heading">7</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-white/10 border border-white/10 rounded-2xl p-4 flex items-center gap-3">
+                      <Sparkles className="w-5 h-5 text-[#2BB673]" />
+                      <p className="text-white/80 text-sm">Instant AI-powered classification</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Main Content */}
+        <section className="max-w-7xl mx-auto px-6 md:px-16 py-12">
+          {/* Header */}
+          <div ref={headerRef} className="mb-8">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={headerInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-12 h-12 bg-[#E6F5EE] rounded-xl flex items-center justify-center border border-emerald-200">
+                  <FlaskConical className="w-6 h-6 text-[#1E8E5A]" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-slate-800 font-heading">AI Soil Analysis</h1>
+                  <p className="text-sm text-slate-500">EfficientNet-B0 Deep Learning Model · 7 Soil Type Classification</p>
+                </div>
+              </div>
+            </motion.div>
           </div>
 
           {/* Photo Tips Toggle */}
           <button
             onClick={() => setShowTips(t => !t)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-all shrink-0 shadow-sm self-start sm:self-center"
+            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-all shadow-sm mb-6"
           >
-            <Info className="w-3.5 h-3.5" />
+            <Info className="w-4 h-4" />
             Photo Guidelines
-            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showTips ? "rotate-180" : ""}`} />
+            <ChevronDown className={`w-4 h-4 transition-transform ${showTips ? "rotate-180" : ""}`} />
           </button>
-        </motion.div>
 
-        {/* ── Photo Tips Panel ── */}
-        <AnimatePresence>
-          {showTips && (
+          {/* Photo Tips Panel */}
+          <AnimatePresence>
+            {showTips && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden mb-8"
+              >
+                <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
+                  <h3 className="text-sm font-semibold text-blue-800 mb-4 flex items-center gap-2">
+                    <Camera className="w-5 h-5 text-blue-500" /> Optimal Photo Recommendations
+                  </h3>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {PHOTO_TIPS.map((tip, i) => (
+                      <li key={i} className="flex items-start gap-2.5 text-sm text-blue-700">
+                        <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+                        {tip}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Main Grid */}
+          <div ref={contentRef} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            {/* Left: Upload */}
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden mb-8"
-            >
-              <div className="bg-blue-50/50 border border-blue-150 rounded-2xl p-5">
-                <h3 className="text-sm font-bold text-blue-800 mb-3 flex items-center gap-2">
-                  <Camera className="w-4 h-4 text-blue-500" /> Optimal Photo Recommendations
-                </h3>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {PHOTO_TIPS.map((tip, i) => (
-                    <li key={i} className="flex items-start gap-2.5 text-xs text-blue-700 font-semibold">
-                      <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
-                      {tip}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ── Main Grid ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
-          {/* ── Left: Upload ── */}
-          <motion.div
             initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1 }}
+            animate={contentInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm h-full flex flex-col justify-between">
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all h-full flex flex-col justify-between">
               <div>
-                <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
                   <Upload className="w-4 h-4 text-[#1E8E5A]" />
                   Upload Photo
                 </h2>
@@ -364,13 +443,13 @@ const SoilAnalysis = () => {
             </div>
           </motion.div>
 
-          {/* ── Right: Results ── */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.15 }}
-            className="flex flex-col gap-4"
-          >
+            {/* Right: Results */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={contentInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
+              transition={{ duration: 0.5, delay: 0.15 }}
+              className="flex flex-col gap-4"
+            >
             <AnimatePresence mode="wait">
               {!result && !analyzing && (
                 <motion.div
@@ -551,32 +630,33 @@ const SoilAnalysis = () => {
                 </motion.div>
               )}
             </AnimatePresence>
-          </motion.div>
-        </div>
+            </motion.div>
+          </div>
 
-        {/* Bottom Info Strip */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4"
-        >
-          {[
-            { icon: Sun, label: "Core Model Pipeline", value: "EfficientNet-B0 Neural Network", color: "text-amber-500" },
-            { icon: Droplets, label: "Soil Class Database", value: "7 Major Local Class Groups", color: "text-blue-500" },
-            { icon: Thermometer, label: "Reliability Safeguard", value: "65% Confidence Warning Threshold", color: "text-[#1E8E5A]" },
-          ].map((item) => (
-            <div key={item.label} className="bg-white border border-slate-200 rounded-2xl px-5 py-4 flex items-center gap-4 shadow-sm">
-              <item.icon className={`w-5 h-5 shrink-0 ${item.color}`} />
-              <div>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{item.label}</p>
-                <p className="text-xs font-bold text-slate-700 mt-0.5">{item.value}</p>
+          {/* Bottom Info Strip */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4"
+          >
+            {[
+              { icon: Sun, label: "Core Model Pipeline", value: "EfficientNet-B0 Neural Network", color: "text-amber-500" },
+              { icon: Droplets, label: "Soil Class Database", value: "7 Major Local Class Groups", color: "text-blue-500" },
+              { icon: Thermometer, label: "Reliability Safeguard", value: "65% Confidence Warning Threshold", color: "text-[#1E8E5A]" },
+            ].map((item) => (
+              <div key={item.label} className="bg-white border border-slate-200 rounded-2xl px-5 py-4 flex items-center gap-4 shadow-sm">
+                <item.icon className={`w-5 h-5 shrink-0 ${item.color}`} />
+                <div>
+                  <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{item.label}</p>
+                  <p className="text-sm font-semibold text-slate-700 mt-0.5">{item.value}</p>
+                </div>
               </div>
-            </div>
-          ))}
-        </motion.div>
+            ))}
+          </motion.div>
 
-        <div className="h-12" />
+          <div className="h-8" />
+        </section>
       </main>
     </div>
   );

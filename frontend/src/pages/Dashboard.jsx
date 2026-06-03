@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { useNavigate, Link } from "react-router-dom";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
 import {
   FlaskConical, Sprout, CloudSun, Map, Activity, Bot, ShieldAlert,
   Wallet, Droplets, Wind, ArrowRight, Sun, Sunset, Moon, Sparkles,
-  TrendingUp, AlertCircle
+  TrendingUp, AlertCircle, BarChart3, Users, Zap, Clock, ChevronRight,
+  Leaf, CheckCircle2
 } from "lucide-react";
-import Navbar from "../components/Navbar";
+import DashboardNavbar from "../components/DashboardNavbar";
 import { AuthContext } from "../context/AuthContext";
+import { useTranslation } from "../translations";
 
 /* ─────────────────────────── helpers ─────────────────────────── */
 const getGreeting = () => {
@@ -19,52 +22,60 @@ const getGreeting = () => {
 
 const colorMap = {
   amber: {
-    border: "border-l-4 border-l-amber-500",
+    border: "border-2 border-amber-200",
     icon: "text-amber-600",
     bg: "bg-amber-50",
-    badge: "bg-amber-100 text-amber-800",
+    badge: "bg-amber-100 text-amber-700",
+    hover: "hover:border-amber-300",
   },
   green: {
-    border: "border-l-4 border-l-[#1E8E5A]",
+    border: "border-2 border-emerald-200",
     icon: "text-[#1E8E5A]",
     bg: "bg-[#E6F5EE]",
     badge: "bg-[#E6F5EE] text-[#0F6B4A]",
+    hover: "hover:border-emerald-300",
   },
   blue: {
-    border: "border-l-4 border-l-[#2F80ED]",
+    border: "border-2 border-blue-200",
     icon: "text-[#2F80ED]",
     bg: "bg-blue-50",
-    badge: "bg-blue-100 text-blue-800",
+    badge: "bg-blue-100 text-blue-700",
+    hover: "hover:border-blue-300",
   },
   teal: {
-    border: "border-l-4 border-l-teal-500",
+    border: "border-2 border-teal-200",
     icon: "text-teal-600",
     bg: "bg-teal-50",
-    badge: "bg-teal-100 text-teal-800",
+    badge: "bg-teal-100 text-teal-700",
+    hover: "hover:border-teal-300",
   },
   pink: {
-    border: "border-l-4 border-l-rose-500",
+    border: "border-2 border-rose-200",
     icon: "text-rose-600",
     bg: "bg-rose-50",
-    badge: "bg-rose-100 text-rose-800",
+    badge: "bg-rose-100 text-rose-700",
+    hover: "hover:border-rose-300",
   },
   purple: {
-    border: "border-l-4 border-l-purple-500",
+    border: "border-2 border-purple-200",
     icon: "text-purple-600",
     bg: "bg-purple-50",
-    badge: "bg-purple-100 text-purple-800",
+    badge: "bg-purple-100 text-purple-700",
+    hover: "hover:border-purple-300",
   },
   red: {
-    border: "border-l-4 border-l-red-500",
+    border: "border-2 border-red-200",
     icon: "text-red-600",
     bg: "bg-red-50",
-    badge: "bg-red-100 text-red-800",
+    badge: "bg-red-100 text-red-700",
+    hover: "hover:border-red-300",
   },
   indigo: {
-    border: "border-l-4 border-l-indigo-500",
+    border: "border-2 border-indigo-200",
     icon: "text-indigo-600",
     bg: "bg-indigo-50",
-    badge: "bg-indigo-100 text-indigo-800",
+    badge: "bg-indigo-100 text-indigo-700",
+    hover: "hover:border-indigo-300",
   },
 };
 
@@ -311,121 +322,210 @@ function FeatureCard({ card, index }) {
 /* ─────────────────────────── main component ─────────────────────────── */
 export default function Dashboard() {
   const { user } = useContext(AuthContext);
+  const { t } = useTranslation();
   const { label: greeting, Icon: GreetingIcon } = getGreeting();
+  
+  const heroRef = useRef(null);
+  const kpiRef = useRef(null);
+  const featuresRef = useRef(null);
+  const tipsRef = useRef(null);
+  
+  const heroInView = useInView(heroRef, { once: true, amount: 0.3 });
+  const kpiInView = useInView(kpiRef, { once: true, amount: 0.3 });
+  const featuresInView = useInView(featuresRef, { once: true, amount: 0.3 });
+  const tipsInView = useInView(tipsRef, { once: true, amount: 0.3 });
 
   const displayName =
     user?.name || user?.user?.name || user?.username || user?.email?.split("@")[0] || "Farmer";
 
   return (
-    <div className="min-h-screen bg-[#F7F9FA]">
-      <Navbar />
-
-      <main className="dashboard-main-content max-w-7xl mx-auto px-6 py-8">
-
-        {/* ── Header Row ── */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-10 pt-4">
-          {/* Greeting */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="flex items-center gap-2 mb-1.5">
-              <GreetingIcon className="w-4 h-4 text-[#2BB673]" />
-              <p className="text-slate-400 text-xs font-bold uppercase tracking-wider">{greeting}</p>
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-800 leading-none tracking-tight font-heading">
-              Welcome, {displayName}
-            </h1>
-            <p className="text-slate-500 text-sm mt-2 font-medium">
-              AgriSense intelligence console and ML dashboard.
-            </p>
-          </motion.div>
-
-          {/* Weather Widget */}
-          <WeatherWidget />
-        </div>
-
-        {/* ── Live Operational Status Chips ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
-          className="flex flex-wrap gap-3 mb-10"
-        >
-          {[
-            { icon: TrendingUp, label: "Agmarknet Scraping Online", color: "text-[#1E8E5A] bg-[#E6F5EE] border-emerald-200/50" },
-            { icon: CloudSun, label: "Open-Meteo GPS Active", color: "text-[#2F80ED] bg-blue-50 border-blue-200/50" },
-            { icon: Sparkles, label: "Neural Model Inferences Operational", color: "text-purple-600 bg-purple-50 border-purple-200/50" },
-          ].map((chip) => (
-            <div
-              key={chip.label}
-              className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider px-3.5 py-2 rounded-full border ${chip.color} shadow-sm`}
+    <div className="min-h-screen bg-[#F8FAFC]">
+      <DashboardNavbar />
+      
+      <main className="pt-24">
+        {/* Hero Banner Section */}
+        <section ref={heroRef} className="relative bg-gradient-to-br from-[#0F4C3A] via-[#0F6B4A] to-[#124230] py-16 md:py-24 overflow-hidden">
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1920&q=80')] bg-cover bg-center opacity-15" />
+          <div className="absolute top-1/4 -left-20 w-96 h-96 rounded-full bg-[#2BB673]/10 blur-3xl pointer-events-none" />
+          <div className="absolute bottom-10 right-0 w-80 h-80 rounded-full bg-[#2F80ED]/10 blur-3xl pointer-events-none" />
+          
+          <div className="max-w-7xl mx-auto px-6 md:px-16 relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={heroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
             >
-              <chip.icon className="w-3.5 h-3.5" />
-              {chip.label}
-            </div>
-          ))}
-        </motion.div>
+              <div className="space-y-6">
+                <div className="inline-flex items-center gap-2 bg-[#2BB673]/15 border border-[#2BB673]/30 text-[#2BB673] text-[11px] font-bold px-4 py-2 rounded-full tracking-widest uppercase">
+                  <GreetingIcon className="w-4 h-4" />
+                  {greeting}
+                </div>
 
-        {/* ── Section Divider ── */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.15 }}
-          className="flex items-center gap-3 mb-6"
-        >
-          <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest">Platform Services</h2>
-          <div className="flex-1 h-px bg-slate-200" />
-          <span className="text-xs text-slate-400 font-bold">
-            {featureCards.length} Tools Available
-          </span>
-        </motion.div>
+                <h1 className="text-white text-4xl md:text-5xl font-extrabold leading-[1.1] tracking-tight font-heading">
+                  Welcome back, <span className="text-[#2BB673]">{displayName}</span>
+                </h1>
 
-        {/* ── Feature Cards Grid ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-          {featureCards.map((card, i) => (
-            <FeatureCard key={card.path} card={card} index={i} />
-          ))}
-        </div>
+                <p className="text-white/80 text-base md:text-lg leading-relaxed max-w-lg">
+                  Your agricultural intelligence dashboard is ready. Monitor soil health, track crop recommendations, and optimize your farm's performance with AI-powered insights.
+                </p>
 
-        {/* ── Today's Tips Section ── */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          aria-label="Farming Insights"
-          className="pt-4"
-        >
-          <div className="flex items-center gap-2 mb-5">
-            <Sparkles className="w-4 h-4 text-[#1E8E5A]" />
-            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-              Today's Agronomy Insights
-            </h2>
+                <div className="flex flex-wrap items-center gap-4 pt-2">
+                  <WeatherWidget />
+                </div>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={heroInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="hidden lg:flex justify-center"
+              >
+                <div className="w-full max-w-md bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-8 shadow-2xl">
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 bg-[#2BB673] rounded-2xl flex items-center justify-center">
+                        <Leaf className="w-7 h-7 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-white font-bold text-lg">Farm Overview</h3>
+                        <p className="text-white/60 text-sm">Real-time intelligence</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Active Tools</p>
+                        <p className="text-white text-3xl font-black font-heading">8</p>
+                      </div>
+                      <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Analyses</p>
+                        <p className="text-white text-3xl font-black font-heading">12</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-white/10 border border-white/10 rounded-2xl p-4 flex items-center gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-[#2BB673]" />
+                      <p className="text-white/80 text-sm">All systems operational</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
           </div>
+        </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {tips.map((tip, i) => (
+        {/* KPI Cards Section */}
+        <section ref={kpiRef} className="max-w-7xl mx-auto px-6 md:px-16 py-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={kpiInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.5 }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          >
+            {[
+              { icon: FlaskConical, label: "Soil Analyses", value: "12", change: "+3 this week", color: "green" },
+              { icon: Sprout, label: "Crop Recommendations", value: "8", change: "+2 this week", color: "green" },
+              { icon: Activity, label: "Market Alerts", value: "5", change: "+1 today", color: "blue" },
+              { icon: ShieldAlert, label: "Risk Warnings", value: "2", change: "Active", color: "amber" },
+            ].map((kpi, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.45 + i * 0.05 }}
-                className="bg-[#E6F5EE] border border-emerald-200/50 border-l-4 border-l-[#1E8E5A] rounded-2xl px-5 py-4 flex items-start gap-4 shadow-sm"
+                initial={{ opacity: 0, y: 20 }}
+                animate={kpiInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+                whileHover={{ y: -4, boxShadow: "0 12px 30px -4px rgba(0, 0, 0, 0.1)" }}
+                className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group"
               >
-                <span className="text-2xl leading-none select-none shrink-0">
-                  {tip.emoji}
-                </span>
-                <p className="text-[#0F6B4A] text-xs sm:text-sm leading-relaxed font-bold">
-                  {tip.text}
-                </p>
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                    kpi.color === 'green' ? 'bg-[#E6F5EE]' :
+                    kpi.color === 'blue' ? 'bg-blue-50' :
+                    kpi.color === 'amber' ? 'bg-amber-50' :
+                    'bg-red-50'
+                  }`}>
+                    <kpi.icon className={`w-6 h-6 ${
+                      kpi.color === 'green' ? 'text-[#1E8E5A]' :
+                      kpi.color === 'blue' ? 'text-blue-600' :
+                      kpi.color === 'amber' ? 'text-amber-600' :
+                      'text-red-600'
+                    }`} />
+                  </div>
+                  <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${
+                    kpi.color === 'green' ? 'bg-green-100 text-green-700' :
+                    kpi.color === 'blue' ? 'bg-blue-100 text-blue-700' :
+                    kpi.color === 'amber' ? 'bg-amber-100 text-amber-700' :
+                    'bg-red-100 text-red-700'
+                  }`}>
+                    {kpi.change}
+                  </span>
+                </div>
+                <h3 className="text-3xl font-black text-slate-800 mb-1 font-heading">{kpi.value}</h3>
+                <p className="text-sm text-slate-500 font-medium">{kpi.label}</p>
               </motion.div>
             ))}
-          </div>
-        </motion.section>
+          </motion.div>
+        </section>
 
-        {/* ── Bottom Spacing ── */}
-        <div className="h-16" />
+        {/* Feature Cards Section */}
+        <section ref={featuresRef} className="max-w-7xl mx-auto px-6 md:px-16 py-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={featuresInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-800 font-heading">Platform Services</h2>
+                <p className="text-slate-500 mt-1">Access all your agricultural intelligence tools</p>
+              </div>
+              <span className="text-xs text-slate-500 font-semibold bg-slate-100 px-4 py-2 rounded-full">
+                {featureCards.length} Tools Available
+              </span>
+            </div>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {featureCards.map((card, i) => (
+              <FeatureCard key={card.path} card={card} index={i} />
+            ))}
+          </div>
+        </section>
+
+        {/* Today's Tips Section */}
+        <section ref={tipsRef} className="max-w-7xl mx-auto px-6 md:px-16 py-12 pb-24">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={tipsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="flex items-center gap-2 mb-6">
+              <Sparkles className="w-5 h-5 text-[#1E8E5A]" />
+              <h2 className="text-xl font-bold text-slate-800 font-heading">Today's Agronomy Insights</h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {tips.map((tip, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={tipsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
+                  transition={{ duration: 0.4, delay: 0.1 + i * 0.1 }}
+                  whileHover={{ y: -4 }}
+                  className="bg-white border border-slate-200 rounded-2xl p-6 flex items-start gap-4 shadow-sm hover:shadow-lg transition-all duration-300"
+                >
+                  <span className="text-3xl leading-none select-none shrink-0">
+                    {tip.emoji}
+                  </span>
+                  <p className="text-slate-700 text-sm leading-relaxed font-medium">
+                    {tip.text}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </section>
       </main>
     </div>
   );

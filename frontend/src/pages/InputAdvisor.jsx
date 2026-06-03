@@ -1,12 +1,26 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import {
-  ShoppingCart, MapPin, Store, Package, CheckCircle, IndianRupee, Search, Loader
+  ShoppingCart,
+  MapPin,
+  Store,
+  Package,
+  CheckCircle,
+  IndianRupee,
+  Search,
+  Loader,
 } from "lucide-react";
 import API from "../services/api";
 
 const CROPS = [
-  "Wheat", "Rice", "Maize", "Cotton", "Sugarcane", "Potato", "Soybean", "Groundnut"
+  "Wheat",
+  "Rice",
+  "Maize",
+  "Cotton",
+  "Sugarcane",
+  "Potato",
+  "Soybean",
+  "Groundnut",
 ];
 
 const InputAdvisor = () => {
@@ -106,209 +120,211 @@ const InputAdvisor = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F9FA] selection:bg-emerald-100">
-      <Navbar />
+    <div className="relative min-h-screen">
+      <div className="fixed inset-0 z-0">
+        <img
+          src="https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=1920&q=80"
+          alt=""
+          className="h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/50 to-black/70" />
+      </div>
+      <div className="relative z-10">
+        <Navbar />
 
-      <main className="dashboard-main-content max-w-4xl mx-auto px-6 py-8">
-        
-        {/* Header */}
-        <div className="mb-8 flex items-center gap-4 pt-4">
-          <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center border border-emerald-100 shadow-sm">
-            <ShoppingCart className="h-6 w-6 text-[#1E8E5A]" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-extrabold text-[#0F6B4A] tracking-tight font-heading">Input Shopping Advisor</h1>
-            <p className="text-slate-450 text-xs sm:text-sm mt-1 font-semibold">
-              Estimate fertilizer/seed requirements and check local dealer inventory options.
+        <main className="mx-auto max-w-4xl px-4 py-10">
+          <div className="mb-8">
+            <div className="mb-1 flex items-center gap-3">
+              <ShoppingCart className="h-7 w-7 text-green-400" />
+              <h1 className="text-2xl font-bold text-white">Input Shopping Advisor</h1>
+            </div>
+            <p className="ml-10 text-sm text-white/50">
+              Estimate required inputs and compare seller inventory by stock, price, and location.
             </p>
           </div>
-        </div>
 
-        {/* Configurations Card */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 mb-8 shadow-sm">
-          <div className="mb-6 flex items-center gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                value={location}
-                onChange={(e) => {
-                  setLocation(e.target.value);
-                  resetResults();
-                }}
-                placeholder="Enter city or district..."
-                className="w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-[#1E8E5A] transition"
-              />
-            </div>
-            <button
-              type="button"
-              onClick={handleDetectLocation}
-              disabled={detecting}
-              className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 px-4 py-3.5 text-xs font-bold text-slate-600 transition-all disabled:opacity-50 active:scale-95"
-            >
-              {detecting ? <Loader className="h-4 w-4 animate-spin" /> : <MapPin className="h-4 w-4 text-[#1E8E5A]" />}
-              <span>{detecting ? "Locating..." : "GPS Locate"}</span>
-            </button>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-1.5 block text-xs font-bold text-slate-500 uppercase tracking-widest">
-                Crop Variety
-              </label>
-              <select
-                value={crop}
-                onChange={(e) => {
-                  setCrop(e.target.value);
-                  resetResults();
-                }}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-slate-800 outline-none focus:border-[#1E8E5A] transition appearance-none font-medium"
+          <div className="mb-8 rounded-2xl border border-white/10 bg-black/40 p-6 shadow-lg backdrop-blur-xl">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+                <input
+                  type="text"
+                  value={location}
+                  onChange={(e) => {
+                    setLocation(e.target.value);
+                    resetResults();
+                  }}
+                  placeholder="Enter city or district..."
+                  className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-sm text-white placeholder:text-white/40 outline-none focus:ring-2 focus:ring-green-400"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleDetectLocation}
+                disabled={detecting}
+                className="flex items-center gap-1.5 rounded-xl border border-white/20 px-4 py-3 text-sm text-white/60 transition-colors hover:bg-white/10 disabled:opacity-50"
               >
-                <option value="" className="bg-white text-slate-800">
-                  Select crop target
-                </option>
-                {availableCrops.map((c) => (
-                  <option key={c} value={c} className="bg-white text-slate-800">
-                    {c}
+                {detecting ? <Loader className="h-4 w-4 animate-spin" /> : <MapPin className="h-4 w-4" />}
+                <span className="hidden sm:block">{detecting ? "Detecting" : "Detect"}</span>
+              </button>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-white/70">
+                  Select Crop
+                </label>
+                <select
+                  value={crop}
+                  onChange={(e) => {
+                    setCrop(e.target.value);
+                    resetResults();
+                  }}
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-green-400"
+                >
+                  <option value="" className="bg-zinc-900 text-white">
+                    Choose a crop
                   </option>
-                ))}
-              </select>
+                  {availableCrops.map((c) => (
+                    <option key={c} value={c} className="bg-zinc-900 text-white">
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-white/70">
+                  Area (acres)
+                </label>
+                <input
+                  type="number"
+                  min="0.1"
+                  step="0.1"
+                  value={area}
+                  onChange={(e) => {
+                    setArea(e.target.value);
+                    resetResults();
+                  }}
+                  placeholder="e.g. 5"
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-green-400"
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="mb-1.5 block text-xs font-bold text-slate-500 uppercase tracking-widest">
-                Cultivation Area (acres)
-              </label>
-              <input
-                type="number"
-                min="0.1"
-                step="0.1"
-                value={area}
-                onChange={(e) => {
-                  setArea(e.target.value);
-                  resetResults();
-                }}
-                placeholder="e.g. 5"
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-[#1E8E5A] transition font-medium"
-              />
-            </div>
+            <button
+              onClick={handleRecommend}
+              disabled={loading || !crop || !area || Number(area) <= 0}
+              className="mt-5 inline-flex items-center gap-2 rounded-xl bg-green-500 px-5 py-2 text-sm font-bold text-white shadow-lg shadow-green-900/20 transition-colors hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Package className="h-4 w-4" />
+              {loading ? "Finding Sellers..." : "Get Recommendations"}
+            </button>
+
+            <p className="mt-3 text-xs text-white/40">
+              Inventory is read from MongoDB. Current records are seeded demo sellers until real dealers are onboarded.
+            </p>
           </div>
 
-          <button
-            onClick={handleRecommend}
-            disabled={loading || !crop || !area || Number(area) <= 0}
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#1E8E5A] hover:bg-[#0F6B4A] px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-md shadow-[#1E8E5A]/10 transition-colors disabled:cursor-not-allowed disabled:opacity-50 active:scale-95"
-          >
-            <Package className="h-4 w-4" />
-            {loading ? "Sourcing Dealer Inventory..." : "Evaluate Shopping Options"}
-          </button>
-
-          <p className="mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-            Inventory is verified from database. Listed dealers represent licensed agricultural supply outlets.
-          </p>
-        </div>
-
-        {error && (
-          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-xs font-bold text-red-650 shadow-sm">
-            {error}
-          </div>
-        )}
-
-        {/* Results */}
-        {results && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-lg font-extrabold text-slate-800 font-heading">
-                Evaluated Input Demands: {crop} ({area} acre{Number(area) !== 1 ? "s" : ""})
-              </h2>
-              {dataSource && <p className="mt-1 text-xs text-slate-400 font-semibold">{dataSource}</p>}
+          {error && (
+            <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/20 px-4 py-3 text-sm text-red-300">
+              {error}
             </div>
+          )}
 
-            {results.map((item) => (
-              <div
-                key={item.name}
-                className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4"
-              >
-                <div className="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
-                  <div className="flex items-center gap-2">
-                    <Package className="h-5 w-5 text-slate-450" />
-                    <span className="text-base font-extrabold text-slate-800 font-heading">
-                      {item.displayName || item.name}
+          {results && (
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-lg font-semibold text-white drop-shadow">
+                  Input Requirements for {crop} - {area} acre{Number(area) !== 1 ? "s" : ""}
+                </h2>
+                {dataSource && <p className="mt-1 text-xs text-white/45">{dataSource}</p>}
+              </div>
+
+              {results.map((item) => (
+                <div
+                  key={item.name}
+                  className="rounded-2xl border border-white/10 bg-black/40 p-5 shadow-lg backdrop-blur-xl"
+                >
+                  <div className="mb-4 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <Package className="h-5 w-5 text-white/60" />
+                      <span className="text-base font-semibold text-white">
+                        {item.displayName || item.name}
+                      </span>
+                    </div>
+                    <span className="rounded-full border border-green-500/20 bg-green-500/10 px-3 py-0.5 text-sm font-medium text-green-300">
+                      {item.totalQty.toLocaleString()} {item.unit}
                     </span>
                   </div>
-                  <span className="rounded-full bg-[#E6F5EE] border border-emerald-200 px-3.5 py-1 text-xs font-bold text-[#0F6B4A]">
-                    Total Required: {item.totalQty.toLocaleString()} {item.unit}
-                  </span>
-                </div>
 
-                <div className="space-y-3">
-                  {item.sellers.map((seller) => {
-                    const isBest = seller.price === item.bestPrice && seller.inStock;
-                    return (
-                      <div
-                        key={seller.id}
-                        className={`flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-4 py-3.5 text-xs font-semibold ${
-                          isBest
-                            ? "border-emerald-250 bg-[#E6F5EE]/40"
-                            : "border-slate-200 bg-white"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Store className="h-4 w-4 text-slate-400" />
-                          <div>
-                            <p className="font-bold text-slate-850">
-                              {seller.name}
-                              {isBest && (
-                                <span className="ml-2 bg-[#E6F5EE] text-[#0F6B4A] border border-emerald-200 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider">
-                                  Best Dealer Price
-                                </span>
-                              )}
-                            </p>
-                            <p className="flex items-center gap-1 text-[10px] text-slate-400 mt-1">
-                              <MapPin className="h-3 w-3" />
-                              {seller.district}, {seller.state} · {seller.distanceKm} km away
-                            </p>
+                  <div className="space-y-2">
+                    {item.sellers.map((seller) => {
+                      const isBest = seller.price === item.bestPrice && seller.inStock;
+                      return (
+                        <div
+                          key={seller.id}
+                          className={`flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm ${isBest
+                              ? "border-green-500/30 bg-green-500/15"
+                              : "border-white/10 bg-white/5"
+                            }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <Store className="h-4 w-4 text-white/50" />
+                            <div>
+                              <p className="font-medium text-white">
+                                {seller.name}
+                                {isBest && (
+                                  <span className="ml-2 text-xs font-semibold text-green-300">
+                                    Best Price
+                                  </span>
+                                )}
+                              </p>
+                              <p className="flex items-center gap-1 text-xs text-white/50">
+                                <MapPin className="h-3 w-3" />
+                                {seller.district}, {seller.state} - {seller.distanceKm} km
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-4">
+                            <span className="flex items-center gap-0.5 font-medium text-white">
+                              <IndianRupee className="h-3.5 w-3.5" />
+                              {seller.price}/{item.unit === "buds" ? "bud" : "kg"}
+                            </span>
+                            <span
+                              className={`flex items-center gap-1 text-xs font-medium ${seller.inStock ? "text-green-300" : "text-red-300"
+                                }`}
+                            >
+                              <CheckCircle className="h-3.5 w-3.5" />
+                              {seller.inStock
+                                ? `${seller.stockQty.toLocaleString()} ${item.unit} in stock`
+                                : "Low Stock"}
+                            </span>
                           </div>
                         </div>
-
-                        <div className="flex flex-wrap items-center gap-5">
-                          <span className="flex items-center font-bold text-slate-800">
-                            <IndianRupee className="h-3.5 w-3.5 mr-0.5 text-slate-500" />
-                            {seller.price}/{item.unit === "buds" ? "bud" : "kg"}
-                          </span>
-                          <span
-                            className={`flex items-center gap-1 text-[10px] font-black uppercase tracking-wider ${
-                              seller.inStock ? "text-[#0F6B4A]" : "text-red-650"
-                            }`}
-                          >
-                            <CheckCircle className="h-3.5 w-3.5" />
-                            {seller.inStock
-                              ? `${seller.stockQty.toLocaleString()} ${item.unit} in stock`
-                              : "Low Stock"}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
 
-            <div className="flex items-center justify-between bg-white border border-slate-200 rounded-3xl px-6 py-5 shadow-sm">
-              <span className="text-base font-extrabold text-slate-800 font-heading">
-                Total Estimated Sourcing Cost
-              </span>
-              <span className="flex items-center font-black text-xl text-[#0F6B4A] font-heading">
-                <IndianRupee className="h-5 w-5 mr-0.5" />
-                {totalCost.toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </span>
+              <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/40 px-6 py-4 shadow-lg backdrop-blur-xl">
+                <span className="text-base font-semibold text-white">
+                  Total Estimated Input Cost
+                </span>
+                <span className="flex items-center gap-1 text-lg font-bold text-green-400">
+                  <IndianRupee className="h-5 w-5" />
+                  {totalCost.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </span>
+              </div>
             </div>
-          </div>
-        )}
-      </main>
+          )}
+        </main>
+      </div>
     </div>
   );
 };
