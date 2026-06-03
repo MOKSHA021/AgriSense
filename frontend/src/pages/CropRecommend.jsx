@@ -379,16 +379,16 @@ export default function CropRecommend() {
               <div className="space-y-6">
                 <div className="inline-flex items-center gap-2 bg-[#2BB673]/15 border border-[#2BB673]/30 text-[#2BB673] text-[11px] font-bold px-4 py-2 rounded-full tracking-widest uppercase">
                   <Sprout className="w-4 h-4" />
-                  Random Forest ML
+                  {t('crops.mlModel')}
                 </div>
 
                 <h1 className="text-white text-4xl md:text-5xl font-extrabold leading-[1.1] tracking-tight font-heading">
-                  Crop Recommendation
-                  <span className="block text-[#2BB673] mt-2">Intelligence Platform</span>
+                  {t('crops.title').split(' ')[0]} {t('crops.title').split(' ')[1]}
+                  <span className="block text-[#2BB673] mt-2">{t('crops.title').split(' ').slice(2).join(' ')}</span>
                 </h1>
 
                 <p className="text-white/80 text-base md:text-lg leading-relaxed max-w-lg">
-                  Leverage our Random Forest machine learning model to predict optimal crop varieties based on soil NPK levels, pH, rainfall, and temperature data for maximum yield.
+                  {t('crops.subtitle')}
                 </p>
               </div>
 
@@ -405,25 +405,25 @@ export default function CropRecommend() {
                         <Sprout className="w-7 h-7 text-white" />
                       </div>
                       <div>
-                        <h3 className="text-white font-bold text-lg">Random Forest</h3>
-                        <p className="text-white/60 text-sm">Machine Learning Model</p>
+                        <h3 className="text-white font-bold text-lg">{t('crops.mlModel')}</h3>
+                        <p className="text-white/60 text-sm">{t('crops.mlModelDesc')}</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
-                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Crops</p>
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">{t('crops.cropsCount')}</p>
                         <p className="text-white text-3xl font-black font-heading">12</p>
                       </div>
                       <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
-                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Parameters</p>
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">{t('crops.parameters')}</p>
                         <p className="text-white text-3xl font-black font-heading">5</p>
                       </div>
                     </div>
 
                     <div className="bg-white/10 border border-white/10 rounded-2xl p-4 flex items-center gap-3">
                       <Zap className="w-5 h-5 text-[#2BB673]" />
-                      <p className="text-white/80 text-sm">AI-powered yield optimization</p>
+                      <p className="text-white/80 text-sm">{t('crops.aiPowered')}</p>
                     </div>
                   </div>
                 </div>
@@ -446,8 +446,8 @@ export default function CropRecommend() {
                   <Sprout className="w-6 h-6 text-[#1E8E5A]" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-slate-800 font-heading">Crop Recommendation</h1>
-                  <p className="text-sm text-slate-500">Select optimal crop varieties based on soil chemistry and climate data</p>
+                  <h1 className="text-2xl font-bold text-slate-800 font-heading">{t('crops.pageTitle')}</h1>
+                  <p className="text-sm text-slate-500">{t('crops.pageDesc')}</p>
                 </div>
               </div>
             </motion.div>
@@ -470,12 +470,12 @@ export default function CropRecommend() {
                     <MapPin className="w-5 h-5 text-[#1E8E5A]" />
                   </div>
                   <div>
-                    <h2 className="font-semibold text-slate-800">GPS Atmospheric Detect</h2>
-                    <p className="text-xs text-slate-500">Auto-detect location & weather</p>
+                    <h2 className="font-semibold text-slate-800">{t('crops.gpsDetectTitle')}</h2>
+                    <p className="text-xs text-slate-500">{t('crops.gpsDetectDesc')}</p>
                   </div>
                 </div>
                 <p className="text-sm text-slate-600 mb-5 leading-relaxed">
-                  Query local meteorological & coordinates grids instantly using geolocation parameters.
+                  {t('crops.gpsDetectText')}
                 </p>
                 <button
                   onClick={autoDetectEverything}
@@ -483,9 +483,9 @@ export default function CropRecommend() {
                   className="w-full flex items-center justify-center gap-2 bg-[#1E8E5A] hover:bg-[#0F6B4A] text-white text-sm font-semibold py-3 rounded-xl transition-all disabled:opacity-60 shadow-md shadow-[#1E8E5A]/10 active:scale-95"
                 >
                   {gpsLoading ? (
-                    <><Loader2 size={16} className="animate-spin" /> Querying Grids...</>
+                    <><Loader2 size={16} className="animate-spin" /> {t('crops.queryingGrids')}</>
                   ) : (
-                    <><MapPin size={16} /> Locate Field</>
+                    <><MapPin size={16} /> {t('crops.locateField')}</>
                   )}
                 </button>
 
@@ -500,7 +500,7 @@ export default function CropRecommend() {
                       <div className="bg-[#E6F5EE] border border-emerald-200/50 rounded-2xl p-4 flex items-start gap-3">
                         <CheckCircle2 size={16} className="text-[#1E8E5A] mt-0.5 shrink-0" />
                         <div className="text-xs text-[#0F6B4A] space-y-1 font-semibold">
-                          <p className="font-bold">Grid Parameters Synced</p>
+                          <p className="font-bold">{t('crops.gridSynced')}</p>
                           <p className="opacity-80">
                             {locationData.lat}°N, {locationData.lon}°E
                             {locationData.temp != null && ` · ${locationData.temp}°C · ${locationData.rain} mm/mo`}
@@ -534,12 +534,12 @@ export default function CropRecommend() {
                     <Camera className="w-5 h-5 text-amber-600" />
                   </div>
                   <div>
-                    <h2 className="font-semibold text-slate-800">Soil Visual Sync</h2>
-                    <p className="text-xs text-slate-500">AI-powered soil classification</p>
+                    <h2 className="font-semibold text-slate-800">{t('crops.soilVisualTitle')}</h2>
+                    <p className="text-xs text-slate-500">{t('crops.soilVisualDesc')}</p>
                   </div>
                 </div>
                 <p className="text-sm text-slate-600 mb-5 leading-relaxed">
-                  Classify soil type from photos in real-time to pre-populate chemical parameters.
+                  {t('crops.soilVisualText')}
                 </p>
 
                 {soilPreview ? (
@@ -552,7 +552,7 @@ export default function CropRecommend() {
                     {analysingImg && (
                       <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center gap-2">
                         <Loader2 size={24} className="text-white animate-spin" />
-                        <p className="text-white text-sm font-semibold">Predicting Structure...</p>
+                        <p className="text-white text-sm font-semibold">{t('crops.predictingStructure')}</p>
                       </div>
                     )}
                     {detectedSoil && !analysingImg && (
@@ -582,8 +582,8 @@ export default function CropRecommend() {
                     }`}
                   >
                     <Upload size={28} className="text-slate-400 mb-3" />
-                    <p className="text-sm font-semibold text-slate-700">Drop soil photograph</p>
-                    <p className="text-xs text-slate-400 mt-1">JPG, PNG, WEBP (Max 10MB)</p>
+                    <p className="text-sm font-semibold text-slate-700">{t('crops.dropSoil')}</p>
+                    <p className="text-xs text-slate-400 mt-1">{t('crops.dropSoilNote')}</p>
                   </div>
                 )}
                 <input
@@ -607,8 +607,8 @@ export default function CropRecommend() {
                 transition={{ duration: 0.5, delay: 0.3 }}
                 className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all"
               >
-                <h2 className="font-semibold text-slate-800 mb-1">Soil Chemistry Presets</h2>
-                <p className="text-sm text-slate-500 mb-4">Instantly fill chemical ratios via major classifications.</p>
+                <h2 className="font-semibold text-slate-800 mb-1">{t('crops.soilPresetsTitle')}</h2>
+                <p className="text-sm text-slate-500 mb-4">{t('crops.soilPresetsDesc')}</p>
                 <div className="flex flex-wrap gap-2">
                   {presetNames.map(name => (
                     <button
@@ -642,8 +642,8 @@ export default function CropRecommend() {
                     <BarChart3 className="w-5 h-5 text-[#1E8E5A]" />
                   </div>
                   <div>
-                    <h2 className="font-semibold text-slate-800">Active Chemistry & Climate Matrices</h2>
-                    <p className="text-xs text-slate-500">Adjust parameters for optimal crop selection</p>
+                    <h2 className="font-semibold text-slate-800">{t('crops.activeChemistryTitle')}</h2>
+                    <p className="text-xs text-slate-500">{t('crops.activeChemistryDesc')}</p>
                   </div>
                 </div>
 
@@ -651,26 +651,26 @@ export default function CropRecommend() {
                   {/* Soil Chemistry */}
                   <div>
                     <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">
-                      Soil Chemistry
+                      {t('crops.soilChemistry')}
                     </p>
                     <ParamSlider
-                      label="Nitrogen (N)" name="N" min={0} max={200} unit=" kg/ha"
+                      label={t('crops.nitrogen')} name="N" min={0} max={200} unit=" kg/ha"
                       value={params.N} onChange={updateParam} icon={Sprout}
                     />
                     <ParamSlider
-                      label="Phosphorus (P)" name="P" min={0} max={150} unit=" kg/ha"
+                      label={t('crops.phosphorus')} name="P" min={0} max={150} unit=" kg/ha"
                       value={params.P} onChange={updateParam} icon={Sprout}
                     />
                     <ParamSlider
-                      label="Potassium (K)" name="K" min={0} max={200} unit=" kg/ha"
+                      label={t('crops.potassium')} name="K" min={0} max={200} unit=" kg/ha"
                       value={params.K} onChange={updateParam} icon={Sprout}
                     />
                     <ParamSlider
-                      label="Soil pH" name="pH" min={3} max={10} step={0.1} unit=""
+                      label={t('crops.soilPh')} name="pH" min={3} max={10} step={0.1} unit=""
                       value={params.pH} onChange={updateParam}
                     />
                     <ParamSlider
-                      label="Soil Moisture" name="soilMoisture" min={0} max={100} unit="%"
+                      label={t('crops.soilMoisture')} name="soilMoisture" min={0} max={100} unit="%"
                       value={params.soilMoisture} onChange={updateParam} icon={Droplets}
                     />
                   </div>
@@ -678,20 +678,20 @@ export default function CropRecommend() {
                   {/* Environment */}
                   <div>
                     <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">
-                      Environment Grids
+                      {t('crops.envGrids')}
                     </p>
                     <ParamSlider
-                      label="Atmospheric Temp" name="temperature" min={0} max={50} unit="°C"
+                      label={t('crops.atmosphericTemp')} name="temperature" min={0} max={50} unit="°C"
                       value={params.temperature} onChange={updateParam} icon={Thermometer}
                     />
                     <ParamSlider
-                      label="Rainfall Forecast" name="rainfall" min={0} max={400} unit=" mm/mo"
+                      label={t('crops.rainfallForecast')} name="rainfall" min={0} max={400} unit=" mm/mo"
                       value={params.rainfall} onChange={updateParam} icon={Droplets}
                     />
 
                     {/* Irrigation Toggle */}
                     <div className="mt-6">
-                      <p className="text-sm font-semibold text-slate-600 mb-3">Irrigation Standard</p>
+                      <p className="text-sm font-semibold text-slate-600 mb-3">{t('crops.irrigationStandard')}</p>
                       <div className="flex rounded-xl border border-slate-200 overflow-hidden bg-slate-50 p-1">
                         <button
                           onClick={() => updateParam('irrigated', true)}
@@ -701,7 +701,7 @@ export default function CropRecommend() {
                               : 'text-slate-500 hover:text-slate-800'
                           }`}
                         >
-                          Irrigated
+                          {t('crops.irrigated')}
                         </button>
                         <button
                           onClick={() => updateParam('irrigated', false)}
@@ -711,7 +711,7 @@ export default function CropRecommend() {
                               : 'text-slate-500 hover:text-slate-800'
                           }`}
                         >
-                          Rain-fed
+                          {t('crops.rainFed')}
                         </button>
                       </div>
                     </div>
@@ -726,9 +726,9 @@ export default function CropRecommend() {
                     className="w-full flex items-center justify-center gap-2 bg-[#1E8E5A] hover:bg-[#0F6B4A] active:scale-[0.98] text-white font-semibold py-3.5 rounded-xl transition-all disabled:opacity-60 text-sm shadow-md shadow-[#1E8E5A]/10"
                   >
                     {loading ? (
-                      <><Loader2 size={18} className="animate-spin" /> Querying Engine...</>
+                      <><Loader2 size={18} className="animate-spin" /> {t('crops.queryingEngine')}</>
                     ) : (
-                      <><TrendingUp size={18} /> Generate Crop Recommendations</>
+                      <><TrendingUp size={18} /> {t('crops.generateCrop')}</>
                     )}
                   </button>
                   {error && (
@@ -753,11 +753,11 @@ export default function CropRecommend() {
                         <TrendingUp className="w-5 h-5 text-[#1E8E5A]" />
                       </div>
                       <div>
-                        <h2 className="font-semibold text-slate-800">Recommended Varieties</h2>
-                        <p className="text-xs text-slate-500">AI-powered crop ranking based on your parameters</p>
+                        <h2 className="font-semibold text-slate-800">{t('crops.recommendedVarieties')}</h2>
+                        <p className="text-xs text-slate-500">{t('crops.aiCropRanking')}</p>
                       </div>
                       <span className="ml-auto text-sm font-semibold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg">
-                        {results.length} Ranked
+                        {results.length} {t('crops.ranked')}
                       </span>
                     </div>
 
@@ -807,7 +807,7 @@ export default function CropRecommend() {
                             {/* Content */}
                             <div className="p-5">
                               <div className="flex items-center justify-between mb-3">
-                                <span className="text-sm font-bold text-[#1E8E5A]">{suitability}% Suitability</span>
+                                <span className="text-sm font-bold text-[#1E8E5A]">{suitability}% {t('crops.suitability')}</span>
                               </div>
 
                               {/* Progress Bar */}
@@ -829,19 +829,19 @@ export default function CropRecommend() {
                                 <div className="flex items-center gap-2 bg-[#E6F5EE] border border-emerald-200 rounded-lg px-3 py-1.5">
                                   <IndianRupee size={12} className="text-[#1E8E5A]" />
                                   <span className="text-xs font-semibold text-emerald-800">
-                                    {(revenue / 1000).toFixed(0)}k Revenue
+                                    {(revenue / 1000).toFixed(0)}{t('crops.revenue')}
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-3 py-1.5">
                                   <IndianRupee size={12} className="text-red-500" />
                                   <span className="text-xs font-semibold text-red-800">
-                                    {(cost / 1000).toFixed(0)}k Cost
+                                    {(cost / 1000).toFixed(0)}{t('crops.cost')}
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-1.5">
                                   <TrendingUp size={12} className="text-[#2F80ED]" />
                                   <span className="text-xs font-semibold text-blue-800">
-                                    {(profit / 1000).toFixed(0)}k Profit
+                                    {(profit / 1000).toFixed(0)}{t('crops.profit')}
                                   </span>
                                 </div>
                               </div>

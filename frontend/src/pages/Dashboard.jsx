@@ -13,11 +13,11 @@ import { AuthContext } from "../context/AuthContext";
 import { useTranslation } from "../translations";
 
 /* ─────────────────────────── helpers ─────────────────────────── */
-const getGreeting = () => {
+const getGreeting = (t) => {
   const h = new Date().getHours();
-  if (h < 12) return { label: "Good morning", Icon: Sun };
-  if (h < 17) return { label: "Good afternoon", Icon: Sunset };
-  return { label: "Good evening", Icon: Moon };
+  if (h < 12) return { label: t('dashboard.goodMorning'), Icon: Sun };
+  if (h < 17) return { label: t('dashboard.goodAfternoon'), Icon: Sunset };
+  return { label: t('dashboard.goodEvening'), Icon: Moon };
 };
 
 const colorMap = {
@@ -80,90 +80,91 @@ const colorMap = {
 };
 
 /* ─────────────────────────── data ─────────────────────────── */
-const featureCards = [
+const getFeatureCards = (t) => [
   {
-    title: "Soil Analysis",
-    desc: "Classify soil types instantly from photos using EfficientNet-B0 ML model.",
+    title: t('dashboard.features.soilTitle'),
+    desc: t('dashboard.features.soilDesc'),
     path: "/dashboard/soil",
     icon: FlaskConical,
     color: "amber",
-    badge: "AI Vision",
+    badge: t('dashboard.features.soilBadge'),
   },
   {
-    title: "Crop Recommendation",
-    desc: "Predict optimal crop types matching soil presets and local rainfall forecasts.",
+    title: t('dashboard.features.cropTitle'),
+    desc: t('dashboard.features.cropDesc'),
     path: "/dashboard/recommend",
     icon: Sprout,
     color: "green",
-    badge: "Random Forest",
+    badge: t('dashboard.features.cropBadge'),
   },
   {
-    title: "Weather Radar",
-    desc: "Check hyper-local atmospheric forecasts and get real-time crop advisories.",
+    title: t('dashboard.features.weatherTitle'),
+    desc: t('dashboard.features.weatherDesc'),
     path: "/dashboard/weather",
     icon: CloudSun,
     color: "blue",
-    badge: "Real-time GPS",
+    badge: t('dashboard.features.weatherBadge'),
   },
   {
-    title: "Best Mandi Finder",
-    desc: "Calculate transportation tolls and geocode high-profit mandi market routes.",
+    title: t('dashboard.features.mandiTitle'),
+    desc: t('dashboard.features.mandiDesc'),
     path: "/dashboard/best-mandi",
     icon: Map,
     color: "teal",
-    badge: "Route Optimizer",
+    badge: t('dashboard.features.mandiBadge'),
   },
   {
-    title: "Live Market Prices",
-    desc: "Monitor current commodity rates direct from active Agmarknet markets.",
+    title: t('dashboard.features.marketTitle'),
+    desc: t('dashboard.features.marketDesc'),
     path: "/dashboard/live-prices",
     icon: Activity,
     color: "pink",
-    badge: "Live Scraping",
+    badge: t('dashboard.features.marketBadge'),
   },
   {
-    title: "Price Forecast",
-    desc: "Project commodity market price trends up to 3 years using Prophet ML.",
+    title: t('dashboard.features.forecastTitle'),
+    desc: t('dashboard.features.forecastDesc'),
     path: "/dashboard/price-forecast",
     icon: Bot,
     color: "purple",
-    badge: "Time-Series AI",
+    badge: t('dashboard.features.forecastBadge'),
   },
   {
-    title: "Risk Assessment",
-    desc: "Analyze extreme weather risk factors including flood, dry spells, and frost.",
+    title: t('dashboard.features.riskTitle'),
+    desc: t('dashboard.features.riskDesc'),
     path: "/dashboard/risk",
     icon: ShieldAlert,
     color: "red",
-    badge: "Climate Alert",
+    badge: t('dashboard.features.riskBadge'),
   },
   {
-    title: "Expense Tracker",
-    desc: "Log seasonal expenses and calculate net margins against predicted revenues.",
+    title: t('dashboard.features.expenseTitle'),
+    desc: t('dashboard.features.expenseDesc'),
     path: "/dashboard/expenses",
     icon: Wallet,
     color: "indigo",
-    badge: "Farm Finance",
+    badge: t('dashboard.features.expenseBadge'),
   },
 ];
 
-const tips = [
+const getTips = (t) => [
   {
     emoji: "💧",
-    text: "Irrigation yields are optimized when applied during early morning hours to minimize water evaporation rates.",
+    text: t('dashboard.tips.tip1'),
   },
   {
     emoji: "🌱",
-    text: "Rotating leguminous pulse crops back into sandy soil restores nitrogen reserves naturally by up to 25%.",
+    text: t('dashboard.tips.tip2'),
   },
   {
     emoji: "📈",
-    text: "Commodity rates generally peak 4 to 6 weeks after major harvest flushes. Time sales accordingly.",
+    text: t('dashboard.tips.tip3'),
   },
 ];
 
 /* ─────────────────────────── weather widget ─────────────────────────── */
 function WeatherWidget() {
+  const { t } = useTranslation();
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -220,7 +221,7 @@ function WeatherWidget() {
     return (
       <div className="bg-white border border-slate-200 rounded-2xl px-5 py-3 shadow-sm flex items-center gap-2 text-slate-500 text-sm min-w-[220px]">
         <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
-        {error}
+        {t('dashboard.weather.error') || "Unable to load weather"}
       </div>
     );
   }
@@ -234,12 +235,12 @@ function WeatherWidget() {
   };
 
   const getWeatherLabel = (code) => {
-    if (code === 0) return "Clear Sky";
-    if (code <= 3) return "Partly Cloudy";
-    if (code <= 48) return "Foggy";
-    if (code <= 67) return "Rainy";
-    if (code <= 77) return "Snowy";
-    return "Thunderstorm";
+    if (code === 0) return t('dashboard.weather.clear') || "Clear Sky";
+    if (code <= 3) return t('dashboard.weather.partlyCloudy') || "Partly Cloudy";
+    if (code <= 48) return t('dashboard.weather.foggy') || "Foggy";
+    if (code <= 67) return t('dashboard.weather.rainy') || "Rainy";
+    if (code <= 77) return t('dashboard.weather.snowy') || "Snowy";
+    return t('dashboard.weather.thunderstorm') || "Thunderstorm";
   };
 
   return (
@@ -277,6 +278,7 @@ function WeatherWidget() {
 /* ─────────────────────────── feature card ─────────────────────────── */
 function FeatureCard({ card, index }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const c = colorMap[card.color];
 
   return (
@@ -312,7 +314,7 @@ function FeatureCard({ card, index }) {
 
       {/* Footer */}
       <div className="flex items-center text-xs font-bold text-[#1E8E5A] group-hover:text-[#0F6B4A] transition-colors pt-2 border-t border-slate-100/50">
-        Launch Tool
+        {t('dashboard.launchTool')}
         <ArrowRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
       </div>
     </motion.div>
@@ -323,7 +325,10 @@ function FeatureCard({ card, index }) {
 export default function Dashboard() {
   const { user } = useContext(AuthContext);
   const { t } = useTranslation();
-  const { label: greeting, Icon: GreetingIcon } = getGreeting();
+  const { label: greeting, Icon: GreetingIcon } = getGreeting(t);
+  
+  const featureCards = getFeatureCards(t);
+  const tips = getTips(t);
   
   const heroRef = useRef(null);
   const kpiRef = useRef(null);
@@ -363,11 +368,11 @@ export default function Dashboard() {
                 </div>
 
                 <h1 className="text-white text-4xl md:text-5xl font-extrabold leading-[1.1] tracking-tight font-heading">
-                  Welcome back, <span className="text-[#2BB673]">{displayName}</span>
+                  {t('dashboard.welcomeBack') || `${t('dashboard.welcome')} back,`} <span className="text-[#2BB673]">{displayName}</span>
                 </h1>
 
                 <p className="text-white/80 text-base md:text-lg leading-relaxed max-w-lg">
-                  Your agricultural intelligence dashboard is ready. Monitor soil health, track crop recommendations, and optimize your farm's performance with AI-powered insights.
+                  {t('dashboard.dashboardDesc')}
                 </p>
 
                 <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -388,25 +393,25 @@ export default function Dashboard() {
                         <Leaf className="w-7 h-7 text-white" />
                       </div>
                       <div>
-                        <h3 className="text-white font-bold text-lg">Farm Overview</h3>
-                        <p className="text-white/60 text-sm">Real-time intelligence</p>
+                        <h3 className="text-white font-bold text-lg">{t('dashboard.farmOverview')}</h3>
+                        <p className="text-white/60 text-sm">{t('dashboard.realTimeIntel')}</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
-                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Active Tools</p>
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">{t('dashboard.activeTools')}</p>
                         <p className="text-white text-3xl font-black font-heading">8</p>
                       </div>
                       <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
-                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Analyses</p>
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">{t('dashboard.analysesCount')}</p>
                         <p className="text-white text-3xl font-black font-heading">12</p>
                       </div>
                     </div>
 
                     <div className="bg-white/10 border border-white/10 rounded-2xl p-4 flex items-center gap-3">
                       <CheckCircle2 className="w-5 h-5 text-[#2BB673]" />
-                      <p className="text-white/80 text-sm">All systems operational</p>
+                      <p className="text-white/80 text-sm">{t('dashboard.allSystemsOp')}</p>
                     </div>
                   </div>
                 </div>
@@ -424,10 +429,10 @@ export default function Dashboard() {
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
           >
             {[
-              { icon: FlaskConical, label: "Soil Analyses", value: "12", change: "+3 this week", color: "green" },
-              { icon: Sprout, label: "Crop Recommendations", value: "8", change: "+2 this week", color: "green" },
-              { icon: Activity, label: "Market Alerts", value: "5", change: "+1 today", color: "blue" },
-              { icon: ShieldAlert, label: "Risk Warnings", value: "2", change: "Active", color: "amber" },
+              { icon: FlaskConical, label: t('dashboard.kpiSoil'), value: "12", change: "+3", color: "green" },
+              { icon: Sprout, label: t('dashboard.kpiCrop'), value: "8", change: "+2", color: "green" },
+              { icon: Activity, label: t('dashboard.kpiMarket'), value: "5", change: "+1", color: "blue" },
+              { icon: ShieldAlert, label: t('dashboard.kpiRisk'), value: "2", change: "Active", color: "amber" },
             ].map((kpi, i) => (
               <motion.div
                 key={i}
@@ -477,11 +482,11 @@ export default function Dashboard() {
           >
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-slate-800 font-heading">Platform Services</h2>
+                <h2 className="text-2xl font-bold text-slate-800 font-heading">{t('dashboard.platformServices')}</h2>
                 <p className="text-slate-500 mt-1">Access all your agricultural intelligence tools</p>
               </div>
               <span className="text-xs text-slate-500 font-semibold bg-slate-100 px-4 py-2 rounded-full">
-                {featureCards.length} Tools Available
+                {featureCards.length} {t('dashboard.toolsAvailable')}
               </span>
             </div>
           </motion.div>
@@ -502,7 +507,7 @@ export default function Dashboard() {
           >
             <div className="flex items-center gap-2 mb-6">
               <Sparkles className="w-5 h-5 text-[#1E8E5A]" />
-              <h2 className="text-xl font-bold text-slate-800 font-heading">Today's Agronomy Insights</h2>
+              <h2 className="text-xl font-bold text-slate-800 font-heading">{t('dashboard.todaysInsights')}</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

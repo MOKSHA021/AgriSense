@@ -56,7 +56,7 @@ const mapWmoToOwm = (code, isDay = 1) => {
   return map[code] || { id: 800, main: 'Clear', description: 'clear sky', icon: `01${d}` };
 };
 
-const getFarmingAdvice = (weather) => {
+const getFarmingAdvice = (weather, t) => {
   if (!weather) return [];
   const tips = [];
   const temp = weather.main?.temp;
@@ -68,21 +68,21 @@ const getFarmingAdvice = (weather) => {
       icon: AlertTriangle,
       color: "text-red-600 bg-red-50 border-red-200",
       borderLeft: "border-l-4 border-l-red-500",
-      text: "Thunderstorm expected — avoid open-field work and secure livestock.",
+      text: t('weather.tips.thunderstorm'),
     });
   if (id >= 500 && id < 600)
     tips.push({
       icon: CloudRain,
       color: "text-blue-600 bg-blue-50 border-blue-200",
       borderLeft: "border-l-4 border-l-blue-500",
-      text: "Rain forecasted — postpone pesticide spraying to avoid wash-off.",
+      text: t('weather.tips.rain'),
     });
   if (id >= 600 && id < 700)
     tips.push({
       icon: Snowflake,
       color: "text-cyan-600 bg-cyan-50 border-cyan-200",
       borderLeft: "border-l-4 border-l-cyan-500",
-      text: "Frost risk — protect sensitive crops with mulching or row covers.",
+      text: t('weather.tips.frost'),
     });
 
   if (temp > 35)
@@ -90,14 +90,14 @@ const getFarmingAdvice = (weather) => {
       icon: Thermometer,
       color: "text-orange-600 bg-orange-50 border-orange-200",
       borderLeft: "border-l-4 border-l-orange-500",
-      text: "High heat — irrigate early morning or late evening to reduce evaporation.",
+      text: t('weather.tips.heat'),
     });
   else if (temp < 5)
     tips.push({
       icon: Snowflake,
       color: "text-cyan-600 bg-cyan-50 border-cyan-200",
       borderLeft: "border-l-4 border-l-cyan-500",
-      text: "Cold snap — cover nurseries and avoid sowing frost-sensitive crops.",
+      text: t('weather.tips.cold'),
     });
 
   if (humidity > 80)
@@ -105,7 +105,7 @@ const getFarmingAdvice = (weather) => {
       icon: Droplets,
       color: "text-teal-600 bg-teal-50 border-teal-200",
       borderLeft: "border-l-4 border-l-teal-500",
-      text: "High humidity — monitor for fungal infections like blight and mildew.",
+      text: t('weather.tips.humidity'),
     });
 
   if (id === 800)
@@ -113,13 +113,13 @@ const getFarmingAdvice = (weather) => {
       icon: Sun,
       color: "text-[#2D6A4F] bg-[#EBF5EE] border-[#C3E6CB]",
       borderLeft: "border-l-4 border-l-[#2D6A4F]",
-      text: "Clear skies — good day for harvesting, drying, and field preparation.",
+      text: t('weather.tips.clear'),
     });
 
   return tips;
 };
 
-const getRiskAlerts = (weather) => {
+const getRiskAlerts = (weather, t) => {
   if (!weather) return [];
   const alerts = [];
   const temp = weather.main?.temp;
@@ -129,20 +129,20 @@ const getRiskAlerts = (weather) => {
   if (id >= 502 && id <= 531)
     alerts.push({
       icon: CloudRain,
-      label: "Flood Risk",
-      text: "Heavy rain detected. Avoid low-lying fields and ensure drainage is clear.",
+      label: t('weather.alerts.floodLabel'),
+      text: t('weather.alerts.floodDesc'),
     });
   if (temp > 40)
     alerts.push({
       icon: Thermometer,
-      label: "Heat Stress",
-      text: "Temperature exceeds 40°C. Provide shade for livestock and increase irrigation.",
+      label: t('weather.alerts.heatLabel'),
+      text: t('weather.alerts.heatDesc'),
     });
   if (id === 800 && humidity < 25)
     alerts.push({
       icon: Sun,
-      label: "Drought Risk",
-      text: "Prolonged dry and clear conditions. Monitor soil moisture levels closely.",
+      label: t('weather.alerts.droughtLabel'),
+      text: t('weather.alerts.droughtDesc'),
     });
 
   return alerts;
@@ -311,8 +311,8 @@ const Weather = () => {
     fetchWeatherByCity(searchInput);
   };
 
-  const advice = getFarmingAdvice(current);
-  const riskAlerts = getRiskAlerts(current);
+  const advice = getFarmingAdvice(current, t);
+  const riskAlerts = getRiskAlerts(current, t);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -334,16 +334,16 @@ const Weather = () => {
               <div className="space-y-6">
                 <div className="inline-flex items-center gap-2 bg-[#2F80ED]/15 border border-[#2F80ED]/30 text-[#2F80ED] text-[11px] font-bold px-4 py-2 rounded-full tracking-widest uppercase">
                   <CloudSun className="w-4 h-4" />
-                  Real-Time GPS
+                  {t('weather.realTimeGPS')}
                 </div>
 
                 <h1 className="text-white text-4xl md:text-5xl font-extrabold leading-[1.1] tracking-tight font-heading">
-                  Weather Intelligence
-                  <span className="block text-[#2BB673] mt-2">Advisory Platform</span>
+                  {t('weather.title').split(' ')[0]} {t('weather.title').split(' ')[1]}
+                  <span className="block text-[#2BB673] mt-2">{t('weather.title').split(' ').slice(2).join(' ')}</span>
                 </h1>
 
                 <p className="text-white/80 text-base md:text-lg leading-relaxed max-w-lg">
-                  Access hyper-local weather forecasts with farming-specific advisories. Get real-time temperature, humidity, wind data, and actionable recommendations for spray timings and harvesting.
+                  {t('weather.subtitle')}
                 </p>
               </div>
 
@@ -360,25 +360,25 @@ const Weather = () => {
                         <CloudSun className="w-7 h-7 text-white" />
                       </div>
                       <div>
-                        <h3 className="text-white font-bold text-lg">Hyper-Local Data</h3>
-                        <p className="text-white/60 text-sm">GPS-Precision Weather</p>
+                        <h3 className="text-white font-bold text-lg">{t('weather.hyperLocalData')}</h3>
+                        <p className="text-white/60 text-sm">{t('weather.gpsPrecisionWeather')}</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
-                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Forecast</p>
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">{t('weather.forecast')}</p>
                         <p className="text-white text-3xl font-black font-heading">5-Day</p>
                       </div>
                       <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
-                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Advisories</p>
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">{t('weather.advisories')}</p>
                         <p className="text-white text-3xl font-black font-heading">Real</p>
                       </div>
                     </div>
 
                     <div className="bg-white/10 border border-white/10 rounded-2xl p-4 flex items-center gap-3">
                       <Sparkles className="w-5 h-5 text-[#2BB673]" />
-                      <p className="text-white/80 text-sm">Farming-specific insights</p>
+                      <p className="text-white/80 text-sm">{t('weather.farmingInsights')}</p>
                     </div>
                   </div>
                 </div>
@@ -401,8 +401,8 @@ const Weather = () => {
                   <CloudSun className="w-6 h-6 text-[#1E8E5A]" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-slate-800 font-heading">Weather</h1>
-                  <p className="text-sm text-slate-500">Real-time weather data with farming-specific advice</p>
+                  <h1 className="text-2xl font-bold text-slate-800 font-heading">{t('weather.pageTitle')}</h1>
+                  <p className="text-sm text-slate-500">{t('weather.pageDesc')}</p>
                 </div>
               </div>
             </motion.div>
@@ -424,7 +424,7 @@ const Weather = () => {
                 type="text"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Search city..."
+                placeholder={t('weather.searchCity')}
                 className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#1E8E5A] focus:border-[#1E8E5A] transition-all shadow-sm"
               />
             </div>
@@ -433,7 +433,7 @@ const Weather = () => {
               className="w-full sm:w-auto px-6 py-3 bg-[#1E8E5A] hover:bg-[#0F6B4A] text-white text-sm font-semibold rounded-xl shadow-sm transition-all flex items-center justify-center gap-2"
             >
               <Navigation className="w-4 h-4" />
-              Locate
+              {t('weather.locate')}
             </button>
           </motion.form>
 
@@ -456,7 +456,7 @@ const Weather = () => {
           {loading && (
             <div className="flex flex-col items-center justify-center py-32 text-slate-500">
               <Loader className="w-10 h-10 animate-spin text-[#1E8E5A] mb-4" />
-              <span className="text-sm font-semibold tracking-widest uppercase">Fetching Atmosphere...</span>
+              <span className="text-sm font-semibold tracking-widest uppercase">{t('weather.fetchingAtmosphere')}</span>
             </div>
           )}
 
@@ -501,35 +501,35 @@ const Weather = () => {
                       <div className="flex flex-col gap-1 p-3 rounded-xl bg-slate-50 border border-slate-200">
                         <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                           <Thermometer className="w-3 h-3" />
-                          Feels
+                          {t('weather.feelsLike')}
                         </div>
                         <span className="text-sm font-semibold text-slate-800">{Math.round(current.main.feels_like)}&deg;C</span>
                       </div>
                       <div className="flex flex-col gap-1 p-3 rounded-xl bg-slate-50 border border-slate-200">
                         <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                           <Droplets className="w-3 h-3" />
-                          Humid
+                          {t('weather.humid')}
                         </div>
                         <span className="text-sm font-semibold text-slate-800">{current.main.humidity}%</span>
                       </div>
                       <div className="flex flex-col gap-1 p-3 rounded-xl bg-slate-50 border border-slate-200">
                         <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                           <Wind className="w-3 h-3" />
-                          Wind
+                          {t('weather.wind')}
                         </div>
                         <span className="text-sm font-semibold text-slate-800">{current.wind.speed} m/s</span>
                       </div>
                       <div className="flex flex-col gap-1 p-3 rounded-xl bg-slate-50 border border-slate-200">
                         <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                           <Gauge className="w-3 h-3" />
-                          Press
+                          {t('weather.press')}
                         </div>
                         <span className="text-sm font-semibold text-slate-800">{current.main.pressure} hPa</span>
                       </div>
                       <div className="flex flex-col gap-1 p-3 rounded-xl bg-slate-50 border border-slate-200 sm:col-span-2">
                         <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                           <Eye className="w-3 h-3" />
-                          Visibility
+                          {t('weather.visibility')}
                         </div>
                         <span className="text-sm font-semibold text-slate-800">{(current.visibility / 1000).toFixed(1)} km</span>
                       </div>
@@ -548,7 +548,7 @@ const Weather = () => {
                     >
                       <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-6 flex items-center gap-2">
                         <CloudSun className="w-4 h-4 text-[#1E8E5A]" />
-                        5-Day Forecast
+                        {t('weather.forecast5Day')}
                       </h2>
                       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                         {forecast.map((day, idx) => (
@@ -603,7 +603,7 @@ const Weather = () => {
                         <div className="absolute top-0 left-0 bottom-0 w-1 bg-red-500 rounded-l-2xl" />
                         <h2 className="text-sm font-semibold uppercase tracking-wider text-red-600 mb-5 flex items-center gap-2 pl-2">
                           <AlertTriangle className="w-4 h-4" />
-                          Risk Alerts
+                          {t('weather.riskAlerts')}
                         </h2>
                         <ul className="space-y-3">
                           {riskAlerts.map((alert, i) => {
@@ -639,7 +639,7 @@ const Weather = () => {
                         <div className="absolute top-0 left-0 bottom-0 w-1 bg-[#1E8E5A] rounded-l-2xl" />
                         <h2 className="text-sm font-semibold uppercase tracking-wider text-[#1E8E5A] mb-5 flex items-center gap-2 pl-2">
                           <CloudSun className="w-4 h-4" />
-                          Farming Advice
+                          {t('weather.farmingAdvice')}
                         </h2>
                         <ul className="space-y-3">
                           {advice.map((tip, i) => {

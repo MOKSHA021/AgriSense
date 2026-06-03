@@ -4,10 +4,12 @@ import { motion } from "framer-motion";
 import { Wheat, Eye, EyeOff, Leaf } from "lucide-react";
 import API from "../services/api";
 import { AuthContext } from "../context/AuthContext";
+import { useTranslation } from "../translations";
 
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
+  const { t } = useTranslation();
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPwd, setShowPwd] = useState(false);
@@ -25,7 +27,7 @@ const Login = () => {
       login(data);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || "Invalid email or password");
+      setError(err.response?.data?.message || t('auth.invalidCreds'));
     } finally {
       setLoading(false);
     }
@@ -55,11 +57,10 @@ const Login = () => {
               </div>
               <span className="text-3xl font-bold text-white font-heading tracking-tight">AgriSense</span>
             </div>
-            <h2 className="text-4xl font-bold text-white font-heading mb-4 leading-tight">
-              Smart farming starts<br />with the right data.
+            <h2 className="text-4xl font-bold text-white font-heading mb-4 leading-tight" dangerouslySetInnerHTML={{ __html: t('auth.loginTitle') }}>
             </h2>
             <p className="text-white/80 text-base leading-relaxed max-w-md">
-              AI-powered soil analysis, crop recommendations, market prices, and weather risk — all in one platform.
+              {t('auth.loginDesc')}
             </p>
           </motion.div>
         </div>
@@ -86,8 +87,8 @@ const Login = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <h1 className="text-3xl font-bold text-slate-800 font-heading mb-2">Welcome back</h1>
-            <p className="text-slate-500 text-base mb-8">Sign in to your farming dashboard</p>
+            <h1 className="text-3xl font-bold text-slate-800 font-heading mb-2">{t('auth.welcomeBack')}</h1>
+            <p className="text-slate-500 text-base mb-8">{t('auth.signInDesc')}</p>
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl mb-6 flex items-center gap-2">
@@ -98,23 +99,23 @@ const Login = () => {
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
               <div>
                 <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">
-                  Email Address
+                  {t('auth.email')}
                 </label>
                 <input
                   type="email" name="email" value={form.email}
-                  onChange={handleChange} placeholder="you@example.com" required
+                  onChange={handleChange} placeholder={t('auth.emailPlaceholder')} required
                   className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1E8E5A] focus:border-[#1E8E5A] transition-all"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">
-                  Password
+                  {t('auth.password')}
                 </label>
                 <div className="relative">
                   <input
                     type={showPwd ? "text" : "password"} name="password" value={form.password}
-                    onChange={handleChange} placeholder="Enter your password" required
+                    onChange={handleChange} placeholder={t('auth.passwordPlaceholder')} required
                     className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1E8E5A] focus:border-[#1E8E5A] transition-all pr-10"
                   />
                   <button type="button" onClick={() => setShowPwd(p => !p)}
@@ -134,15 +135,15 @@ const Login = () => {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z"/>
                     </svg>
-                    Signing in...
+                    {t('auth.signingIn')}
                   </span>
-                ) : "Sign In"}
+                ) : t('auth.signIn')}
               </button>
             </form>
 
             <p className="text-center text-sm text-slate-500 mt-8">
-              Don&apos;t have an account?{" "}
-              <Link to="/register" className="text-[#1E8E5A] font-semibold hover:underline">Create one free</Link>
+              {t('auth.noAccount')}{" "}
+              <Link to="/register" className="text-[#1E8E5A] font-semibold hover:underline">{t('auth.createOne')}</Link>
             </p>
           </motion.div>
         </div>

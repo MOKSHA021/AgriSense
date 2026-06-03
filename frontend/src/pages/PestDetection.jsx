@@ -15,7 +15,7 @@ import {
   X
 } from "lucide-react";
 
-const diseases = [
+const getDiseases = (t) => [
   {
     name: "Late Blight",
     severity: "High",
@@ -61,6 +61,8 @@ function getRandomConfidence() {
 }
 
 const PestDetection = () => {
+  const { t } = useTranslation();
+  const diseases = getDiseases(t);
   const fileInputRef = useRef(null);
   const [preview, setPreview] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
@@ -130,9 +132,9 @@ const PestDetection = () => {
             <ScanSearch className="w-6 h-6 text-emerald-600" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold font-heading text-slate-900">AI Pest Detection</h1>
+            <h1 className="text-3xl font-bold font-heading text-slate-900">{t('pest.title')}</h1>
             <p className="text-slate-500 font-medium mt-1">
-              Upload a clear leaf photo for instant computer vision analysis and treatment guidance.
+              {t('pest.desc')}
             </p>
           </div>
         </div>
@@ -148,10 +150,10 @@ const PestDetection = () => {
               <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-emerald-100 transition-all shadow-inner">
                 <ImageIcon className="w-8 h-8 text-slate-400 group-hover:text-emerald-600" />
               </div>
-              <h3 className="text-lg font-bold font-heading text-slate-700 mb-1 group-hover:text-emerald-700">Drop your leaf photo here</h3>
-              <p className="text-sm text-slate-500 font-medium mb-4">or click to browse from your device</p>
+              <h3 className="text-lg font-bold font-heading text-slate-700 mb-1 group-hover:text-emerald-700">{t('pest.dropPhoto')}</h3>
+              <p className="text-sm text-slate-500 font-medium mb-4">{t('pest.clickBrowse')}</p>
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-lg text-xs font-semibold text-slate-500">
-                <ShieldCheck className="w-4 h-4"/> Supports JPG, PNG, WebP up to 10MB
+                <ShieldCheck className="w-4 h-4"/> {t('pest.supports')}
               </div>
               <input
                 ref={fileInputRef}
@@ -179,7 +181,7 @@ const PestDetection = () => {
                        <div className="absolute inset-0 flex flex-col items-center justify-center">
                            <ScanSearch className="w-12 h-12 text-emerald-500 animate-pulse mb-3 drop-shadow-lg"/>
                            <span className="bg-slate-900/80 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-lg flex items-center gap-2">
-                             <Loader2 className="w-4 h-4 animate-spin"/> Analyzing Imagery... {progress}%
+                             <Loader2 className="w-4 h-4 animate-spin"/> {t('pest.analyzing')} {progress}%
                            </span>
                        </div>
                     </div>
@@ -200,7 +202,7 @@ const PestDetection = () => {
                     onClick={handleReset}
                     className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition-colors"
                   >
-                    <RefreshCw className="w-4 h-4" /> Analyze Another Leaf
+                    <RefreshCw className="w-4 h-4" /> {t('pest.analyzeAnother')}
                   </button>
                 )}
               </div>
@@ -210,8 +212,8 @@ const PestDetection = () => {
                 {analyzing ? (
                   <div className="h-full border border-slate-100 bg-slate-50/50 rounded-2xl p-6 flex flex-col items-center justify-center text-center">
                     <div className="w-16 h-16 border-4 border-slate-200 border-t-emerald-500 rounded-full animate-spin mb-4"></div>
-                    <h3 className="text-lg font-bold font-heading text-slate-700 mb-2">Machine Learning Engine Active</h3>
-                    <p className="text-sm font-medium text-slate-500 max-w-xs">Cross-referencing millions of pathogen vectors and leaf health markers...</p>
+                    <h3 className="text-lg font-bold font-heading text-slate-700 mb-2">{t('pest.engineActive')}</h3>
+                    <p className="text-sm font-medium text-slate-500 max-w-xs">{t('pest.engineDesc')}</p>
                   </div>
                 ) : result ? (
                   <div className="space-y-5 animate-fade-in flex-1">
@@ -224,11 +226,11 @@ const PestDetection = () => {
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-1">
                             <h3 className="text-xl font-bold font-heading">{result.name}</h3>
-                            <span className="text-sm font-bold px-2 py-0.5 rounded-md bg-white/50">{result.confidence}% Match</span>
+                            <span className="text-sm font-bold px-2 py-0.5 rounded-md bg-white/50">{result.confidence}% {t('pest.match')}</span>
                           </div>
-                          <p className="text-sm font-semibold opacity-80 uppercase tracking-widest mb-3">Severity: {result.severity}</p>
+                          <p className="text-sm font-semibold opacity-80 uppercase tracking-widest mb-3">{t('pest.severity')}: {result.severity}</p>
                           <div className="bg-white/60 rounded-xl p-3 shadow-sm border border-white/40">
-                            <h4 className="text-xs font-bold uppercase tracking-wider opacity-60 mb-1">Recommended Treatment</h4>
+                            <h4 className="text-xs font-bold uppercase tracking-wider opacity-60 mb-1">{t('pest.treatment')}</h4>
                             <p className="text-sm font-semibold leading-relaxed">{result.treatment}</p>
                           </div>
                         </div>
@@ -240,7 +242,7 @@ const PestDetection = () => {
                       <div className="border border-slate-200 bg-white rounded-2xl p-5 shadow-sm">
                         <div className="flex items-center gap-2 mb-4">
                           <Store className="w-5 h-5 text-slate-400" />
-                          <h4 className="font-bold font-heading text-slate-800">Available Near You</h4>
+                          <h4 className="font-bold font-heading text-slate-800">{t('pest.availableNear')}</h4>
                         </div>
                         <div className="space-y-3">
                           {nearbyShops.map((shop, i) => (
@@ -251,13 +253,13 @@ const PestDetection = () => {
                                 </div>
                                 <div>
                                   <p className="text-sm font-bold text-slate-800">{shop.name}</p>
-                                  <p className="text-xs font-medium text-slate-500">{shop.distance} away</p>
+                                  <p className="text-xs font-medium text-slate-500">{shop.distance} {t('pest.away')}</p>
                                 </div>
                               </div>
                               <div className="text-right">
-                                <p className="text-sm font-bold text-slate-900">&#8377;{shop.price}<span className="text-xs text-slate-500 font-medium">/btl</span></p>
+                                <p className="text-sm font-bold text-slate-900">&#8377;{shop.price}<span className="text-xs text-slate-500 font-medium">{t('pest.btl')}</span></p>
                                 <p className={`text-[10px] uppercase font-bold tracking-wider mt-0.5 ${shop.stock === 'In Stock' ? 'text-emerald-600' : 'text-amber-600'}`}>
-                                  {shop.stock}
+                                  {shop.stock === 'In Stock' ? t('pest.inStock') : t('pest.lowStock')}
                                 </p>
                               </div>
                             </div>

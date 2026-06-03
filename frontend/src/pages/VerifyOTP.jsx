@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Wheat, Mail } from "lucide-react";
 import API from "../services/api";
 import { AuthContext } from "../context/AuthContext";
+import { useTranslation } from "../translations";
 
 const VerifyOTP = () => {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
+  const { t } = useTranslation();
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
@@ -35,7 +37,7 @@ const VerifyOTP = () => {
     setError("");
     const otpString = otp.join("");
     if (otpString.length < 6) {
-      setError("Please enter all 6 digits");
+      setError(t('auth.enterAllDigits'));
       setLoading(false);
       return;
     }
@@ -45,7 +47,7 @@ const VerifyOTP = () => {
       login(data);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || "Invalid OTP");
+      setError(err.response?.data?.message || t('auth.invalidOtp'));
     } finally {
       setLoading(false);
     }
@@ -54,9 +56,9 @@ const VerifyOTP = () => {
   const handleResend = async () => {
     try {
       await API.post("/auth/resend-otp", { email });
-      setResendMsg("OTP resent — check your email.");
+      setResendMsg(t('auth.otpResent'));
     } catch {
-      setResendMsg("Failed to resend. Try again.");
+      setResendMsg(t('auth.resendFailed'));
     }
   };
 
@@ -73,9 +75,9 @@ const VerifyOTP = () => {
           <Mail className="w-5 h-5 text-gray-600" />
         </div>
 
-        <h2 className="text-xl font-bold text-gray-900 mb-1">Check your email</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-1">{t('auth.checkEmail')}</h2>
         <p className="text-gray-400 text-sm mb-6">
-          We sent a 6-digit code to<br />
+          {t('auth.sentCode')}<br />
           <span className="font-medium text-gray-700">{email}</span>
         </p>
 
@@ -112,17 +114,17 @@ const VerifyOTP = () => {
             disabled={loading}
             className="w-full py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 disabled:opacity-50 transition"
           >
-            {loading ? "Verifying..." : "Verify"}
+            {loading ? t('auth.verifying') : t('auth.verify')}
           </button>
         </form>
 
         <p className="text-sm text-gray-400 mt-6">
-          Didn&apos;t receive it?{" "}
+          {t('auth.didntReceive')}{" "}
           <button
             onClick={handleResend}
             className="text-gray-900 font-medium hover:underline"
           >
-            Resend OTP
+            {t('auth.resendOtp')}
           </button>
         </p>
       </div>

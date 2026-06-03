@@ -5,6 +5,7 @@ import L from "leaflet";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 import "leaflet-routing-machine";
 import { calculateTransportCost } from "../../utils/transportCost";
+import { useTranslation } from "../../translations";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -101,6 +102,7 @@ const MandiMap = ({
   onRouteFound,
   onFarmerMove,
 }) => {
+  const { t } = useTranslation();
   return (
     <MapContainer
       center={farmerLocation}
@@ -116,19 +118,18 @@ const MandiMap = ({
       <ClickHandler mode={clickMode} onMapClick={onMapClick} />
       {flyTarget && <FlyTo position={flyTarget} />}
 
-      {/* 🔵 Farmer marker */}
       <Marker position={farmerLocation} icon={farmerIcon}>
         <Popup>
           <div className="min-w-[170px]">
-            <h4 className="font-bold text-base mb-1">🚜 Your Farm</h4>
+            <h4 className="font-bold text-base mb-1">{t('mandi.yourFarm')}</h4>
             <p className="text-xs text-gray-500 mb-2">
               {farmerAddress || `${farmerLocation[0].toFixed(4)}, ${farmerLocation[1].toFixed(4)}`}
             </p>
             <button
-              className="w-full bg-blue-500 text-white py-1 px-2 rounded text-xs hover:bg-blue-600"
+              className="w-full bg-blue-500 text-slate-800 py-1 px-2 rounded text-xs hover:bg-blue-600"
               onClick={onFarmerMove}
             >
-              📍 Move Pin
+              {t('mandi.movePin')}
             </button>
           </div>
         </Popup>
@@ -140,7 +141,7 @@ const MandiMap = ({
           <Popup>
             <div className="min-w-[180px]">
               <h4 className="font-bold text-base mb-1">
-                🏪 {selectedMandi?.name || "Pinned Mandi"}
+                🏪 {selectedMandi?.name || t('mandi.pinnedMandi').replace('🏪 ', '')}
               </h4>
               {selectedMandi && (
                 <p className="text-xs text-gray-500">

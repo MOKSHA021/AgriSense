@@ -206,6 +206,7 @@ const SoilAnalysis = () => {
     ? (result.soil_type_clean || (result.soil_type || "").replace(/_Soil$/i, "").replace(/_/g, " ")).trim()
     : null;
   const soilData = cleanType ? SOIL_DATA[cleanType] : null;
+  const soilTranslation = cleanType ? t(`soilData.${cleanType}`) : null;
   const confidence = result?.confidence ?? 0;
   const isLowConfidence = confidence < CONFIDENCE_THRESHOLD;
 
@@ -237,16 +238,16 @@ const SoilAnalysis = () => {
               <div className="space-y-6">
                 <div className="inline-flex items-center gap-2 bg-[#2BB673]/15 border border-[#2BB673]/30 text-[#2BB673] text-[11px] font-bold px-4 py-2 rounded-full tracking-widest uppercase">
                   <FlaskConical className="w-4 h-4" />
-                  AI Vision Technology
+                  {t('soilAI.aiVision')}
                 </div>
 
                 <h1 className="text-white text-4xl md:text-5xl font-extrabold leading-[1.1] tracking-tight font-heading">
-                  Soil Intelligence
-                  <span className="block text-[#2BB673] mt-2">Analysis Platform</span>
+                  {t('soilAI.subtitle')}
+                  <span className="block text-[#2BB673] mt-2">{t('soilAI.platform')}</span>
                 </h1>
 
                 <p className="text-white/80 text-base md:text-lg leading-relaxed max-w-lg">
-                  Upload a photo of your soil sample and let our EfficientNet-B0 deep learning model instantly classify soil type with 87% accuracy. Get actionable insights for optimal crop selection.
+                  {t('soilAI.desc')}
                 </p>
               </div>
 
@@ -264,24 +265,24 @@ const SoilAnalysis = () => {
                       </div>
                       <div>
                         <h3 className="text-white font-bold text-lg">EfficientNet-B0</h3>
-                        <p className="text-white/60 text-sm">Deep Learning Model</p>
+                        <p className="text-white/60 text-sm">{t('soilAI.modelDesc')}</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
-                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Accuracy</p>
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">{t('soilAI.accuracy')}</p>
                         <p className="text-white text-3xl font-black font-heading">87%</p>
                       </div>
                       <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
-                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Types</p>
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">{t('soilAI.types')}</p>
                         <p className="text-white text-3xl font-black font-heading">7</p>
                       </div>
                     </div>
 
                     <div className="bg-white/10 border border-white/10 rounded-2xl p-4 flex items-center gap-3">
                       <Sparkles className="w-5 h-5 text-[#2BB673]" />
-                      <p className="text-white/80 text-sm">Instant AI-powered classification</p>
+                      <p className="text-white/80 text-sm">{t('soilAI.instantAI')}</p>
                     </div>
                   </div>
                 </div>
@@ -304,7 +305,7 @@ const SoilAnalysis = () => {
                   <FlaskConical className="w-6 h-6 text-[#1E8E5A]" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-slate-800 font-heading">AI Soil Analysis</h1>
+                  <h1 className="text-2xl font-bold text-slate-800 font-heading">{t('soilAI.title')}</h1>
                   <p className="text-sm text-slate-500">EfficientNet-B0 Deep Learning Model · 7 Soil Type Classification</p>
                 </div>
               </div>
@@ -317,7 +318,7 @@ const SoilAnalysis = () => {
             className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-all shadow-sm mb-6"
           >
             <Info className="w-4 h-4" />
-            Photo Guidelines
+            {t('soilAI.photoTipsToggle')}
             <ChevronDown className={`w-4 h-4 transition-transform ${showTips ? "rotate-180" : ""}`} />
           </button>
 
@@ -332,7 +333,7 @@ const SoilAnalysis = () => {
               >
                 <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
                   <h3 className="text-sm font-semibold text-blue-800 mb-4 flex items-center gap-2">
-                    <Camera className="w-5 h-5 text-blue-500" /> Optimal Photo Recommendations
+                    <Camera className="w-5 h-5 text-blue-500" /> {t('soilAI.photoTipsTitle')}
                   </h3>
                   <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {PHOTO_TIPS.map((tip, i) => (
@@ -360,7 +361,7 @@ const SoilAnalysis = () => {
               <div>
                 <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
                   <Upload className="w-4 h-4 text-[#1E8E5A]" />
-                  Upload Photo
+                  {t('soilAI.uploadPhoto')}
                 </h2>
 
                 {!preview ? (
@@ -379,11 +380,11 @@ const SoilAnalysis = () => {
                       <Camera className={`w-6 h-6 transition-colors ${isDragging ? "text-[#0F6B4A]" : "text-slate-400"}`} />
                     </div>
                     <p className="text-sm font-bold text-slate-700 mb-1">
-                      {isDragging ? "Release to upload" : "Drag and drop soil photo"}
+                      {isDragging ? t('soilAI.releaseUpload') : t('soilAI.dragDrop')}
                     </p>
-                    <p className="text-xs text-slate-400 mb-4">or click to browse files</p>
+                    <p className="text-xs text-slate-400 mb-4">{t('soilAI.clickBrowse')}</p>
                     <span className="text-[10px] font-bold bg-slate-50 border border-slate-200 text-slate-500 px-3 py-1.5 rounded-full">
-                      JPG · PNG · WEBP (Max 10MB)
+                      {t('soilAI.formatNote')}
                     </span>
                     <input
                       ref={fileInputRef}
@@ -406,7 +407,7 @@ const SoilAnalysis = () => {
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/20 backdrop-blur-sm">
                           <Loader2 className="w-10 h-10 text-[#1E8E5A] animate-spin mb-3" />
                           <span className="text-xs text-slate-700 font-bold bg-white px-4 py-2 rounded-full shadow-sm">
-                            Analyzing with EfficientNet AI...
+                            {t('soilAI.analyzing')}
                           </span>
                         </div>
                       )}
@@ -436,7 +437,7 @@ const SoilAnalysis = () => {
                     onClick={handleReset}
                     className="w-full flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 transition-all"
                   >
-                    <RefreshCw className="w-4 h-4" /> Analyze Another Image
+                    <RefreshCw className="w-4 h-4" /> {t('soilAI.analyzeAnother')}
                   </button>
                 )}
               </div>
@@ -462,8 +463,8 @@ const SoilAnalysis = () => {
                   <div className="w-16 h-16 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-center mb-4">
                     <FlaskConical className="w-8 h-8 text-slate-300" />
                   </div>
-                  <p className="text-slate-800 font-bold text-sm">Waiting for upload</p>
-                  <p className="text-slate-400 text-xs mt-1">Uploaded image diagnostics will show up here.</p>
+                  <p className="text-slate-800 font-bold text-sm">{t('soilAI.waitingUpload')}</p>
+                  <p className="text-slate-400 text-xs mt-1">{t('soilAI.waitingDesc')}</p>
                 </motion.div>
               )}
 
@@ -476,8 +477,8 @@ const SoilAnalysis = () => {
                   className="bg-white border border-slate-200 rounded-3xl p-8 flex flex-col items-center justify-center min-h-[380px] shadow-sm"
                 >
                   <Loader2 className="w-10 h-10 text-[#1E8E5A] animate-spin mb-4" />
-                  <p className="text-slate-800 text-sm font-bold">Inferencing Neural Net...</p>
-                  <p className="text-slate-400 text-xs mt-1">Generating crop-ready chemistry variables.</p>
+                  <p className="text-slate-800 text-sm font-bold">{t('soilAI.inferencing')}</p>
+                  <p className="text-slate-400 text-xs mt-1">{t('soilAI.inferencingDesc')}</p>
                 </motion.div>
               )}
 
@@ -498,9 +499,9 @@ const SoilAnalysis = () => {
                     >
                       <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                       <div>
-                        <p className="text-xs font-bold text-amber-700">Low Matching Score</p>
+                        <p className="text-xs font-bold text-amber-700">{t('soilAI.lowConfidence')}</p>
                         <p className="text-[11px] text-amber-650 mt-0.5 leading-relaxed font-semibold">
-                          The neural layer returns a {Math.round(confidence * 100)}% matching score. Consider re-uploading a clearer photograph under better daylight conditions.
+                          {t('soilAI.lowConfidenceDesc')}
                         </p>
                       </div>
                     </motion.div>
@@ -515,12 +516,12 @@ const SoilAnalysis = () => {
                         <div className="flex items-start justify-between mb-4">
                           <div>
                             <span className="text-3xl mb-2 block select-none">{soilData.emoji}</span>
-                            <h2 className="text-2xl font-black text-slate-800 font-heading">{cleanType} Soil</h2>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Classification Result</p>
+                            <h2 className="text-2xl font-black text-slate-800 font-heading">{soilTranslation?.name || cleanType} Soil</h2>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">{t('soilAI.classificationResult')}</p>
                           </div>
                           <div className="text-right">
                             <p className="text-4xl font-black text-slate-800 tracking-tighter">{Math.round(confidence * 100)}%</p>
-                            <p className="text-[9px] text-slate-400 uppercase tracking-widest font-black">Confidence</p>
+                            <p className="text-[9px] text-slate-400 uppercase tracking-widest font-black">{t('soilAI.confidence')}</p>
                           </div>
                         </div>
 
@@ -534,13 +535,13 @@ const SoilAnalysis = () => {
                           />
                         </div>
 
-                        <p className="text-xs text-slate-500 leading-relaxed font-medium">{soilData.description}</p>
+                        <p className="text-xs text-slate-500 leading-relaxed font-medium">{soilTranslation?.description || soilData.description}</p>
                       </div>
                     </div>
                   ) : (
                     <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
-                      <p className="text-lg font-bold text-slate-800">{cleanType} Soil</p>
-                      <p className="text-xs text-[#1E8E5A] mt-1 font-bold">Confidence: {Math.round(confidence * 100)}%</p>
+                      <p className="text-lg font-bold text-slate-800">{soilTranslation?.name || cleanType} Soil</p>
+                      <p className="text-xs text-[#1E8E5A] mt-1 font-bold">{t('soilAI.confidence')}: {Math.round(confidence * 100)}%</p>
                     </div>
                   )}
 
@@ -548,9 +549,9 @@ const SoilAnalysis = () => {
                     <>
                       {/* Characteristics */}
                       <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
-                        <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Diagnostic Profile</h3>
+                        <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">{t('soilAI.diagnosticProfile')}</h3>
                         <div className="grid grid-cols-2 gap-3">
-                          {soilData.characteristics.map((c, i) => (
+                          {(soilTranslation?.characteristics || soilData.characteristics).map((c, i) => (
                             <div key={i} className="flex items-center gap-2 text-xs font-bold text-slate-700 bg-slate-50 rounded-xl px-3 py-2.5 border border-slate-100">
                               <div className="w-2 h-2 rounded-full bg-[#1E8E5A] shrink-0" />
                               <span className="truncate">{c}</span>
@@ -559,12 +560,12 @@ const SoilAnalysis = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-100">
                           <div className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5">
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">pH Index</p>
-                            <p className="text-sm font-bold text-slate-850 mt-0.5 leading-none">{soilData.ph}</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{t('soilAI.phIndex')}</p>
+                            <p className="text-sm font-bold text-slate-850 mt-0.5 leading-none">{soilTranslation?.ph || soilData.ph}</p>
                           </div>
                           <div className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5">
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">NPK Ratios</p>
-                            <p className="text-sm font-bold text-slate-850 mt-0.5 leading-none">{soilData.npk}</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{t('soilAI.npkRatios')}</p>
+                            <p className="text-sm font-bold text-slate-850 mt-0.5 leading-none">{soilTranslation?.npk || soilData.npk}</p>
                           </div>
                         </div>
                       </div>
@@ -572,10 +573,10 @@ const SoilAnalysis = () => {
                       {/* Suitable Crops */}
                       <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
                         <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                          <Wheat className="w-4 h-4 text-[#1E8E5A]" /> Compatible Varieties
+                          <Wheat className="w-4 h-4 text-[#1E8E5A]" /> {t('soilAI.compatibleCrops')}
                         </h3>
                         <div className="flex flex-wrap gap-2">
-                          {soilData.crops.map((crop) => (
+                          {(soilTranslation?.crops || soilData.crops).map((crop) => (
                             <span key={crop} className="px-3.5 py-1.5 bg-[#E6F5EE] border border-emerald-200/50 text-[#0F6B4A] text-xs rounded-full font-bold">
                               {crop}
                             </span>
@@ -587,8 +588,8 @@ const SoilAnalysis = () => {
                       <div className="bg-[#E6F5EE] border border-emerald-200/40 rounded-3xl p-5 flex items-start gap-4">
                         <CheckCircle2 className="w-5.5 h-5.5 text-[#1E8E5A] shrink-0 mt-0.5" />
                         <div>
-                          <p className="text-xs font-bold text-[#0F6B4A] mb-1">Agronomy Advisory</p>
-                          <p className="text-xs text-[#1E8E5A] leading-relaxed font-bold">{soilData.recommendation}</p>
+                          <p className="text-xs font-bold text-[#0F6B4A] mb-1">{t('soilAI.agronomyAdvisory')}</p>
+                          <p className="text-xs text-[#1E8E5A] leading-relaxed font-bold">{soilTranslation?.recommendation || soilData.recommendation}</p>
                         </div>
                       </div>
                     </>
@@ -601,7 +602,7 @@ const SoilAnalysis = () => {
                         onClick={() => setShowAllScores(s => !s)}
                         className="flex items-center justify-between w-full text-left"
                       >
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Model Probability Matrix</span>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('soilAI.modelMatrix')}</span>
                         <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${showAllScores ? "rotate-180" : ""}`} />
                       </button>
                       <AnimatePresence>
@@ -641,9 +642,9 @@ const SoilAnalysis = () => {
             className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4"
           >
             {[
-              { icon: Sun, label: "Core Model Pipeline", value: "EfficientNet-B0 Neural Network", color: "text-amber-500" },
-              { icon: Droplets, label: "Soil Class Database", value: "7 Major Local Class Groups", color: "text-blue-500" },
-              { icon: Thermometer, label: "Reliability Safeguard", value: "65% Confidence Warning Threshold", color: "text-[#1E8E5A]" },
+              { icon: Sun, label: t('soilAI.corePipeline'), value: t('soilAI.modelValue'), color: "text-amber-500" },
+              { icon: Droplets, label: t('soilAI.classDatabase'), value: t('soilAI.classValue'), color: "text-blue-500" },
+              { icon: Thermometer, label: t('soilAI.reliability'), value: t('soilAI.reliabilityValue'), color: "text-[#1E8E5A]" },
             ].map((item) => (
               <div key={item.label} className="bg-white border border-slate-200 rounded-2xl px-5 py-4 flex items-center gap-4 shadow-sm">
                 <item.icon className={`w-5 h-5 shrink-0 ${item.color}`} />

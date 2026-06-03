@@ -4,10 +4,12 @@ import { motion } from "framer-motion";
 import { Wheat, Eye, EyeOff, CheckCircle, Leaf } from "lucide-react";
 import API from "../services/api";
 import { AuthContext } from "../context/AuthContext";
+import { useTranslation } from "../translations";
 
 const Register = () => {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
+  const { t } = useTranslation();
 
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [showPwd, setShowPwd] = useState(false);
@@ -81,17 +83,11 @@ const Register = () => {
               </div>
               <span className="text-3xl font-bold text-white font-heading tracking-tight">AgriSense</span>
             </div>
-            <h2 className="text-4xl font-bold text-white font-heading mb-4 leading-tight">
-              Join thousands of<br />smart farmers.
+            <h2 className="text-4xl font-bold text-white font-heading mb-4 leading-tight" dangerouslySetInnerHTML={{ __html: t('auth.registerTitle') }}>
             </h2>
-            <ul className="space-y-3">
-              {benefits.map((b, i) => (
-                <li key={i} className="flex items-center gap-3 text-base text-white/90">
-                  <CheckCircle className="w-5 h-5 text-[#1E8E5A] shrink-0" />
-                  {b}
-                </li>
-              ))}
-            </ul>
+            <p className="text-white/80 text-base leading-relaxed max-w-md mb-6">
+              {t('auth.registerDesc')}
+            </p>
           </motion.div>
         </div>
       </div>
@@ -117,8 +113,8 @@ const Register = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <h1 className="text-3xl font-bold text-slate-800 font-heading mb-2">Create your account</h1>
-            <p className="text-slate-500 text-base mb-8">Start farming smarter with AI — it's free</p>
+            <h1 className="text-3xl font-bold text-slate-800 font-heading mb-2">{t('auth.createAccount')}</h1>
+            <p className="text-slate-500 text-base mb-8">{t('auth.startOptimizing')}</p>
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl mb-5 flex items-center gap-2">
@@ -135,34 +131,34 @@ const Register = () => {
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
               <div>
                 <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">
-                  Full Name
+                  {t('auth.fullName')}
                 </label>
                 <input
                   type="text" name="name" value={form.name}
-                  onChange={handleChange} placeholder="Your name" required
+                  onChange={handleChange} placeholder={t('auth.namePlaceholder')} required
                   className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1E8E5A] focus:border-[#1E8E5A] transition-all"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">
-                  Email Address
+                  {t('auth.email')}
                 </label>
                 <input
                   type="email" name="email" value={form.email}
-                  onChange={handleChange} placeholder="you@example.com" required
+                  onChange={handleChange} placeholder={t('auth.emailPlaceholder')} required
                   className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1E8E5A] focus:border-[#1E8E5A] transition-all"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">
-                  Password
+                  {t('auth.password')}
                 </label>
                 <div className="relative">
                   <input
                     type={showPwd ? "text" : "password"} name="password" value={form.password}
-                    onChange={handleChange} placeholder="Min 6 characters" required
+                    onChange={handleChange} placeholder={t('auth.createPassword')} required
                     className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1E8E5A] focus:border-[#1E8E5A] transition-all pr-10"
                   />
                   <button type="button" onClick={() => setShowPwd(p => !p)}
@@ -192,15 +188,15 @@ const Register = () => {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z"/>
                     </svg>
-                    Creating Account...
+                    {t('auth.creating')}
                   </span>
-                ) : "Create Free Account"}
+                ) : t('auth.createAccount')}
               </button>
             </form>
 
             <p className="text-center text-sm text-slate-500 mt-8">
-              Already have an account?{" "}
-              <Link to="/login" className="text-[#1E8E5A] font-semibold hover:underline">Sign in</Link>
+              {t('auth.alreadyHave')}{" "}
+              <Link to="/login" className="text-[#1E8E5A] font-semibold hover:underline">{t('auth.signInInstead')}</Link>
             </p>
           </motion.div>
         </div>

@@ -93,7 +93,7 @@ const ExpenseTracker = () => {
         setExpenses(data.expenses || []);
         setPlan(nextPlan);
         setSavedPlan(nextPlan);
-        setPlanStatus("Forecast saved");
+        setPlanStatus(t('expense.forecastSaved'));
       } catch (err) {
         if (active) {
           setError(err.response?.data?.message || "Could not load expenses");
@@ -120,15 +120,15 @@ const ExpenseTracker = () => {
 
   let statusLabel, statusColor, statusBorder;
   if (profitRatio > 0.3) {
-    statusLabel = "On Track";
+    statusLabel = t('expense.onTrack');
     statusColor = "text-[#0F6B4A] bg-[#E6F5EE]";
     statusBorder = "border-[#2BB673]/20";
   } else if (profitRatio > 0.1) {
-    statusLabel = "Tight Budget";
+    statusLabel = t('expense.tightBudget');
     statusColor = "text-amber-700 bg-amber-50";
     statusBorder = "border-amber-250";
   } else {
-    statusLabel = "Over Budget";
+    statusLabel = t('expense.overBudget');
     statusColor = "text-red-700 bg-red-50";
     statusBorder = "border-red-200";
   }
@@ -145,7 +145,7 @@ const ExpenseTracker = () => {
 
   const handlePlanChange = (e) => {
     setPlan((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    setPlanStatus("Forecast changed");
+    setPlanStatus(t('expense.forecastChanged'));
   };
 
   const handleSavePlan = async (e) => {
@@ -159,10 +159,10 @@ const ExpenseTracker = () => {
       setPlan(nextPlan);
       setSavedPlan(nextPlan);
       setExpenses(data.expenses || []);
-      setPlanStatus("Forecast saved");
+      setPlanStatus(t('expense.forecastSaved'));
     } catch (err) {
       setError(err.response?.data?.message || "Could not save crop plan");
-      setPlanStatus("Save failed");
+      setPlanStatus(t('expense.saveFailed'));
     } finally {
       setSavingPlan(false);
     }
@@ -213,18 +213,18 @@ const ExpenseTracker = () => {
 
   const handleExportCsv = () => {
     const summaryRows = [
-      ["AgriSense Expense Report"],
-      ["Crop", plan.crop],
-      ["Season", plan.season],
-      ["Area", plan.area],
-      ["Yield/acre", plan.expectedYield],
-      ["Price/quintal", plan.expectedPrice],
-      ["Predicted Revenue", predictedRevenue],
-      ["Total Spent", totalSpent],
-      ["Estimated Profit", estimatedProfit],
-      ["Status", statusLabel],
+      [t('expense.reportTitle')],
+      [t('expense.crop'), plan.crop],
+      [t('expense.season'), plan.season],
+      [t('expense.areaAcres'), plan.area],
+      [t('expense.yieldPerAcre'), plan.expectedYield],
+      [t('expense.pricePerQuintal'), plan.expectedPrice],
+      [t('expense.predictedRevenue'), predictedRevenue],
+      [t('expense.totalSpent'), totalSpent],
+      [t('expense.estimatedProfit'), estimatedProfit],
+      [t('expense.status'), statusLabel],
       [],
-      ["Date", "Category", "Amount", "Notes"],
+      [t('expense.date'), t('expense.category'), t('expense.amount'), t('expense.notes')],
     ];
 
     const expenseRows = sortedExpenses.map((expense) => [
@@ -283,19 +283,19 @@ const ExpenseTracker = () => {
           </style>
         </head>
         <body>
-          <button onclick="window.print()" style="float:right;padding:8px 12px">Save as PDF</button>
-          <h1>AgriSense Expense Report</h1>
-          <div class="muted">${escapeHtml(plan.crop || "Crop")} / ${escapeHtml(plan.season || "Season")} - ${new Date().toLocaleDateString("en-IN")}</div>
+          <button onclick="window.print()" style="float:right;padding:8px 12px">${t('expense.saveAsPdf')}</button>
+          <h1>${t('expense.reportTitle')}</h1>
+          <div class="muted">${escapeHtml(plan.crop || t('expense.crop'))} / ${escapeHtml(plan.season || t('expense.season'))} - ${new Date().toLocaleDateString("en-IN")}</div>
           <div class="grid">
-            <div class="card"><div class="label">Total Spent</div><div class="value">Rs ${currency(totalSpent)}</div></div>
-            <div class="card"><div class="label">Predicted Revenue</div><div class="value">Rs ${currency(predictedRevenue)}</div></div>
-            <div class="card"><div class="label">Estimated Profit</div><div class="value">Rs ${currency(estimatedProfit)}</div></div>
-            <div class="card"><div class="label">Status</div><div class="value">${statusLabel}</div></div>
+            <div class="card"><div class="label">${t('expense.totalSpent')}</div><div class="value">Rs ${currency(totalSpent)}</div></div>
+            <div class="card"><div class="label">${t('expense.predictedRevenue')}</div><div class="value">Rs ${currency(predictedRevenue)}</div></div>
+            <div class="card"><div class="label">${t('expense.estimatedProfit')}</div><div class="value">Rs ${currency(estimatedProfit)}</div></div>
+            <div class="card"><div class="label">${t('expense.status')}</div><div class="value">${statusLabel}</div></div>
           </div>
-          <h2>Expenses</h2>
+          <h2>${t('expense.title')}</h2>
           <table>
-            <thead><tr><th>Date</th><th>Category</th><th>Amount</th><th>Notes</th></tr></thead>
-            <tbody>${rows || '<tr><td colspan="4">No expenses recorded.</td></tr>'}</tbody>
+            <thead><tr><th>${t('expense.date')}</th><th>${t('expense.category')}</th><th>${t('expense.amount')}</th><th>${t('expense.notes')}</th></tr></thead>
+            <tbody>${rows || `<tr><td colspan="4">${t('expense.noExpensesRecorded')}</td></tr>`}</tbody>
           </table>
         </body>
       </html>
@@ -323,16 +323,16 @@ const ExpenseTracker = () => {
               <div className="space-y-6">
                 <div className="inline-flex items-center gap-2 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold px-4 py-2 rounded-full tracking-widest uppercase">
                   <Wallet className="w-4 h-4" />
-                  Financial Management
+                  {t('expense.financialManagement')}
                 </div>
 
                 <h1 className="text-white text-4xl md:text-5xl font-extrabold leading-[1.1] tracking-tight font-heading">
-                  Expense Tracker
-                  <span className="block text-[#2BB673] mt-2">Budget Intelligence</span>
+                  {t('expense.title')}
+                  <span className="block text-[#2BB673] mt-2">{t('expense.subtitle')}</span>
                 </h1>
 
                 <p className="text-white/80 text-base md:text-lg leading-relaxed max-w-lg">
-                  Track seasonal farm expenditure next to predicted crop revenue indexes. Smart budgeting with profit margin analysis and export-ready reports.
+                  {t('expense.desc')}
                 </p>
               </div>
 
@@ -349,25 +349,25 @@ const ExpenseTracker = () => {
                         <Wallet className="w-7 h-7 text-white" />
                       </div>
                       <div>
-                        <h3 className="text-white font-bold text-lg">Budget AI</h3>
-                        <p className="text-white/60 text-sm">Financial Analytics</p>
+                        <h3 className="text-white font-bold text-lg">{t('expense.budgetAI')}</h3>
+                        <p className="text-white/60 text-sm">{t('expense.financialAnalytics')}</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
-                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Categories</p>
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">{t('expense.categoriesCount')}</p>
                         <p className="text-white text-3xl font-black font-heading">8</p>
                       </div>
                       <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
-                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Reports</p>
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">{t('expense.reportsCount')}</p>
                         <p className="text-white text-3xl font-black font-heading">PDF</p>
                       </div>
                     </div>
 
                     <div className="bg-white/10 border border-white/10 rounded-2xl p-4 flex items-center gap-3">
                       <Sparkles className="w-5 h-5 text-[#2BB673]" />
-                      <p className="text-white/80 text-sm">Profit margin analysis</p>
+                      <p className="text-white/80 text-sm">{t('expense.profitMarginAnalysis')}</p>
                     </div>
                   </div>
                 </div>
@@ -390,8 +390,8 @@ const ExpenseTracker = () => {
                   <Wallet className="h-6 w-6 text-[#1E8E5A]" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-slate-800 font-heading">Expense Tracker</h1>
-                  <p className="text-sm text-slate-500">Track seasonal farm expenditure next to predicted crop revenue indexes</p>
+                  <h1 className="text-2xl font-bold text-slate-800 font-heading">{t('expense.headerTitle')}</h1>
+                  <p className="text-sm text-slate-500">{t('expense.headerDesc')}</p>
                 </div>
               </div>
             </motion.div>
@@ -413,9 +413,9 @@ const ExpenseTracker = () => {
         {/* Summary Metric Cards */}
         <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
           {[
-            { label: "Total Spent", val: totalSpent, color: "text-slate-800" },
-            { label: "Predicted Revenue", val: predictedRevenue, color: "text-[#1E8E5A]" },
-            { label: "Estimated Net Margin", val: estimatedProfit, color: "text-[#0F6B4A]" }
+            { label: t('expense.totalSpent'), val: totalSpent, color: "text-slate-800" },
+            { label: t('expense.predictedRevenue'), val: predictedRevenue, color: "text-[#1E8E5A]" },
+            { label: t('expense.estimatedNetMargin'), val: estimatedProfit, color: "text-[#0F6B4A]" }
           ].map((stat, i) => (
             <motion.div 
               key={i}
@@ -438,7 +438,7 @@ const ExpenseTracker = () => {
             transition={{ delay: 0.15 }}
             className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm flex flex-col justify-between"
           >
-            <p className="mb-2 text-[9px] font-bold uppercase tracking-widest text-slate-400">Budget Status</p>
+            <p className="mb-2 text-[9px] font-bold uppercase tracking-widest text-slate-400">{t('expense.budgetStatus')}</p>
             <div>
               <span className={`inline-block rounded-full border px-3 py-1.5 text-[9px] font-black uppercase tracking-wider shadow-sm ${statusColor} ${statusBorder}`}>
                 {statusLabel}
@@ -460,12 +460,12 @@ const ExpenseTracker = () => {
               <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center border border-emerald-100 shadow-sm shrink-0">
                 <Plus className="h-4 w-4 text-[#1E8E5A]" />
               </div>
-              Record Expense
+              {t('expense.recordExpense')}
             </h2>
             
             <div className="space-y-4">
               <div>
-                <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Category</label>
+                <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">{t('expense.category')}</label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
@@ -480,7 +480,7 @@ const ExpenseTracker = () => {
               </div>
 
               <div>
-                <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Amount (INR)</label>
+                <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">{t('expense.amountInr')}</label>
                 <input
                   type="number"
                   min="0"
@@ -494,7 +494,7 @@ const ExpenseTracker = () => {
               </div>
 
               <div>
-                <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Transaction Date</label>
+                <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">{t('expense.transactionDate')}</label>
                 <input
                   type="date"
                   value={date}
@@ -505,7 +505,7 @@ const ExpenseTracker = () => {
               </div>
 
               <div>
-                <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Notes / Dealer</label>
+                <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">{t('expense.notes')}</label>
                 <input
                   type="text"
                   placeholder="e.g. Seed Purchase"
@@ -522,7 +522,7 @@ const ExpenseTracker = () => {
               className="mt-6 w-full flex items-center justify-center gap-2 rounded-full bg-[#1E8E5A] hover:bg-[#0F6B4A] py-3 text-xs font-bold uppercase tracking-wider text-white shadow-md shadow-[#1E8E5A]/10 transition-all disabled:opacity-50 active:scale-95"
             >
               <Plus className="h-4 w-4" />
-              {savingExpense ? "Saving..." : "Add Transaction"}
+              {savingExpense ? t('expense.saving') : t('expense.addTransaction')}
             </button>
           </motion.form>
 
@@ -540,16 +540,16 @@ const ExpenseTracker = () => {
                   <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100 shadow-sm shrink-0">
                     <TrendingUp className="h-4 w-4 text-[#2F80ED]" />
                   </div>
-                  Crop Budget Forecast
+                  {t('expense.cropBudgetForecast')}
                 </h2>
                 <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-[#2F80ED]">
-                  {plan.crop || "Crop"} / {plan.season || "Season"}
+                  {plan.crop || t('expense.crop')} / {plan.season || t('expense.season')}
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                 <div>
-                  <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Crop Type</label>
+                  <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">{t('expense.cropType')}</label>
                   <select
                     name="crop"
                     value={plan.crop}
@@ -564,7 +564,7 @@ const ExpenseTracker = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Season</label>
+                  <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">{t('expense.season')}</label>
                   <select
                     name="season"
                     value={plan.season}
@@ -579,7 +579,7 @@ const ExpenseTracker = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Area (Acres)</label>
+                  <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">{t('expense.areaAcres')}</label>
                   <input
                     name="area"
                     type="number"
@@ -591,7 +591,7 @@ const ExpenseTracker = () => {
                   />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Yield/Acre (Qtl)</label>
+                  <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">{t('expense.yieldAcre')}</label>
                   <input
                     name="expectedYield"
                     type="number"
@@ -603,7 +603,7 @@ const ExpenseTracker = () => {
                   />
                 </div>
                 <div className="col-span-2 sm:col-span-1">
-                  <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">Price/Qtl (INR)</label>
+                  <label className="mb-1.5 block text-[9px] font-bold uppercase tracking-widest text-slate-400">{t('expense.priceQtl')}</label>
                   <input
                     name="expectedPrice"
                     type="number"
@@ -623,12 +623,12 @@ const ExpenseTracker = () => {
                   className="flex items-center gap-2 rounded-full bg-[#2F80ED] hover:bg-[#1B6AD1] px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-md shadow-[#2F80ED]/10 transition-all disabled:opacity-50 active:scale-95"
                 >
                   <Save className="h-4 w-4" />
-                  {savingPlan ? "Updating..." : "Update Forecast"}
+                  {savingPlan ? t('expense.updating') : t('expense.updateForecast')}
                 </button>
                 {planStatus && (
                   <p
                     className={`flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest ${
-                      planStatus === "Save failed"
+                      planStatus === t('expense.saveFailed')
                         ? "text-red-500"
                         : hasPlanChanges
                           ? "text-amber-500"
@@ -654,7 +654,7 @@ const ExpenseTracker = () => {
                   <div className="w-8 h-8 rounded-xl bg-orange-50 flex items-center justify-center border border-orange-100 shadow-sm shrink-0">
                     <BarChart3 className="h-4 w-4 text-orange-600" />
                   </div>
-                  Category Expenditures
+                  {t('expense.categoryExpenditures')}
                 </h2>
                 <div className="space-y-4">
                   {categories.filter((cat) => categoryTotals[cat] > 0).map(
@@ -693,7 +693,7 @@ const ExpenseTracker = () => {
           >
             <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
               <h2 className="text-base font-bold text-slate-800 tracking-tight font-heading flex items-center gap-2">
-                All Transactions 
+                {t('expense.allTransactions')} 
                 <span className="bg-slate-100 text-slate-500 text-xs px-2.5 py-1 rounded-md border border-slate-200/50">{expenses.length}</span>
               </h2>
               <div className="flex flex-wrap items-center gap-3">
@@ -702,21 +702,21 @@ const ExpenseTracker = () => {
                   className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 transition-all hover:bg-slate-50 hover:text-slate-800"
                 >
                   <Download className="h-3.5 w-3.5" />
-                  CSV
+                  {t('expense.csv')}
                 </button>
                 <button
                   onClick={handleExportPdf}
                   className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 transition-all hover:bg-slate-50 hover:text-slate-800"
                 >
                   <FileText className="h-3.5 w-3.5" />
-                  PDF
+                  {t('expense.pdf')}
                 </button>
                 <button
                   onClick={handleClearAll}
                   className="flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-red-650 transition-all hover:bg-red-100"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
-                  Clear All
+                  {t('expense.clearAll')}
                 </button>
               </div>
             </div>
@@ -725,10 +725,10 @@ const ExpenseTracker = () => {
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                    <th className="p-4 pl-6">Date</th>
-                    <th className="p-4">Category</th>
-                    <th className="p-4">Amount</th>
-                    <th className="p-4">Notes</th>
+                    <th className="p-4 pl-6">{t('expense.date')}</th>
+                    <th className="p-4">{t('expense.category')}</th>
+                    <th className="p-4">{t('expense.amount')}</th>
+                    <th className="p-4">{t('expense.notes')}</th>
                     <th className="p-4 pr-6" />
                   </tr>
                 </thead>
@@ -781,7 +781,7 @@ const ExpenseTracker = () => {
             className="bg-white border border-slate-200 rounded-3xl py-16 text-center shadow-sm flex flex-col items-center justify-center"
           >
             <Wallet className="w-10 h-10 text-slate-300 mb-4" />
-            <p className="text-slate-400 font-semibold text-sm">No recorded transactions for this forecast cycle.<br/>Input a transaction above to log metrics.</p>
+            <p className="text-slate-400 font-semibold text-sm" dangerouslySetInnerHTML={{ __html: t('expense.noRecordedTransactions') }}></p>
           </motion.div>
         )}
         </section>

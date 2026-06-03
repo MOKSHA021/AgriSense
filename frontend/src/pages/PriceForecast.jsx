@@ -34,16 +34,16 @@ const PriceForecast = () => {
               <div className="space-y-6">
                 <div className="inline-flex items-center gap-2 bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 text-[11px] font-bold px-4 py-2 rounded-full tracking-widest uppercase">
                   <LineChart className="w-4 h-4" />
-                  Time-Series AI
+                  {t('market.timeSeriesAI')}
                 </div>
 
                 <h1 className="text-white text-4xl md:text-5xl font-extrabold leading-[1.1] tracking-tight font-heading">
-                  Price Forecast
-                  <span className="block text-[#2BB673] mt-2">Prediction Platform</span>
+                  {t('market.forecastTitle')}
+                  <span className="block text-[#2BB673] mt-2">{t('market.forecastSubtitle')}</span>
                 </h1>
 
                 <p className="text-white/80 text-base md:text-lg leading-relaxed max-w-lg">
-                  Prophet ML models projecting future agricultural rates up to 3 years ahead for smarter crop planning and market timing decisions.
+                  {t('market.forecastDesc')}
                 </p>
               </div>
 
@@ -60,25 +60,25 @@ const PriceForecast = () => {
                         <LineChart className="w-7 h-7 text-white" />
                       </div>
                       <div>
-                        <h3 className="text-white font-bold text-lg">Prophet ML</h3>
-                        <p className="text-white/60 text-sm">Time-Series Forecasting</p>
+                        <h3 className="text-white font-bold text-lg">{t('market.prophetML')}</h3>
+                        <p className="text-white/60 text-sm">{t('market.forecasting')}</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
-                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Years</p>
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">{t('market.years')}</p>
                         <p className="text-white text-3xl font-black font-heading">3</p>
                       </div>
                       <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
-                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Crops</p>
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">{t('market.crops')}</p>
                         <p className="text-white text-3xl font-black font-heading">12</p>
                       </div>
                     </div>
 
                     <div className="bg-white/10 border border-white/10 rounded-2xl p-4 flex items-center gap-3">
                       <Sparkles className="w-5 h-5 text-[#2BB673]" />
-                      <p className="text-white/80 text-sm">AI-powered market predictions</p>
+                      <p className="text-white/80 text-sm">{t('market.aiPredictions')}</p>
                     </div>
                   </div>
                 </div>
@@ -101,8 +101,8 @@ const PriceForecast = () => {
                   <LineChart className="w-6 h-6 text-blue-500" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-slate-800 font-heading">AI Price Forecast</h1>
-                  <p className="text-sm text-slate-500">Facebook Prophet embedded time-series AI for future market prices</p>
+                  <h1 className="text-2xl font-bold text-slate-800 font-heading">{t('market.headerTitle')}</h1>
+                  <p className="text-sm text-slate-500">{t('market.headerDesc')}</p>
                 </div>
               </div>
             </motion.div>
@@ -111,7 +111,7 @@ const PriceForecast = () => {
           <PricePrediction />
 
           <p className="text-center text-xs text-slate-400 font-medium mt-16">
-            AgriSense · Prophet ML Prediction Model · © {new Date().getFullYear()}
+            {t('market.forecastFooter')} · © {new Date().getFullYear()}
           </p>
         </section>
       </main>

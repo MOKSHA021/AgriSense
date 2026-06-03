@@ -6,6 +6,7 @@ import MandiCard from "../components/market/MandiCard";
 import MandiMap from "../components/market/MandiMap";
 import LivePrices from "../components/market/LivePrices.jsx";
 import PricePrediction from "../components/market/PricePrediction";
+import { useTranslation } from "../translations";
 
 // ── Geocode mandi name → lat/lng via Nominatim ──
 const geocodeMandi = async (mandiName, district, state) => {
@@ -24,6 +25,7 @@ const geocodeMandi = async (mandiName, district, state) => {
 };
 
 const Market = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("mandi");
 
   // ── Districts ──
@@ -185,18 +187,18 @@ const Market = () => {
 
         {/* Page Header */}
         <div>
-          <h1 className="text-2xl font-bold text-white drop-shadow">Market Prices</h1>
+          <h1 className="text-2xl font-bold text-white drop-shadow">{t('market.title')}</h1>
           <p className="text-white/70 text-sm mt-1">
-            Find the best mandi, browse live prices, or predict future rates.
+            {t('market.subtitle')}
           </p>
         </div>
 
         {/* Tab Switcher */}
         <div className="flex gap-2 bg-black/40 backdrop-blur-md rounded-2xl p-1.5 shadow-sm border border-white/10 w-fit">
           {[
-            { id: "mandi",   label: "🏆 Best Mandi",      active: "bg-green-600"   },
-            { id: "live",    label: "📋 Live Prices",      active: "bg-green-600"  },
-            { id: "predict", label: "🤖 Price Prediction", active: "bg-green-600" },
+            { id: "mandi",   label: t('market.tabBestMandi'),      active: "bg-green-600"   },
+            { id: "live",    label: t('market.tabLivePrices'),      active: "bg-green-600"  },
+            { id: "predict", label: t('market.tabPredict'), active: "bg-green-600" },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -284,7 +286,7 @@ const Market = () => {
                       🌾 {mandiResults.crop} · {mandiResults.quantity} qtl · {mandiResults.district}, {mandiResults.state}
                     </span>
                     <span className="text-amber-100 text-xs">
-                      {mandiResults.mandis.length} mandis found
+                      {mandiResults.mandis.length} {t('market.mandisFound')}
                     </span>
                   </div>
 
@@ -306,10 +308,10 @@ const Market = () => {
               {/* Map */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-semibold text-white/70">🗺️ Map</label>
+                  <label className="text-sm font-semibold text-white/70">{t('market.mapLabel')}</label>
                   {clickMode && (
                     <span className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full animate-pulse">
-                      🖱️ Click map to set {clickMode === "farmer" ? "farm" : "mandi"} location
+                      {clickMode === "farmer" ? t('mandi.clickMapFarm') : t('mandi.clickMapMandi')}
                     </span>
                   )}
                 </div>
@@ -331,19 +333,19 @@ const Market = () => {
                 {/* Route Info Card */}
                 {routeInfo && (
                   <div className="mt-3 p-4 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl">
-                    <h4 className="text-sm font-bold text-amber-400 mb-3">🛣️ Route Summary</h4>
+                    <h4 className="text-sm font-bold text-amber-400 mb-3">{t('mandi.routeSummary')}</h4>
 
                     <div className="grid grid-cols-3 gap-3 text-center mb-3">
                       <div className="bg-white/10 rounded-xl p-2">
-                        <p className="text-xs text-white/40">Distance</p>
+                        <p className="text-xs text-white/40">{t('mandi.distance')}</p>
                         <p className="font-bold text-blue-400">{routeInfo.distanceKm} km</p>
                       </div>
                       <div className="bg-white/10 rounded-xl p-2">
-                        <p className="text-xs text-white/40">Est. Time</p>
+                        <p className="text-xs text-white/40">{t('mandi.estTime')}</p>
                         <p className="font-bold text-emerald-400">~{routeInfo.durationMin} min</p>
                       </div>
                       <div className="bg-white/10 rounded-xl p-2">
-                        <p className="text-xs text-white/40">Total Cost</p>
+                        <p className="text-xs text-white/40">{t('mandi.totalCost')}</p>
                         <p className="font-bold text-red-400">
                           ₹{routeInfo.totalCost?.toLocaleString()}
                         </p>
@@ -352,19 +354,19 @@ const Market = () => {
 
                     <div className="grid grid-cols-3 gap-2 text-center text-xs">
                       <div className="bg-orange-500/10 rounded-xl py-2">
-                        <p className="text-white/40">Fuel</p>
+                        <p className="text-white/40">{t('mandi.fuel')}</p>
                         <p className="font-semibold text-orange-400">
                           ₹{routeInfo.breakdown?.fuelCost?.toLocaleString()}
                         </p>
                       </div>
                       <div className="bg-purple-500/10 rounded-xl py-2">
-                        <p className="text-white/40">Toll</p>
+                        <p className="text-white/40">{t('mandi.toll')}</p>
                         <p className="font-semibold text-purple-400">
                           ₹{routeInfo.breakdown?.tollCost?.toLocaleString()}
                         </p>
                       </div>
                       <div className="bg-white/5 rounded-xl py-2">
-                        <p className="text-white/40">Loading</p>
+                        <p className="text-white/40">{t('mandi.loading')}</p>
                         <p className="font-semibold text-white/60">
                           ₹{routeInfo.breakdown?.loadingCost?.toLocaleString()}
                         </p>
@@ -372,7 +374,7 @@ const Market = () => {
                     </div>
 
                     <p className="text-xs text-white/40 text-center mt-2">
-                      🚛 {routeInfo.truckType} truck · based on real road distance
+                      🚛 {routeInfo.truckType} {t('mandi.truckTypeNote')}
                     </p>
                   </div>
                 )}
@@ -381,7 +383,7 @@ const Market = () => {
                 {selectedMandi && (
                   <div className="mt-2 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-center">
                     <p className="text-sm font-semibold text-emerald-400">
-                      ✅ Selected: <span className="font-bold">{selectedMandi.name}</span>
+                      {t('mandi.selectedMandi')} <span className="font-bold">{selectedMandi.name}</span>
                     </p>
                   </div>
                 )}
@@ -397,7 +399,7 @@ const Market = () => {
         {activeTab === "predict" && <PricePrediction />}
 
         <p className="text-center text-xs text-white/40 pb-4">
-          🌾 AgriSense · Mandi data: Agmarknet · © {new Date().getFullYear()}
+          {t('market.footer')} · © {new Date().getFullYear()}
         </p>
       </main>
       </div>

@@ -131,37 +131,37 @@ export default function LandingPage() {
 
         <div className="hidden md:flex items-center gap-6 text-sm font-semibold">
           <a href="#platform" className={`transition-colors ${scrolled ? "text-slate-600 hover:text-[#1E8E5A]" : "text-white/80 hover:text-white"}`}>
-            Platform
+            {t('landing.platform')}
           </a>
           <a href="#intelligence" className={`transition-colors ${scrolled ? "text-slate-600 hover:text-[#1E8E5A]" : "text-white/80 hover:text-white"}`}>
-            AI Models
+            {t('landing.aiModels')}
           </a>
           <a href="#features" className={`transition-colors ${scrolled ? "text-slate-600 hover:text-[#1E8E5A]" : "text-white/80 hover:text-white"}`}>
-            Features
+            {t('landing.features')}
           </a>
           <a href="#workflow" className={`transition-colors ${scrolled ? "text-slate-600 hover:text-[#1E8E5A]" : "text-white/80 hover:text-white"}`}>
-            Workflow
+            {t('landing.workflow')}
           </a>
           <div className="h-4 w-px bg-slate-300/30" />
           <LanguageSwitcher variant="navbar" />
           <Link to="/login" className={`transition-colors ${scrolled ? "text-slate-700 hover:text-[#1E8E5A]" : "text-white/95 hover:text-white"}`}>
-            Sign In
+            {t('nav.signIn')}
           </Link>
           <Link
             to="/register"
             className="bg-[#1E8E5A] hover:bg-[#0F6B4A] text-white px-5 py-2.5 rounded-full text-xs font-bold transition-all shadow-md shadow-[#1E8E5A]/10"
           >
-            Get Started Free
+            {t('nav.getStarted')}
           </Link>
         </div>
 
         <div className="flex md:hidden items-center gap-3">
           <LanguageSwitcher variant="navbar" />
           <Link to="/login" className="text-white text-xs font-bold bg-[#1E8E5A]/20 border border-white/20 px-3 py-1.5 rounded-full">
-            Sign In
+            {t('nav.signIn')}
           </Link>
           <Link to="/register" className="bg-[#1E8E5A] text-white text-xs font-bold px-3 py-1.5 rounded-full">
-            Register
+            {t('nav.register')}
           </Link>
         </div>
       </nav>
@@ -186,12 +186,12 @@ export default function LandingPage() {
             </div>
 
             <h1 className="text-white text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight font-heading">
-              OPTIMIZE YOUR FIELD.
-              <span className="block text-[#2BB673] mt-2">MAXIMIZE YOUR HARVEST.</span>
+              {t('landing.heroTitle')}
+              <span className="block text-[#2BB673] mt-2">{t('landing.heroSubtitle')}</span>
             </h1>
 
             <p className="text-white/80 text-base sm:text-lg leading-relaxed max-w-lg">
-              AgriSense unifies crop recommendations, real-time weather risk advisories, and mandate transport cost geocoding into an enterprise platform powered by Random Forest & EfficientNet ML models.
+              {t('landing.heroDesc')}
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-4">
@@ -199,7 +199,7 @@ export default function LandingPage() {
                 onClick={() => navigate("/register")}
                 className="group inline-flex items-center gap-2 bg-[#1E8E5A] hover:bg-[#0F6B4A] text-white font-bold px-7 py-4 rounded-full text-xs transition-all shadow-xl shadow-green-950/30 hover:scale-105"
               >
-                START YOUR FREE ANALYSIS
+                {t('landing.startAnalysis')}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
 
@@ -207,14 +207,14 @@ export default function LandingPage() {
                 to="/login"
                 className="inline-flex items-center gap-2 text-white/90 hover:text-white text-xs font-bold bg-white/5 hover:bg-white/10 border border-white/15 px-6 py-4 rounded-full transition-all"
               >
-                Sign In to Dashboard
+                {t('landing.signInDashboard')}
               </Link>
             </div>
 
             <div className="pt-8 flex items-center gap-8 border-t border-white/10">
               <div>
                 <p className="text-white text-2xl font-black font-heading leading-none">87.8%</p>
-                <p className="text-white/50 text-[10px] uppercase font-bold tracking-wider mt-1.5">Model Accuracy</p>
+                <p className="text-white/50 text-[10px] uppercase font-bold tracking-wider mt-1.5">{t('landing.modelAccuracy')}</p>
               </div>
               <div className="w-px h-8 bg-white/15" />
               <div className="flex items-center gap-3">
@@ -225,7 +225,7 @@ export default function LandingPage() {
                     </div>
                   ))}
                 </div>
-                <p className="text-white/60 text-xs font-medium">Trusted by agricultural analysts and farmers.</p>
+                <p className="text-white/60 text-xs font-medium">{t('landing.trustedBy')}</p>
               </div>
             </div>
           </motion.div>
@@ -335,12 +335,12 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=1920&q=80')] bg-cover bg-center opacity-5" />
         <div className="max-w-7xl mx-auto px-6 md:px-16 text-center">
           <div className="max-w-3xl mx-auto space-y-4 mb-16">
-            <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Enterprise Architecture</span>
+            <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">{t('landing.enterpriseArchitecture')}</span>
             <h2 className="text-[#0F6B4A] text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight font-heading">
-              A Unified Agriculture Intelligence Cloud
+              {t('landing.platformTitle')}
             </h2>
             <p className="text-slate-500 text-base md:text-lg">
-              AgriSense connects disparate field inputs with machine learning backends to optimize the crop cycle from soil testing to final mandi sale.
+              {t('landing.platformDesc')}
             </p>
           </div>
 
@@ -402,12 +402,12 @@ export default function LandingPage() {
             animate={platformInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
             transition={{ duration: 0.5 }}
           >
-            <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Predictive ML Models</span>
+            <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">{t('landing.predictiveML')}</span>
             <h2 className="text-[#0F6B4A] text-3xl sm:text-4xl font-extrabold tracking-tight font-heading">
-              Powered by Advanced Neural & Statistical Modeling
+              {t('landing.mlTitle')}
             </h2>
             <p className="text-slate-500 text-sm sm:text-base leading-relaxed">
-              AgriSense integrates state-of-the-art Python ML service nodes directly into the frontend user workflow. All prediction runs happen instantly.
+              {t('landing.mlDesc')}
             </p>
 
             <div className="space-y-4 pt-4">
@@ -505,12 +505,12 @@ export default function LandingPage() {
       <section id="features" ref={featuresRef} className="py-24 bg-[#F8FAFC]">
         <div className="max-w-7xl mx-auto px-6 md:px-16 text-center">
           <div className="max-w-3xl mx-auto space-y-4 mb-16">
-            <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Comprehensive Toolset</span>
+            <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">{t('landing.comprehensiveToolset')}</span>
             <h2 className="text-[#0F4C3A] text-3xl sm:text-4xl font-extrabold tracking-tight font-heading">
-              Complete Feature Suite for Precision Agriculture
+              {t('landing.featuresTitle')}
             </h2>
             <p className="text-slate-500 text-sm sm:text-base">
-              Explore how each feature converts complex field conditions into profit-maximizing insights.
+              {t('landing.featuresDesc')}
             </p>
           </div>
 
@@ -605,12 +605,12 @@ export default function LandingPage() {
       <section id="workflow" ref={workflowRef} className="py-24 bg-[#F7F9FA] border-t border-slate-200/50">
         <div className="max-w-7xl mx-auto px-6 md:px-16 text-center">
           <div className="max-w-3xl mx-auto space-y-4 mb-16">
-            <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Operational Workflow</span>
+            <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">{t('landing.operationalWorkflow')}</span>
             <h2 className="text-[#0F6B4A] text-3xl sm:text-4xl font-extrabold tracking-tight font-heading">
-              From Soil Analysis to Mandi Sale
+              {t('landing.workflowTitle')}
             </h2>
             <p className="text-slate-500 text-sm sm:text-base">
-              A step-by-step cycle designed to keep your agriculture pipeline completely optimized.
+              {t('landing.workflowDesc')}
             </p>
           </div>
 
@@ -666,12 +666,12 @@ export default function LandingPage() {
       <section ref={benefitsRef} className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 md:px-16 text-center">
           <div className="max-w-3xl mx-auto space-y-4 mb-16">
-            <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Real Value</span>
+            <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">{t('landing.realValue')}</span>
             <h2 className="text-[#0F6B4A] text-3xl sm:text-4xl font-extrabold tracking-tight font-heading">
-              Deliver Quantifiable Farming Success
+              {t('landing.benefitsTitle')}
             </h2>
             <p className="text-slate-500 text-sm sm:text-base">
-              Why smart farming enterprises select AgriSense to monitor and forecast their agricultural investments.
+              {t('landing.benefitsDesc')}
             </p>
           </div>
 

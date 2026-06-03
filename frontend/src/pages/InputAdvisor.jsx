@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
+import { useTranslation } from "../translations";
 import {
   ShoppingCart,
   MapPin,
@@ -24,6 +25,7 @@ const CROPS = [
 ];
 
 const InputAdvisor = () => {
+  const { t } = useTranslation();
   const [crop, setCrop] = useState("");
   const [area, setArea] = useState("");
   const [location, setLocation] = useState("");
@@ -69,7 +71,7 @@ const InputAdvisor = () => {
       setTotalCost(data.totalCost || 0);
       setDataSource(data.dataSource || "");
     } catch (err) {
-      setError(err.response?.data?.message || "Could not load input recommendations");
+      setError(err.response?.data?.message || t('soil.couldNotLoad'));
       resetResults();
     } finally {
       setLoading(false);
@@ -78,7 +80,7 @@ const InputAdvisor = () => {
 
   const handleDetectLocation = () => {
     if (!navigator.geolocation) {
-      setError("Location detection is not supported in this browser");
+      setError(t('soil.notSupported'));
       return;
     }
 
@@ -114,7 +116,7 @@ const InputAdvisor = () => {
       },
       () => {
         setDetecting(false);
-        setError("Could not detect location. Please type your city or district.");
+        setError(t('soil.errorDetect'));
       },
     );
   };
@@ -136,10 +138,10 @@ const InputAdvisor = () => {
           <div className="mb-8">
             <div className="mb-1 flex items-center gap-3">
               <ShoppingCart className="h-7 w-7 text-green-400" />
-              <h1 className="text-2xl font-bold text-white">Input Shopping Advisor</h1>
+              <h1 className="text-2xl font-bold text-white">{t('soil.title')}</h1>
             </div>
             <p className="ml-10 text-sm text-white/50">
-              Estimate required inputs and compare seller inventory by stock, price, and location.
+              {t('soil.desc')}
             </p>
           </div>
 
@@ -154,7 +156,7 @@ const InputAdvisor = () => {
                     setLocation(e.target.value);
                     resetResults();
                   }}
-                  placeholder="Enter city or district..."
+                  placeholder={t('soil.placeholder')}
                   className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-10 pr-4 text-sm text-white placeholder:text-white/40 outline-none focus:ring-2 focus:ring-green-400"
                 />
               </div>
@@ -165,14 +167,14 @@ const InputAdvisor = () => {
                 className="flex items-center gap-1.5 rounded-xl border border-white/20 px-4 py-3 text-sm text-white/60 transition-colors hover:bg-white/10 disabled:opacity-50"
               >
                 {detecting ? <Loader className="h-4 w-4 animate-spin" /> : <MapPin className="h-4 w-4" />}
-                <span className="hidden sm:block">{detecting ? "Detecting" : "Detect"}</span>
+                <span className="hidden sm:block">{detecting ? t('soil.detecting') : t('soil.detect')}</span>
               </button>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-white/70">
-                  Select Crop
+                  {t('soil.selectCrop')}
                 </label>
                 <select
                   value={crop}
@@ -183,7 +185,7 @@ const InputAdvisor = () => {
                   className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm text-white outline-none focus:ring-2 focus:ring-green-400"
                 >
                   <option value="" className="bg-zinc-900 text-white">
-                    Choose a crop
+                    {t('soil.chooseCrop')}
                   </option>
                   {availableCrops.map((c) => (
                     <option key={c} value={c} className="bg-zinc-900 text-white">
@@ -195,7 +197,7 @@ const InputAdvisor = () => {
 
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-white/70">
-                  Area (acres)
+                  {t('soil.areaAcres')}
                 </label>
                 <input
                   type="number"
@@ -206,7 +208,7 @@ const InputAdvisor = () => {
                     setArea(e.target.value);
                     resetResults();
                   }}
-                  placeholder="e.g. 5"
+                  placeholder={t('soil.areaPlaceholder')}
                   className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm text-white placeholder:text-white/35 outline-none focus:ring-2 focus:ring-green-400"
                 />
               </div>
@@ -218,11 +220,11 @@ const InputAdvisor = () => {
               className="mt-5 inline-flex items-center gap-2 rounded-xl bg-green-500 px-5 py-2 text-sm font-bold text-white shadow-lg shadow-green-900/20 transition-colors hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Package className="h-4 w-4" />
-              {loading ? "Finding Sellers..." : "Get Recommendations"}
+              {loading ? t('soil.findingSellers') : t('soil.getRecommendations')}
             </button>
 
             <p className="mt-3 text-xs text-white/40">
-              Inventory is read from MongoDB. Current records are seeded demo sellers until real dealers are onboarded.
+              {t('soil.inventoryNote')}
             </p>
           </div>
 
@@ -236,7 +238,7 @@ const InputAdvisor = () => {
             <div className="space-y-6">
               <div>
                 <h2 className="text-lg font-semibold text-white drop-shadow">
-                  Input Requirements for {crop} - {area} acre{Number(area) !== 1 ? "s" : ""}
+                  {t('soil.requirementsFor')} {crop} - {area} acre{Number(area) !== 1 ? "s" : ""}
                 </h2>
                 {dataSource && <p className="mt-1 text-xs text-white/45">{dataSource}</p>}
               </div>
@@ -276,7 +278,7 @@ const InputAdvisor = () => {
                                 {seller.name}
                                 {isBest && (
                                   <span className="ml-2 text-xs font-semibold text-green-300">
-                                    Best Price
+                                    {t('soil.bestPrice')}
                                   </span>
                                 )}
                               </p>
@@ -298,8 +300,8 @@ const InputAdvisor = () => {
                             >
                               <CheckCircle className="h-3.5 w-3.5" />
                               {seller.inStock
-                                ? `${seller.stockQty.toLocaleString()} ${item.unit} in stock`
-                                : "Low Stock"}
+                                ? `${seller.stockQty.toLocaleString()} ${item.unit} ${t('soil.inStock')}`
+                                : t('soil.lowStock')}
                             </span>
                           </div>
                         </div>
@@ -311,7 +313,7 @@ const InputAdvisor = () => {
 
               <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/40 px-6 py-4 shadow-lg backdrop-blur-xl">
                 <span className="text-base font-semibold text-white">
-                  Total Estimated Input Cost
+                  {t('soil.totalCost')}
                 </span>
                 <span className="flex items-center gap-1 text-lg font-bold text-green-400">
                   <IndianRupee className="h-5 w-5" />

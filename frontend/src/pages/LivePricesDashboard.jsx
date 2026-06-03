@@ -38,12 +38,12 @@ const LivePricesDashboard = () => {
                 </div>
 
                 <h1 className="text-white text-4xl md:text-5xl font-extrabold leading-[1.1] tracking-tight font-heading">
-                  Live Market Prices
+                  {t('dashboard.features.marketTitle')}
                   <span className="block text-[#2BB673] mt-2">Intelligence Platform</span>
                 </h1>
 
                 <p className="text-white/80 text-base md:text-lg leading-relaxed max-w-lg">
-                  Monitor current commodity rates direct from active Agmarknet markets across India. Real-time data scraped to prevent middleman margin erosion.
+                  {t('dashboard.features.marketDesc')}
                 </p>
               </div>
 
@@ -101,8 +101,8 @@ const LivePricesDashboard = () => {
                   <Activity className="w-6 h-6 text-pink-500" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-slate-800 font-heading">Live Market Prices</h1>
-                  <p className="text-sm text-slate-500">Real-time commodity rates straight from the mandis</p>
+                  <h1 className="text-2xl font-bold text-slate-800 font-heading">{t('dashboard.features.marketTitle')}</h1>
+                  <p className="text-sm text-slate-500">{t('dashboard.features.marketDesc')}</p>
                 </div>
               </div>
             </motion.div>

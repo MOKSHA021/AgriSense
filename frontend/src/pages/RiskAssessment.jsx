@@ -126,11 +126,11 @@ const RiskAssessment = () => {
 
   const handleAssess = (e) => { e.preventDefault(); if (!cityInput.trim()) return; fetchAndAssess(`q=${encodeURIComponent(cityInput.trim())}`); };
   const handleAutoDetect = () => {
-    if (!navigator.geolocation) { setError("Geolocation not supported."); return; }
+    if (!navigator.geolocation) { setError(t('risk.errorGeolocation')); return; }
     setDetecting(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => { setDetecting(false); fetchAndAssess(`lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`); },
-      () => { setDetecting(false); setError("Could not detect location. Please enter a city manually."); }
+      () => { setDetecting(false); setError(t('risk.errorDetect')); }
     );
   };
 
@@ -138,7 +138,7 @@ const RiskAssessment = () => {
   const totalScore = risks ? risks.reduce((s, r) => s + LEVEL_CONFIG[r.level].score, 0) : 0;
   const maxScore = 12;
   const riskPct = Math.round((totalScore / maxScore) * 100);
-  const overallLabel = riskPct >= 60 ? "CRITICAL RISK" : riskPct >= 30 ? "MODERATE RISK" : "OPTIMAL";
+  const overallLabel = riskPct >= 60 ? t('risk.criticalRisk') : riskPct >= 30 ? t('risk.moderateRisk') : t('risk.optimal');
   const overallColor = riskPct >= 60 ? "text-red-600" : riskPct >= 30 ? "text-amber-600" : "text-[#2D6A4F]";
   const overallBadgeBg = riskPct >= 60 ? "bg-red-50 border-red-200 text-red-600" : riskPct >= 30 ? "bg-amber-50 border-amber-200 text-amber-600" : "bg-[#EBF5EE] border-[#C3E6CB] text-[#2D6A4F]";
   const overallBarColor = riskPct >= 60 ? "bg-gradient-to-r from-red-500 to-rose-400" : riskPct >= 30 ? "bg-gradient-to-r from-amber-500 to-orange-400" : "bg-gradient-to-r from-[#2D6A4F] to-[#52B788]";
@@ -164,16 +164,16 @@ const RiskAssessment = () => {
               <div className="space-y-6">
                 <div className="inline-flex items-center gap-2 bg-red-500/15 border border-red-500/30 text-red-400 text-[11px] font-bold px-4 py-2 rounded-full tracking-widest uppercase">
                   <ShieldAlert className="w-4 h-4" />
-                  Critical Alert
+                  {t('risk.criticalAlert')}
                 </div>
 
                 <h1 className="text-white text-4xl md:text-5xl font-extrabold leading-[1.1] tracking-tight font-heading">
-                  Risk Assessment
-                  <span className="block text-[#2BB673] mt-2">Mitigation Platform</span>
+                  {t('risk.title')}
+                  <span className="block text-[#2BB673] mt-2">{t('risk.subtitle')}</span>
                 </h1>
 
                 <p className="text-white/80 text-base md:text-lg leading-relaxed max-w-lg">
-                  Analyze extreme weather risk factors including flood, dry spells, and frost. Get proactive mitigation advisories to protect your crops and maximize yield safety.
+                  {t('risk.desc')}
                 </p>
               </div>
 
@@ -190,25 +190,25 @@ const RiskAssessment = () => {
                         <ShieldAlert className="w-7 h-7 text-white" />
                       </div>
                       <div>
-                        <h3 className="text-white font-bold text-lg">Risk Radar</h3>
-                        <p className="text-white/60 text-sm">Climate Alert System</p>
+                        <h3 className="text-white font-bold text-lg">{t('risk.riskRadar')}</h3>
+                        <p className="text-white/60 text-sm">{t('risk.climateAlertSystem')}</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
-                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Risks</p>
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">{t('risk.risks')}</p>
                         <p className="text-white text-3xl font-black font-heading">4</p>
                       </div>
                       <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
-                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Alerts</p>
-                        <p className="text-white text-3xl font-black font-heading">Real</p>
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">{t('risk.alerts')}</p>
+                        <p className="text-white text-3xl font-black font-heading">{t('risk.real')}</p>
                       </div>
                     </div>
 
                     <div className="bg-white/10 border border-white/10 rounded-2xl p-4 flex items-center gap-3">
                       <Sparkles className="w-5 h-5 text-[#2BB673]" />
-                      <p className="text-white/80 text-sm">Proactive mitigation guides</p>
+                      <p className="text-white/80 text-sm">{t('risk.proactiveGuides')}</p>
                     </div>
                   </div>
                 </div>
@@ -231,8 +231,8 @@ const RiskAssessment = () => {
                   <ShieldAlert className="w-6 h-6 text-orange-500" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-slate-800 font-heading">Risk Assessment</h1>
-                  <p className="text-sm text-slate-500">Analyze weather data to identify farming risks and get crop safety recommendations</p>
+                  <h1 className="text-2xl font-bold text-slate-800 font-heading">{t('risk.headerTitle')}</h1>
+                  <p className="text-sm text-slate-500">{t('risk.headerDesc')}</p>
                 </div>
               </div>
             </motion.div>
@@ -251,19 +251,19 @@ const RiskAssessment = () => {
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
                   type="text" value={cityInput} onChange={(e) => setCityInput(e.target.value)}
-                  placeholder="Enter city name..."
+                  placeholder={t('risk.enterCity')}
                   className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#1E8E5A] focus:ring-2 focus:ring-[#1E8E5A]/20 transition-colors"
                 />
               </div>
               <button type="button" onClick={handleAutoDetect} disabled={detecting}
                 className="flex items-center justify-center gap-2 px-6 py-3 border border-slate-200 bg-slate-50 rounded-xl text-sm font-semibold uppercase tracking-wider text-slate-600 hover:bg-slate-100 disabled:opacity-50 transition-all w-full sm:w-auto h-full">
                 {detecting ? <Loader className="w-4 h-4 animate-spin" /> : <MapPin className="w-4 h-4" />}
-                <span>Detect</span>
+                <span>{t('risk.detect')}</span>
               </button>
             </div>
 
             <div className="flex flex-wrap items-center gap-3 mb-6">
-              <label className="text-xs font-semibold uppercase tracking-wider text-slate-500 mr-2">Season:</label>
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-500 mr-2">{t('risk.seasonLabel')}</label>
               {SEASONS.map((s) => (
                 <button key={s} type="button" onClick={() => setSeason(s)}
                   className={`px-5 py-2.5 rounded-full text-[10px] font-semibold uppercase tracking-wider transition-all ${season === s ? "bg-[#1E8E5A] text-white shadow-sm border border-[#1E8E5A]" : "bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 hover:text-slate-800"}`}>
@@ -274,7 +274,7 @@ const RiskAssessment = () => {
 
             <button type="submit" disabled={loading || !cityInput.trim()}
               className="w-full py-3 bg-[#1E8E5A] hover:bg-[#0F6B4A] text-white text-sm font-semibold uppercase tracking-wider rounded-xl disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all flex items-center justify-center gap-2">
-              {loading ? <><Loader className="w-5 h-5 animate-spin" /> Assessing Environment...</> : <><Target className="w-5 h-5" /> Evaluate Risks</>}
+              {loading ? <><Loader className="w-5 h-5 animate-spin" /> {t('risk.assessing')}</> : <><Target className="w-5 h-5" /> {t('risk.assessBtn')}</>}
             </button>
           </motion.form>
 
@@ -305,13 +305,13 @@ const RiskAssessment = () => {
                 <div className="flex items-center justify-between mb-6 relative z-10 mt-2">
                   <div>
                     <h2 className="text-xl font-bold text-[#1B4332] tracking-tight">{cityName}</h2>
-                    <p className="text-sm font-medium text-[#6B8C7B] uppercase tracking-widest mt-1">{season} Season</p>
+                    <p className="text-sm font-medium text-[#6B8C7B] uppercase tracking-widest mt-1">{season} {t('risk.seasonLabelCard')}</p>
                     <p className={`text-[10px] font-black uppercase tracking-[0.2em] mt-3 inline-block px-3 py-1 rounded-full border ${overallBadgeBg}`}>{overallLabel}</p>
                   </div>
                   <div className="text-right">
                     {/* Circular score indicator */}
                     <div className={`text-6xl font-black tracking-tighter ${overallColor}`}>{riskPct}%</div>
-                    <p className="text-xs text-[#6B8C7B] mt-1 uppercase tracking-wider">Risk Score</p>
+                    <p className="text-xs text-[#6B8C7B] mt-1 uppercase tracking-wider">{t('risk.riskScore')}</p>
                   </div>
                 </div>
 
@@ -319,7 +319,7 @@ const RiskAssessment = () => {
                 <div className="w-full h-4 bg-[#F0F7EE] rounded-full overflow-hidden border border-[#E0EDD9] shadow-inner relative z-10">
                   <div className={`h-full rounded-full transition-all duration-1000 ease-out ${overallBarColor}`} style={{ width: `${riskPct}%` }} />
                 </div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-[#6B8C7B] mt-4 text-center relative z-10">Risk score computed via predictive meteorological analysis</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#6B8C7B] mt-4 text-center relative z-10">{t('risk.riskScoreComputed')}</p>
               </div>
 
               {/* Delayed Sowing */}
@@ -331,8 +331,8 @@ const RiskAssessment = () => {
                 >
                   <Clock className="w-6 h-6 shrink-0 mt-0.5 text-amber-600" />
                   <div>
-                    <p className="text-base font-bold text-amber-700 tracking-tight">Sowing Delay Recommended</p>
-                    <p className="text-sm font-medium text-amber-600 mt-2 leading-relaxed">Multiple critical risk conditions detected. We advise delaying sowing operations by 1–2 weeks until meteorological conditions stabilize. Monitor ongoing forecasts.</p>
+                    <p className="text-base font-bold text-amber-700 tracking-tight">{t('risk.sowingDelay')}</p>
+                    <p className="text-sm font-medium text-amber-600 mt-2 leading-relaxed">{t('risk.sowingDelayDesc')}</p>
                   </div>
                 </motion.div>
               )}
@@ -366,7 +366,7 @@ const RiskAssessment = () => {
                         </div>
                         <p className="text-sm font-medium text-[#6B8C7B] mb-3 leading-relaxed">{risk.description}</p>
                         <div className="bg-[#F7F4EE] rounded-xl p-3 border border-[#E0EDD9]">
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#6B8C7B] mb-1">Recommended Action</p>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#6B8C7B] mb-1">{t('risk.recommendedAction')}</p>
                           <p className="text-sm font-semibold text-[#1B3A28]">{risk.action}</p>
                         </div>
                       </motion.div>
@@ -379,9 +379,9 @@ const RiskAssessment = () => {
                     className="col-span-full bg-[#EBF5EE] border border-[#C3E6CB] rounded-[2rem] p-10 text-center flex flex-col items-center justify-center shadow-sm"
                   >
                     <CheckCircle className="w-12 h-12 text-[#2D6A4F] mb-4" />
-                    <h3 className="text-2xl font-black text-[#1B4332] tracking-tight">Optimal Conditions</h3>
+                    <h3 className="text-2xl font-black text-[#1B4332] tracking-tight">{t('risk.optimalConditions')}</h3>
                     <p className="text-sm font-medium text-[#2D6A4F] mt-2 max-w-lg leading-relaxed">
-                      Zero significant meteorological risks detected for the 5-day forecast horizon. Conditions are highly favorable for all scheduled farming operations.
+                      {t('risk.optimalConditionsDesc')}
                     </p>
                   </motion.div>
                 )}
@@ -391,7 +391,7 @@ const RiskAssessment = () => {
               <div className="bg-white border border-[#E0EDD9] rounded-[2rem] p-8 shadow-sm">
                 <h2 className="text-xs font-bold uppercase tracking-widest text-[#6B8C7B] mb-6 flex items-center gap-2">
                   <Sprout className="w-4 h-4 text-[#2D6A4F]" />
-                  Recommended Safe Crops
+                  {t('risk.recommendedSafeCrops')}
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {safeCrops.map((crop, i) => (

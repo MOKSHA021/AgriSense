@@ -197,16 +197,16 @@ const BestMandi = () => {
               <div className="space-y-6">
                 <div className="inline-flex items-center gap-2 bg-teal-500/15 border border-teal-500/30 text-teal-400 text-[11px] font-bold px-4 py-2 rounded-full tracking-widest uppercase">
                   <Map className="w-4 h-4" />
-                  Geospatial AI
+                  {t('mandi.geospatialAI')}
                 </div>
 
                 <h1 className="text-white text-4xl md:text-5xl font-extrabold leading-[1.1] tracking-tight font-heading">
-                  Best Mandi Finder
-                  <span className="block text-[#2BB673] mt-2">Market Intelligence</span>
+                  {t('mandi.title')}
+                  <span className="block text-[#2BB673] mt-2">{t('mandi.subtitle')}</span>
                 </h1>
 
                 <p className="text-white/80 text-base md:text-lg leading-relaxed max-w-lg">
-                  Find the most profitable market near you based on live prices and transport costs. Geospatial analysis for optimal selling decisions.
+                  {t('mandi.description')}
                 </p>
               </div>
 
@@ -223,25 +223,25 @@ const BestMandi = () => {
                         <Map className="w-7 h-7 text-white" />
                       </div>
                       <div>
-                        <h3 className="text-white font-bold text-lg">Geospatial AI</h3>
-                        <p className="text-white/60 text-sm">Market Optimization</p>
+                        <h3 className="text-white font-bold text-lg">{t('mandi.geospatialAI')}</h3>
+                        <p className="text-white/60 text-sm">{t('mandi.marketOptimization')}</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
-                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Markets</p>
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">{t('mandi.marketsCount')}</p>
                         <p className="text-white text-3xl font-black font-heading">500+</p>
                       </div>
                       <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
-                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">States</p>
+                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">{t('mandi.statesCount')}</p>
                         <p className="text-white text-3xl font-black font-heading">All</p>
                       </div>
                     </div>
 
                     <div className="bg-white/10 border border-white/10 rounded-2xl p-4 flex items-center gap-3">
                       <Sparkles className="w-5 h-5 text-[#2BB673]" />
-                      <p className="text-white/80 text-sm">Transport cost optimization</p>
+                      <p className="text-white/80 text-sm">{t('mandi.transportCostOptimization')}</p>
                     </div>
                   </div>
                 </div>
@@ -264,8 +264,8 @@ const BestMandi = () => {
                   <Map className="w-6 h-6 text-teal-500" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-slate-800 font-heading">Best Mandi Finder</h1>
-                  <p className="text-sm text-slate-500">Find the most profitable market near you based on live prices and transport costs</p>
+                  <h1 className="text-2xl font-bold text-slate-800 font-heading">{t('mandi.pageTitle') || t('dashboard.features.mandiTitle') || "Best Mandi Finder"}</h1>
+                  <p className="text-sm text-slate-500">{t('mandi.pageDesc') || t('dashboard.features.mandiDesc')}</p>
                 </div>
               </div>
             </motion.div>
@@ -356,7 +356,7 @@ const BestMandi = () => {
                     🌾 {mandiResults.crop} · {mandiResults.quantity} qtl · {mandiResults.district}, {mandiResults.state}
                   </span>
                   <span className="text-amber-100 text-xs font-bold uppercase tracking-wider">
-                    {mandiResults.mandis.length} mandis
+                    {mandiResults.mandis.length} {t('mandi.mandis')}
                   </span>
                 </div>
 
@@ -387,11 +387,11 @@ const BestMandi = () => {
             <div className="bg-white/[0.02] backdrop-blur-2xl rounded-3xl p-6 border border-white/5">
               <div className="flex items-center justify-between mb-4">
                 <label className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                  <Map className="w-4 h-4 text-teal-400" /> Map View
+                  <Map className="w-4 h-4 text-teal-400" /> {t('mandi.mapView')}
                 </label>
                 {clickMode && (
                   <span className="text-xs bg-teal-500/10 border border-teal-500/20 text-teal-400 px-3 py-1.5 rounded-full animate-pulse font-bold tracking-wide">
-                    🖱️ Click map to set {clickMode === "farmer" ? "farm" : "mandi"} location
+                    {clickMode === "farmer" ? t('mandi.clickMapFarm') : t('mandi.clickMapMandi')}
                   </span>
                 )}
               </div>
@@ -421,19 +421,19 @@ const BestMandi = () => {
                     exit={{ opacity: 0, y: 10, height: 0 }}
                     className="mt-4 p-5 bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl shadow-xl overflow-hidden"
                   >
-                    <h4 className="text-sm font-bold text-amber-400 mb-4 tracking-tight">🛣️ Route Summary</h4>
+                    <h4 className="text-sm font-bold text-amber-400 mb-4 tracking-tight">{t('mandi.routeSummary')}</h4>
 
                     <div className="grid grid-cols-3 gap-3 text-center mb-4">
                       <div className="bg-white/5 rounded-xl p-3 border border-white/5">
-                        <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Distance</p>
+                        <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">{t('mandi.distance')}</p>
                         <p className="font-bold text-blue-400 text-base">{routeInfo.distanceKm} km</p>
                       </div>
                       <div className="bg-white/5 rounded-xl p-3 border border-white/5">
-                        <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Est. Time</p>
+                        <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">{t('mandi.estTime')}</p>
                         <p className="font-bold text-emerald-400 text-base">~{routeInfo.durationMin} min</p>
                       </div>
                       <div className="bg-white/5 rounded-xl p-3 border border-white/5">
-                        <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Total Cost</p>
+                        <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">{t('mandi.totalCost')}</p>
                         <p className="font-bold text-red-400 text-base">
                           ₹{routeInfo.totalCost?.toLocaleString()}
                         </p>
@@ -442,19 +442,19 @@ const BestMandi = () => {
 
                     <div className="grid grid-cols-3 gap-3 text-center text-xs">
                       <div className="bg-orange-500/10 rounded-xl py-3 border border-orange-500/10">
-                        <p className="text-white/40 font-bold mb-1">Fuel</p>
+                        <p className="text-white/40 font-bold mb-1">{t('mandi.fuel')}</p>
                         <p className="font-bold text-orange-400 text-sm">
                           ₹{routeInfo.breakdown?.fuelCost?.toLocaleString()}
                         </p>
                       </div>
                       <div className="bg-purple-500/10 rounded-xl py-3 border border-purple-500/10">
-                        <p className="text-white/40 font-bold mb-1">Toll</p>
+                        <p className="text-white/40 font-bold mb-1">{t('mandi.toll')}</p>
                         <p className="font-bold text-purple-400 text-sm">
                           ₹{routeInfo.breakdown?.tollCost?.toLocaleString()}
                         </p>
                       </div>
                       <div className="bg-white/5 rounded-xl py-3 border border-white/5">
-                        <p className="text-white/40 font-bold mb-1">Loading</p>
+                        <p className="text-white/40 font-bold mb-1">{t('mandi.loading')}</p>
                         <p className="font-bold text-white/60 text-sm">
                           ₹{routeInfo.breakdown?.loadingCost?.toLocaleString()}
                         </p>
@@ -462,7 +462,7 @@ const BestMandi = () => {
                     </div>
 
                     <p className="text-xs text-white/40 text-center mt-4 font-medium">
-                      🚛 {routeInfo.truckType} truck · based on real road distance
+                      🚛 {routeInfo.truckType} {t('mandi.truckTypeNote')}
                     </p>
                   </motion.div>
                 )}
@@ -472,7 +472,7 @@ const BestMandi = () => {
               {selectedMandi && (
                 <div className="mt-4 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-center">
                   <p className="text-sm font-semibold text-emerald-400">
-                    ✅ Selected: <span className="font-bold text-emerald-300">{selectedMandi.name}</span>
+                    {t('mandi.selectedMandi')} <span className="font-bold text-emerald-300">{selectedMandi.name}</span>
                   </p>
                 </div>
               )}
@@ -481,7 +481,7 @@ const BestMandi = () => {
         </div>
 
         <p className="text-center text-xs text-slate-400 pb-4 mt-12 font-medium">
-          🌾 AgriSense · Route Optimization via OpenRouteService
+          {t('mandi.footer')}
         </p>
         </section>
       </main>
