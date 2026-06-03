@@ -206,7 +206,6 @@ const Weather = () => {
   const contentRef = useRefHook(null);
   
   const headerInView = useInView(headerRef, { once: true, amount: 0.3 });
-  const contentInView = useInView(contentRef, { once: true, amount: 0.3 });
 
   const fetchWeatherByCoords = async (lat, lon, cityNameFallback = null) => {
     setLoading(true);
@@ -467,7 +466,7 @@ const Weather = () => {
                 {/* Current conditions hero */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
-                  animate={contentInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
                   className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-8 shadow-sm hover:shadow-md transition-all relative overflow-hidden flex flex-col justify-between"
                 >
@@ -542,7 +541,7 @@ const Weather = () => {
                   {forecast.length > 0 && (
                     <motion.div
                       initial={{ opacity: 0, x: 20 }}
-                      animate={contentInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.5, delay: 0.3 }}
                       className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm hover:shadow-md transition-all"
                     >
@@ -554,7 +553,7 @@ const Weather = () => {
                         {forecast.map((day, idx) => (
                           <motion.div
                             initial={{ opacity: 0, y: 10 }}
-                            animate={contentInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3, delay: 0.4 + (idx * 0.1) }}
                             key={day.date}
                             className="flex flex-col items-center border border-slate-200 bg-slate-50 rounded-xl p-4 transition-colors hover:bg-[#E6F5EE] hover:border-emerald-200"
@@ -596,7 +595,7 @@ const Weather = () => {
                     {riskAlerts.length > 0 && (
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
-                        animate={contentInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.5 }}
                         className="bg-white rounded-2xl border border-red-200 p-6 shadow-sm relative overflow-hidden"
                       >
@@ -631,7 +630,7 @@ const Weather = () => {
                     {advice.length > 0 && (
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
-                        animate={contentInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.6 }}
                         className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm relative overflow-hidden sm:col-span-1"
                         style={{ gridColumn: riskAlerts.length === 0 ? 'span 2' : undefined }}
