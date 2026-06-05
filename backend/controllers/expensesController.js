@@ -15,8 +15,8 @@ const normalizePlan = (plan = {}) => ({
   crop: String(plan.crop || "Wheat").trim() || "Wheat",
   season: String(plan.season || "Rabi").trim() || "Rabi",
   area: String(plan.area || "2").trim() || "2",
-  expectedYield: String(plan.expectedYield || "22").trim() || "22",
-  expectedPrice: String(plan.expectedPrice || "2300").trim() || "2300",
+  expectedYield: String(plan.expectedYield || "18").trim() || "18",
+  expectedPrice: String(plan.expectedPrice || "2275").trim() || "2275",
 });
 
 const getRecord = (userId) =>

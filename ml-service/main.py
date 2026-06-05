@@ -30,9 +30,10 @@ logging.basicConfig(
 logger = logging.getLogger("agrisense")
 
 # ── Import routers AFTER logging is configured ────────────────────────────────
-from routes.soil  import router as soil_router   # noqa: E402
-from routes.crop  import router as crop_router   # noqa: E402
-from routes.price import router as price_router  # noqa: E402
+from routes.soil     import router as soil_router      # noqa: E402
+from routes.crop     import router as crop_router      # noqa: E402
+from routes.price    import router as price_router     # noqa: E402
+from routes.reference import router as reference_router # noqa: E402
 
 
 # ── Startup / Shutdown lifecycle ──────────────────────────────────────────────
@@ -106,6 +107,7 @@ async def log_requests(request: Request, call_next):
 app.include_router(soil_router)
 app.include_router(crop_router)
 app.include_router(price_router)
+app.include_router(reference_router)
 
 
 # ── Health & info endpoints ───────────────────────────────────────────────────

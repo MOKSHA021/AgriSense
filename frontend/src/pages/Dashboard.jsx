@@ -198,7 +198,7 @@ function WeatherWidget() {
           // fallback: New Delhi
           fetchWeather(28.6139, 77.209);
         },
-        { timeout: 6000 }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     } else {
       fetchWeather(28.6139, 77.209);

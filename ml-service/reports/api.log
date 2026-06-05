@@ -69,3 +69,51 @@
 2026-06-02 19:10:32,432 | WARNING | agrisense | [soil] Returning mock data since model is missing.
 2026-06-02 19:31:47,291 | WARNING | agrisense | [price] No price model found for 'Tomato'. Using mock mode.
 2026-06-02 19:48:02,149 | WARNING | agrisense | [soil] Returning mock data since model is missing.
+2026-06-05 07:12:40,481 | INFO | agrisense | [soil] Loaded checkpoint from epoch 24 (val_acc=86.55%)
+2026-06-05 07:12:40,505 | INFO | agrisense | [soil] EfficientNet-B0 loaded | Classes: ['Alluvial_Soil', 'Arid_Soil', 'Black_Soil', 'Laterite_Soil', 'Mountain_Soil', 'Red_Soil', 'Yellow_Soil']
+2026-06-05 07:13:05,785 | INFO | agrisense | [crop] Pipeline loaded | Classes: 22 crops | Soil types available: ['Alluvial_Soil', 'Black_Soil', 'Red_Soil', 'Laterite_Soil', 'Arid_Soil', 'Yellow_Soil', 'Mountain_Soil']
+2026-06-05 07:13:05,811 | INFO | agrisense | =======================================================
+2026-06-05 07:13:05,812 | INFO | agrisense |   AgriSense ML Service — Starting Up
+2026-06-05 07:13:05,812 | INFO | agrisense |   Time    : 2026-06-05T01:43:05.812557Z
+2026-06-05 07:13:05,812 | INFO | agrisense |   Base dir: C:\Users\moksh\AgriSense\ml-service
+2026-06-05 07:13:05,817 | INFO | agrisense |   All core model files found ✅
+2026-06-05 07:13:05,818 | INFO | agrisense | =======================================================
+2026-06-05 10:13:39,554 | INFO | agrisense | → POST /predict/soil
+2026-06-05 10:13:40,837 | INFO | agrisense | [soil] TTA→ Laterite_Soil (39.44%) low_conf=True | file=download.jpg size=11KB
+2026-06-05 10:13:40,844 | INFO | agrisense | ← POST /predict/soil | 200
+2026-06-05 10:26:33,573 | INFO | agrisense | → GET /
+2026-06-05 10:26:33,636 | INFO | agrisense | ← GET / | 200
+2026-06-05 10:26:33,891 | INFO | agrisense | → GET /favicon.ico
+2026-06-05 10:26:33,896 | INFO | agrisense | ← GET /favicon.ico | 404
+2026-06-05 10:31:33,968 | INFO | agrisense | → POST /predict/price
+2026-06-05 10:31:34,271 | INFO | agrisense | [price] Loading Prophet model for Tomato
+2026-06-05 10:31:38,120 | ERROR | prophet.plot | Importing plotly failed. Interactive plots will not work.
+2026-06-05 10:31:40,261 | WARNING | agrisense | [price] Exact date 2026-09-05 not in forecast range; using nearest: 2026-09-02T00:00:00.000000
+2026-06-05 10:31:40,263 | INFO | agrisense | [price] Tomato @ 2026-09-05 → ₹1934 [989–3778]
+2026-06-05 10:31:40,268 | INFO | agrisense | ← POST /predict/price | 200
+2026-06-05 10:45:15,091 | INFO | agrisense | → POST /predict/soil
+2026-06-05 10:45:15,864 | INFO | agrisense | [soil] TTA→ Laterite_Soil (44.01%) low_conf=True | file=download.jpg size=11KB
+2026-06-05 10:45:15,868 | INFO | agrisense | ← POST /predict/soil | 200
+2026-06-05 11:08:54,890 | INFO | agrisense | → POST /predict/soil
+2026-06-05 11:08:55,203 | INFO | agrisense | [soil] TTA→ Laterite_Soil (42.48%) low_conf=True | file=download.jpg size=11KB
+2026-06-05 11:08:55,206 | INFO | agrisense | ← POST /predict/soil | 200
+2026-06-05 11:47:50,060 | INFO | agrisense | → POST /predict/soil
+2026-06-05 11:47:51,842 | INFO | agrisense | [soil] TTA→ Laterite_Soil (41.55%) low_conf=True | file=download.jpg size=11KB
+2026-06-05 11:47:51,851 | INFO | agrisense | ← POST /predict/soil | 200
+2026-06-05 11:48:59,452 | INFO | agrisense | → POST /predict/soil
+2026-06-05 11:49:01,447 | INFO | agrisense | [soil] TTA→ Laterite_Soil (42.53%) low_conf=True | file=download.jpg size=11KB
+2026-06-05 11:49:01,449 | INFO | agrisense | ← POST /predict/soil | 200
+2026-06-05 11:51:24,031 | INFO | agrisense | → POST /predict/price
+2026-06-05 11:51:27,284 | WARNING | agrisense | [price] Exact date 2026-09-06 not in forecast range; using nearest: 2026-09-02T00:00:00.000000
+2026-06-05 11:51:27,285 | INFO | agrisense | [price] Tomato @ 2026-09-06 → ₹1934 [1021–3685]
+2026-06-05 11:51:27,291 | INFO | agrisense | ← POST /predict/price | 200
+2026-06-05 12:05:13,927 | INFO | agrisense | → POST /predict/soil
+2026-06-05 12:05:14,469 | INFO | agrisense | [soil] TTA→ Laterite_Soil (41.57%) low_conf=True | file=download.jpg size=11KB
+2026-06-05 12:05:14,472 | INFO | agrisense | ← POST /predict/soil | 200
+2026-06-05 12:06:05,715 | INFO | agrisense | → POST /predict/soil
+2026-06-05 12:06:06,043 | INFO | agrisense | [soil] TTA→ Laterite_Soil (46.21%) low_conf=True | file=download.jpg size=11KB
+2026-06-05 12:06:06,044 | INFO | agrisense | ← POST /predict/soil | 200
+2026-06-05 12:08:15,785 | INFO | agrisense | → POST /predict/price
+2026-06-05 12:08:15,799 | INFO | agrisense | [price] Loading Prophet model for Wheat
+2026-06-05 12:08:16,703 | INFO | agrisense | [price] Wheat @ 2026-09-05 → ₹4451 [3549–5636]
+2026-06-05 12:08:16,705 | INFO | agrisense | ← POST /predict/price | 200

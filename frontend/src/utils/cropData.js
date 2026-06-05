@@ -131,11 +131,12 @@ export function scoreCrop(crop, inputs) {
   total += rangeScore(inputs.rainfall, crop.rainfall) * weights.rainfall;
   maxTotal += weights.rainfall;
 
+  // Filter crops based on irrigation type - completely exclude incompatible crops
   if (inputs.irrigationType === "rainfed" && !crop.rainfed) {
-    total *= 0.4;
+    return 0; // Exclude crops that require irrigation
   }
   if (inputs.irrigationType === "irrigated" && !crop.irrigated) {
-    total *= 0.7;
+    return 0; // Exclude crops that are only rainfed
   }
 
   return Math.round((total / maxTotal) * 100);

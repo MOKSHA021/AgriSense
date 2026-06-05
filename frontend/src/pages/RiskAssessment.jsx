@@ -119,7 +119,8 @@ const RiskAssessment = () => {
     setDetecting(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => { setDetecting(false); fetchAndAssess(`lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`); },
-      () => setDetecting(false)
+      () => setDetecting(false),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -130,7 +131,8 @@ const RiskAssessment = () => {
     setDetecting(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => { setDetecting(false); fetchAndAssess(`lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`); },
-      () => { setDetecting(false); setError(t('risk.errorDetect')); }
+      () => { setDetecting(false); setError(t('risk.errorDetect')); },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   };
 

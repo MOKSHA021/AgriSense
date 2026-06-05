@@ -287,7 +287,8 @@ const WeatherSidePanel = () => {
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => fetchWeatherByCoords(pos.coords.latitude, pos.coords.longitude),
-      () => fetchWeatherByCity("Delhi")
+      () => fetchWeatherByCity("Delhi"),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -15,14 +15,14 @@ import { useTranslation } from '../translations';
    CROP IMAGES
 ───────────────────────────────────────────── */
 const CROP_IMAGES = {
-  Rice: 'https://images.unsplash.com/photo-1536304929831-ee1ca9d44906?w=400&q=80',
+  Rice: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&q=80',
   Wheat: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&q=80',
   Maize: 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=400&q=80',
   Sugarcane: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80',
-  Millets: 'https://images.unsplash.com/photo-1589881133595-a3c085cb731d?w=400&q=80',
-  Cotton: 'https://images.unsplash.com/photo-1563178406-4cdc2923acbc?w=400&q=80',
+  Millets: 'https://images.unsplash.com/photo-1515943885413-1bad1e7c0068?w=400&q=80',
+  Cotton: 'https://images.unsplash.com/photo-N_Cg-5EsXog?w=400&q=80',
   Potato: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&q=80',
-  Tomato: 'https://images.unsplash.com/photo-1558818498-28c1e002b655?w=400&q=80',
+  Tomato: 'https://images.unsplash.com/photo-1546470427-227c7369a9b8?w=400&q=80',
   Groundnut: 'https://images.unsplash.com/photo-1567306226408-28b57e55f7fc?w=400&q=80',
   Soybean: 'https://images.unsplash.com/photo-1559181567-c3190ca9959b?w=400&q=80',
   Chickpea: 'https://images.unsplash.com/photo-1585032226651-759b368d7246?w=400&q=80',
@@ -39,6 +39,9 @@ const soilPresets = {
   Red:      { N: 40, P: 25, K: 35, pH: 6.2, soilMoisture: 35 },
   Laterite: { N: 30, P: 20, K: 25, pH: 5.5, soilMoisture: 40 },
   Sandy:    { N: 20, P: 15, K: 20, pH: 6.0, soilMoisture: 25 },
+  Arid:     { N: 25, P: 18, K: 45, pH: 8.0, soilMoisture: 15 },
+  Yellow:   { N: 35, P: 22, K: 30, pH: 5.8, soilMoisture: 45 },
+  Mountain: { N: 50, P: 32, K: 40, pH: 6.5, soilMoisture: 50 },
 };
 
 /* ─────────────────────────────────────────────
@@ -189,7 +192,7 @@ export default function CropRecommend() {
   const [params, setParams] = useState({
     N: 60, P: 40, K: 50, pH: 6.5,
     temperature: 25, rainfall: 80, soilMoisture: 50,
-    irrigated: true,
+    irrigationType: 'irrigated',
   });
   const [activePreset,  setActivePreset]  = useState(null);
   const [locationData,   setLocationData]  = useState(null);
@@ -202,9 +205,42 @@ export default function CropRecommend() {
   const [imgError,       setImgError]      = useState('');
   const [loading,        setLoading]       = useState(false);
   const [results,        setResults]       = useState([]);
+  const [excludedResults, setExcludedResults] = useState([]);
+  const [dbCrops,        setDbCrops]       = useState([]);
+  const [userDistrict,   setUserDistrict]  = useState('');
+  const [chosenCrop,     setChosenCrop]    = useState(null);
+  const [districtThreshold, setDistrictThreshold] = useState(15);
   const [error,          setError]         = useState('');
   const [dragOver,       setDragOver]      = useState(false);
   const [sidebarOpen,    setSidebarOpen]   = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    const loadData = async () => {
+      try {
+        const [cropsRes, choiceRes] = await Promise.all([
+          API.get("/reference/crops"),
+          API.get("/reference/user-chosen-crop").catch(() => ({ data: { choice: null } }))
+        ]);
+        if (!active) return;
+        setDbCrops(cropsRes.data.crops || []);
+        if (choiceRes.data?.choice) {
+          setChosenCrop(choiceRes.data.choice);
+          setUserDistrict(choiceRes.data.choice.district.toUpperCase());
+        }
+      } catch (err) {
+        console.error("Failed to load reference data:", err);
+      }
+    };
+    loadData();
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    if (locationData?.district && locationData.district !== "Unknown") {
+      setUserDistrict(locationData.district.toUpperCase());
+    }
+  }, [locationData]);
 
   const fileInputRef = useRef(null);
   const headerRef = useRefHook(null);
@@ -233,52 +269,156 @@ export default function CropRecommend() {
       return;
     }
 
+    // Add timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      setGpsLoading(false);
+      setGpsError('Request timed out. Please try again.');
+    }, 15000);
+
+    // Region-based NPK defaults for India (when SoilGrids API fails)
+    const getRegionalDefaults = (lat, lon) => {
+      // Indo-Gangetic Plains (north India, alluvial)
+      if (lat >= 24 && lat <= 32 && lon >= 74 && lon <= 88)
+        return { N: 75, P: 45, K: 55, pH: 7.2 };
+      // Deccan Plateau (central/south India, black/red soil)
+      if (lat >= 14 && lat <= 24 && lon >= 73 && lon <= 82)
+        return { N: 55, P: 35, K: 60, pH: 7.0 };
+      // Coastal regions (south & east, laterite/alluvial)
+      if (lat >= 8 && lat <= 22 && (lon >= 76 && lon <= 80 || lon >= 82 && lon <= 88))
+        return { N: 50, P: 30, K: 45, pH: 6.5 };
+      // Western dry region (Rajasthan, Gujarat arid)
+      if (lat >= 20 && lat <= 30 && lon >= 68 && lon <= 74)
+        return { N: 30, P: 20, K: 40, pH: 8.0 };
+      // Northeast India (mountain/forest soil)
+      if (lat >= 22 && lat <= 28 && lon >= 88 && lon <= 97)
+        return { N: 60, P: 35, K: 40, pH: 5.8 };
+      // Generic India default
+      return { N: 55, P: 35, K: 45, pH: 6.8 };
+    };
+
     navigator.geolocation.getCurrentPosition(
       async ({ coords }) => {
         const { latitude: lat, longitude: lon } = coords;
-        try {
-          /* Weather from open-meteo */
-          const weatherRes = await fetch(
-            `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,rain&daily=precipitation_sum&timezone=auto&forecast_days=1`
-          );
-          const weather = await weatherRes.json();
-          const temp = Math.round(weather?.current?.temperature_2m ?? 25);
-          const rain = Math.round(weather?.daily?.precipitation_sum?.[0] ?? 5);
+        const regionalDefaults = getRegionalDefaults(lat, lon);
+        let temp = 25;
+        let monthlyRain = 80;
+        let humidity = 60;
+        let N = regionalDefaults.N;
+        let P = regionalDefaults.P;
+        let K = regionalDefaults.K;
+        let pH = regionalDefaults.pH;
+        let weatherSuccess = false;
+        let soilSuccess = false;
 
-          /* SoilGrids */
-          const soilRes = await fetch(
-            `https://rest.isric.org/soilgrids/v2.0/properties/query?lon=${lon}&lat=${lat}&property=nitrogen&property=phh2o&property=soc&depth=0-5cm&value=mean`
-          );
-          const soilData = await soilRes.json();
-          const layers   = soilData?.properties?.layers ?? [];
-          const getVal   = (prop, fallback) => {
-            const layer = layers.find(l => l.name === prop);
-            return layer?.depths?.[0]?.values?.mean ?? fallback;
-          };
-          const nitrogenRaw = getVal('nitrogen', 600);
-          const phRaw       = getVal('phh2o',    65);
-          const N  = Math.min(140, Math.round(nitrogenRaw / 10));
-          const pH = Math.min(9, Math.max(4, +(phRaw / 10).toFixed(1)));
+        try {
+          /* Weather from Open-Meteo — use past 30 days for actual monthly rainfall */
+          try {
+            const weatherController = new AbortController();
+            const weatherTimeout = setTimeout(() => weatherController.abort(), 5000);
+            
+            const weatherRes = await fetch(
+              `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,rain&daily=precipitation_sum&timezone=auto&past_days=30&forecast_days=1`,
+              { signal: weatherController.signal }
+            );
+            clearTimeout(weatherTimeout);
+            
+            if (weatherRes.ok) {
+              const weather = await weatherRes.json();
+              temp = Math.round(weather?.current?.temperature_2m ?? 25);
+              humidity = Math.round(weather?.current?.relative_humidity_2m ?? 60);
+              // Sum the last 30 days of precipitation for actual monthly rainfall
+              const dailyPrecip = weather?.daily?.precipitation_sum ?? [];
+              monthlyRain = Math.round(dailyPrecip.reduce((sum, v) => sum + (v || 0), 0));
+              weatherSuccess = true;
+            }
+          } catch (weatherErr) {
+            console.error('Weather API failed:', weatherErr);
+          }
+
+          /* SoilGrids with timeout - optional enhancement over regional defaults */
+          try {
+            const soilController = new AbortController();
+            const soilTimeout = setTimeout(() => soilController.abort(), 8000);
+            
+            const soilRes = await fetch(
+              `https://rest.isric.org/soilgrids/v2.0/properties/query?lon=${lon}&lat=${lat}&property=nitrogen&property=phh2o&property=soc&depth=0-5cm&value=mean`,
+              { signal: soilController.signal }
+            );
+            clearTimeout(soilTimeout);
+            
+            if (soilRes.ok) {
+              const soilData = await soilRes.json();
+              const layers   = soilData?.properties?.layers ?? [];
+              const getVal   = (prop, fallback) => {
+                const layer = layers.find(l => l.name === prop);
+                return layer?.depths?.[0]?.values?.mean ?? fallback;
+              };
+              const nitrogenRaw = getVal('nitrogen', N * 10);
+              const phRaw       = getVal('phh2o',    pH * 10);
+              N  = Math.min(140, Math.round(nitrogenRaw / 10));
+              pH = Math.min(9, Math.max(4, +(phRaw / 10).toFixed(1)));
+              soilSuccess = true;
+            }
+          } catch (soilErr) {
+            console.error('Soil API failed:', soilErr);
+          }
 
           setParams(p => ({
             ...p,
             temperature: temp,
-            rainfall: Math.min(300, rain * 30),
-            N, pH,
+            humidity: humidity,
+            rainfall: Math.min(400, monthlyRain),
+            N, P, K, pH,
           }));
-          setLocationData({ lat: lat.toFixed(4), lon: lon.toFixed(4), temp, rain });
+          
+          // Always show location data with monthly rainfall
+          let detectedDistrict = "Unknown";
+          try {
+            const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`, {
+              headers: { "Accept-Language": "en-US,en;q=0.9" }
+            });
+            if (geoRes.ok) {
+              const geo = await geoRes.json();
+              const addr = geo.address || {};
+              detectedDistrict = addr.district || addr.county || addr.state_district || addr.city || "Unknown";
+              detectedDistrict = detectedDistrict.replace(/\bDistrict\b/gi, '').trim();
+            }
+          } catch (geoErr) {
+            console.error("Geocoding failed:", geoErr);
+          }
+
+          setLocationData({ lat: lat.toFixed(4), lon: lon.toFixed(4), temp, rain: monthlyRain, district: detectedDistrict });
+
+          if (weatherSuccess && soilSuccess) {
+            // All good — no error
+          } else if (weatherSuccess) {
+            setGpsError('Weather synced. Soil data estimated from regional profile.');
+          } else if (soilSuccess) {
+            setGpsError('Soil data synced. Weather estimated from defaults.');
+          } else {
+            setGpsError('Using regional estimates for your location. Adjust sliders if needed.');
+          }
+          
+          clearTimeout(timeoutId);
         } catch (err) {
           console.error(err);
-          setGpsError('Could not fetch weather/soil data. Using your location only.');
-          setLocationData({ lat: lat.toFixed(4), lon: lon.toFixed(4) });
+          clearTimeout(timeoutId);
+          setGpsError('Using regional estimates for your location. Adjust sliders if needed.');
+          setParams(p => ({
+            ...p,
+            N, P, K, pH,
+          }));
+          setLocationData({ lat: lat.toFixed(4), lon: lon.toFixed(4), district: "Unknown" });
         } finally {
           setGpsLoading(false);
         }
       },
       (err) => {
+        clearTimeout(timeoutId);
         setGpsError('Location access denied. Please enable GPS permission.');
         setGpsLoading(false);
-      }
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   };
 
@@ -297,17 +437,72 @@ export default function CropRecommend() {
 
   const analyseSoilImage = async (file) => {
     setAnalysingImg(true);
+    setImgError('');
     try {
       const formData = new FormData();
-      formData.append('image', file);
+      formData.append('file', file);
+      
       const res = await API.post('/ml/predict/soil', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      const soilType = res.data?.soil_type || res.data?.prediction || 'Unknown';
-      setDetectedSoil(soilType);
-      if (soilPresets[soilType]) applyPreset(soilType);
-    } catch {
-      setDetectedSoil('Detection failed – presets unchanged.');
+      
+      // Log the full response for debugging
+      console.log('Soil analysis response:', res.data);
+      
+      // Use soil_type_clean (added by backend) or strip "_Soil" suffix for preset lookup
+      const rawType = res.data?.soil_type || res.data?.prediction || 'Unknown';
+      const cleanType = res.data?.soil_type_clean || rawType.replace(/_Soil$/i, '').replace(/_/g, ' ').trim();
+      const confidence = res.data?.confidence;
+      const allScores = res.data?.all_scores;
+      
+      console.log('Detected soil type:', cleanType, 'Confidence:', confidence);
+      
+      setDetectedSoil(cleanType);
+      if (soilPresets[cleanType]) applyPreset(cleanType);
+
+      // Auto-detect weather data when soil is detected
+      try {
+        // Use default location (Hyderabad) or try to get current location
+        let lat = 17.3850; // Hyderabad default
+        let lon = 78.4867;
+        
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            ({ coords }) => {
+              lat = coords.latitude;
+              lon = coords.longitude;
+            },
+            () => {}, // Silently fail if geolocation denied
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+          );
+        }
+
+        // Fetch weather data from Open-Meteo
+        const weatherRes = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,rain&daily=precipitation_sum&timezone=auto&forecast_days=1`
+        );
+        if (weatherRes.ok) {
+          const weather = await weatherRes.json();
+          const temp = Math.round(weather?.current?.temperature_2m ?? 25);
+          const humidity = Math.round(weather?.current?.relative_humidity_2m ?? 60);
+          const rain = Math.round(weather?.daily?.precipitation_sum?.[0] ?? 5);
+          
+          setParams(p => ({
+            ...p,
+            temperature: temp,
+            humidity: humidity,
+            rainfall: Math.min(300, rain * 30),
+          }));
+        }
+      } catch (weatherErr) {
+        console.error('Weather fetch failed during soil analysis:', weatherErr);
+        // Don't fail soil analysis if weather fetch fails
+      }
+    } catch (err) {
+      console.error('Soil analysis error:', err);
+      const errorMsg = err.response?.data?.detail || err.message || 'Detection failed';
+      setDetectedSoil('Detection failed');
+      setImgError(`Soil analysis failed: ${errorMsg}. Please try again with a clearer soil image.`);
     } finally {
       setAnalysingImg(false);
     }
@@ -326,30 +521,82 @@ export default function CropRecommend() {
     setLoading(true);
     setError('');
     setResults([]);
-    try {
-      const res = await API.post('/ml/predict/crop', params);
-      const raw = res.data?.recommendations || res.data?.predictions || [];
-      if (raw.length) {
-        setResults(raw.slice(0, 5));
-      } else {
-        throw new Error('empty');
+    setExcludedResults([]);
+
+    const targetCrops = dbCrops.length > 0 ? dbCrops.map(c => ({
+      name: c.name,
+      N: c.N,
+      P: c.P,
+      K: c.K,
+      pH: c.ph || c.pH,
+      temp: c.temp,
+      rain: c.rainfall || c.rain,
+      moisture: c.humidity || c.moisture,
+      revenue: c.yield * c.price,
+      cost: Math.round(c.yield * c.price * (c.cost_pct || 0.6)),
+      tip: c.tip,
+    })) : cropsData;
+
+    let districtCounts = {};
+    let threshold = 15;
+
+    if (userDistrict.trim()) {
+      try {
+        const { data } = await API.get(`/reference/district-crop-counts?district=${encodeURIComponent(userDistrict.trim())}`);
+        districtCounts = data.counts || {};
+        threshold = data.threshold || 15;
+        setDistrictThreshold(threshold);
+      } catch (err) {
+        console.error("Failed to load district crop counts:", err);
       }
-    } catch {
-      /* Fallback local scoring */
-      const scored = cropsData
-        .map(c => ({
-          name: c.name,
-          suitability: scoreCrop(c, params),
-          revenue: c.revenue,
-          cost:    c.cost,
-          profit:  c.revenue - c.cost,
-          tip:     c.tip,
-        }))
-        .sort((a, b) => b.suitability - a.suitability)
-        .slice(0, 5);
-      setResults(scored);
-    } finally {
-      setLoading(false);
+    }
+
+    /* Always use local scoring to support irrigation filtering */
+    const scored = targetCrops
+      .map(c => ({
+        name: c.name,
+        suitability: scoreCrop(c, params),
+        revenue: c.revenue,
+        cost:    c.cost,
+        profit:  c.revenue - c.cost,
+        tip:     c.tip,
+        count:   districtCounts[c.name] || 0,
+      }))
+      .sort((a, b) => b.suitability - a.suitability);
+
+    const suggested = [];
+    const excluded = [];
+
+    scored.forEach(c => {
+      if (userDistrict.trim() && c.count >= threshold) {
+        excluded.push(c);
+      } else {
+        suggested.push(c);
+      }
+    });
+
+    setResults(suggested.slice(0, 5));
+    setExcludedResults(excluded);
+
+    setLoading(false);
+  };
+
+  const handleSelectCrop = async (cropName) => {
+    if (!userDistrict.trim()) {
+      setError("Please specify your district before selecting a crop.");
+      return;
+    }
+    setError("");
+    try {
+      const { data } = await API.post("/reference/choose-crop", {
+        crop: cropName,
+        district: userDistrict
+      });
+      setChosenCrop(data.choice);
+      // Re-trigger recommendation to update counts and filter out if threshold reached!
+      handleRecommend();
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to save crop choice");
     }
   };
 
@@ -499,12 +746,17 @@ export default function CropRecommend() {
                     >
                       <div className="bg-[#E6F5EE] border border-emerald-200/50 rounded-2xl p-4 flex items-start gap-3">
                         <CheckCircle2 size={16} className="text-[#1E8E5A] mt-0.5 shrink-0" />
-                        <div className="text-xs text-[#0F6B4A] space-y-1 font-semibold">
+                        <div className="text-xs text-[#0F6B4A] space-y-1 font-semibold text-left">
                           <p className="font-bold">{t('crops.gridSynced')}</p>
                           <p className="opacity-80">
                             {locationData.lat}°N, {locationData.lon}°E
                             {locationData.temp != null && ` · ${locationData.temp}°C · ${locationData.rain} mm/mo`}
                           </p>
+                          {locationData.district && locationData.district !== "Unknown" && (
+                            <p className="font-bold text-[10px] mt-1 text-emerald-800">
+                              📍 Detected: {locationData.district}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </motion.div>
@@ -520,6 +772,22 @@ export default function CropRecommend() {
                     </motion.div>
                   )}
                 </AnimatePresence>
+
+                <div className="mt-4">
+                  <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-slate-400 text-left">
+                    District Name
+                  </label>
+                  <input
+                    type="text"
+                    value={userDistrict}
+                    onChange={(e) => setUserDistrict(e.target.value.toUpperCase())}
+                    placeholder="e.g. ANANTAPUR"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-800 focus:border-[#1E8E5A] focus:outline-none"
+                  />
+                  <p className="text-[10px] text-slate-450 mt-1 text-left">
+                    Required to assess overproduction limits in your region.
+                  </p>
+                </div>
               </motion.div>
 
               {/* Soil Image Upload Card */}
@@ -694,9 +962,9 @@ export default function CropRecommend() {
                       <p className="text-sm font-semibold text-slate-600 mb-3">{t('crops.irrigationStandard')}</p>
                       <div className="flex rounded-xl border border-slate-200 overflow-hidden bg-slate-50 p-1">
                         <button
-                          onClick={() => updateParam('irrigated', true)}
+                          onClick={() => updateParam('irrigationType', 'irrigated')}
                           className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all ${
-                            params.irrigated
+                            params.irrigationType === 'irrigated'
                               ? 'bg-white text-[#1E8E5A] shadow-sm border border-slate-100'
                               : 'text-slate-500 hover:text-slate-800'
                           }`}
@@ -704,9 +972,9 @@ export default function CropRecommend() {
                           {t('crops.irrigated')}
                         </button>
                         <button
-                          onClick={() => updateParam('irrigated', false)}
+                          onClick={() => updateParam('irrigationType', 'rainfed')}
                           className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all ${
-                            !params.irrigated
+                            params.irrigationType === 'rainfed'
                               ? 'bg-white text-[#1E8E5A] shadow-sm border border-slate-100'
                               : 'text-slate-500 hover:text-slate-800'
                           }`}
@@ -794,13 +1062,13 @@ export default function CropRecommend() {
                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                 onError={e => { e.target.src = CROP_IMAGES.default; }}
                               />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                               {/* Rank Badge */}
                               <div className={`absolute top-3 left-3 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-black shadow-md ${rankColors[idx] || rankColors[3]}`}>
                                 #{idx + 1}
                               </div>
                               <div className="absolute bottom-3 left-3">
-                                <h3 className="text-white font-bold text-lg font-heading">{crop.name}</h3>
+                                <h3 className="text-white font-bold text-lg font-heading drop-shadow-lg">{crop.name}</h3>
                               </div>
                             </div>
 
@@ -845,11 +1113,55 @@ export default function CropRecommend() {
                                   </span>
                                 </div>
                               </div>
+
+                              {/* Selection Action & Counts */}
+                              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                  Choice Count: <span className="text-slate-700 font-extrabold">{crop.count || 0} / {districtThreshold}</span>
+                                </span>
+                                
+                                {chosenCrop?.crop === crop.name ? (
+                                  <span className="inline-flex items-center gap-1 bg-[#E6F5EE] border border-emerald-300 text-[#0F6B4A] text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg">
+                                    <CheckCircle2 size={12} /> Selected
+                                  </span>
+                                ) : (
+                                  <button
+                                    onClick={() => handleSelectCrop(crop.name)}
+                                    className="bg-[#1E8E5A] hover:bg-[#0F6B4A] text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg transition-colors active:scale-95"
+                                  >
+                                    Plant This
+                                  </button>
+                                )}
+                              </div>
                             </div>
                           </motion.div>
                         );
                       })}
                     </div>
+
+                    {excludedResults.length > 0 && (
+                      <div className="mt-8 pt-8 border-t border-slate-200 text-left">
+                        <h3 className="text-sm font-bold text-red-600 uppercase tracking-wider mb-4 flex items-center gap-2 justify-start">
+                          <AlertTriangle size={16} /> Blocked due to Overproduction Safeguard
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                          {excludedResults.map((crop, idx) => (
+                            <div key={crop.name || idx} className="bg-red-50/50 border border-red-200/50 rounded-2xl p-4 flex flex-col justify-between opacity-85 text-left">
+                              <div>
+                                <h4 className="font-bold text-slate-800 text-sm">{crop.name}</h4>
+                                <p className="text-xs text-red-650 font-semibold mt-1">
+                                  Threshold Limit Exceeded ({crop.count || 0} selections)
+                                </p>
+                                <p className="text-[11px] text-slate-500 mt-2 leading-relaxed">{crop.tip || crop.description || ''}</p>
+                              </div>
+                              <div className="mt-3 pt-2 border-t border-red-100/50 text-[10px] font-bold text-slate-400">
+                                DISTRICT OVERPRODUCTION SAFEGUARD ACTIVE
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>

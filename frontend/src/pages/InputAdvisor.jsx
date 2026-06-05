@@ -118,6 +118,7 @@ const InputAdvisor = () => {
         setDetecting(false);
         setError(t('soil.errorDetect'));
       },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   };
 

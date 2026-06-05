@@ -156,6 +156,7 @@ const MandiMap = ({
       {/* Route — drawn on "Show Route" click */}
       {showRoute && mandiLocation && (
         <RoutingMachine
+          key={`route-${farmerLocation[0]}-${farmerLocation[1]}-${mandiLocation[0]}-${mandiLocation[1]}`}
           farmerPos={farmerLocation}
           mandiPos={mandiLocation}
           quantity={quantity}

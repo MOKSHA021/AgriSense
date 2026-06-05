@@ -219,21 +219,8 @@ const Weather = () => {
       
       let resolvedCityName = cityNameFallback;
       if (!resolvedCityName) {
-        try {
-          const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`, {
-            headers: {
-              "Accept-Language": "en-US,en;q=0.9"
-            }
-          });
-          if (geoRes.ok) {
-            const geo = await geoRes.json();
-            resolvedCityName = geo.address?.city || geo.address?.town || geo.address?.village || geo.address?.county || "Hyderabad";
-          } else {
-            resolvedCityName = "Hyderabad";
-          }
-        } catch (e) {
-          resolvedCityName = "Hyderabad";
-        }
+        // Show coordinates instead of reverse geocoding to avoid incorrect location data
+        resolvedCityName = `${lat.toFixed(4)}°N, ${lon.toFixed(4)}°E`;
       }
 
       const curWeather = mapWmoToOwm(data.current.weather_code, data.current.is_day);
@@ -300,7 +287,8 @@ const Weather = () => {
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => fetchWeatherByCoords(pos.coords.latitude, pos.coords.longitude),
-      () => fetchWeatherByCity("Delhi")
+      () => fetchWeatherByCity("Delhi"),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

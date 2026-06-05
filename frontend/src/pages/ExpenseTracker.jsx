@@ -18,8 +18,20 @@ const PLAN_CROPS = [
 
 const SEASONS = ["Kharif", "Rabi", "Zaid"];
 
+const FALLBACK_CROPS_DETAIL = [
+  { name: "Rice", yield: 20, price: 2100 },
+  { name: "Wheat", yield: 18, price: 2275 },
+  { name: "Maize", yield: 22, price: 1870 },
+  { name: "Sugarcane", yield: 350, price: 350 },
+  { name: "Millets", yield: 8, price: 2800 },
+  { name: "Cotton", yield: 15, price: 6500 },
+  { name: "Potato", yield: 200, price: 1200 },
+  { name: "Soybean", yield: 12, price: 4500 },
+  { name: "Groundnut", yield: 15, price: 5500 },
+];
+
 const DEFAULT_PLAN = {
-  crop: "Wheat", season: "Rabi", area: "2", expectedYield: "22", expectedPrice: "2300"
+  crop: "Wheat", season: "Rabi", area: "2", expectedYield: "18", expectedPrice: "2275"
 };
 
 const currency = (value) => Number(value || 0).toLocaleString("en-IN");
@@ -45,6 +57,7 @@ const ExpenseTracker = () => {
   const [categories, setCategories] = useState([]);
   const [planCrops, setPlanCrops] = useState([]);
   const [seasons, setSeasons] = useState([]);
+  const [cropsDetail, setCropsDetail] = useState([]);
   const [category, setCategory] = useState("");
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
@@ -64,15 +77,17 @@ const ExpenseTracker = () => {
 
     const loadReferenceData = async () => {
       try {
-        const [catRes, cropRes, seasonRes] = await Promise.all([
+        const [catRes, cropRes, seasonRes, cropsDetailRes] = await Promise.all([
           API.get("/reference/expense-categories"),
           API.get("/reference/plan-crops"),
           API.get("/reference/seasons"),
+          API.get("/reference/crops").catch(() => ({ data: { crops: [] } })),
         ]);
         if (!active) return;
         setCategories(catRes.data.categories || []);
         setPlanCrops(cropRes.data.crops || []);
         setSeasons(seasonRes.data.seasons || []);
+        setCropsDetail(cropsDetailRes.data.crops || []);
         setCategory(catRes.data.categories?.[0] || "");
       } catch (err) {
         if (active) {
@@ -80,6 +95,7 @@ const ExpenseTracker = () => {
           setCategories(CATEGORIES);
           setPlanCrops(PLAN_CROPS);
           setSeasons(SEASONS);
+          setCropsDetail(FALLBACK_CROPS_DETAIL);
           setCategory(CATEGORIES[0]);
         }
       }
@@ -144,7 +160,22 @@ const ExpenseTracker = () => {
   const hasPlanChanges = JSON.stringify(plan) !== JSON.stringify(savedPlan);
 
   const handlePlanChange = (e) => {
-    setPlan((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    if (name === "crop") {
+      const details = cropsDetail.find((c) => c.name === value) || FALLBACK_CROPS_DETAIL.find((c) => c.name === value);
+      if (details) {
+        setPlan((prev) => ({
+          ...prev,
+          crop: value,
+          expectedYield: String(details.yield),
+          expectedPrice: String(details.price),
+        }));
+      } else {
+        setPlan((prev) => ({ ...prev, crop: value }));
+      }
+    } else {
+      setPlan((prev) => ({ ...prev, [name]: value }));
+    }
     setPlanStatus(t('expense.forecastChanged'));
   };
 

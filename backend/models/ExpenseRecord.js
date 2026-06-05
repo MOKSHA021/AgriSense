@@ -5,8 +5,8 @@ const cropPlanSchema = new mongoose.Schema(
     crop: { type: String, default: "Wheat" },
     season: { type: String, default: "Rabi" },
     area: { type: String, default: "2" },
-    expectedYield: { type: String, default: "22" },
-    expectedPrice: { type: String, default: "2300" },
+    expectedYield: { type: String, default: "18" },
+    expectedPrice: { type: String, default: "2275" },
   },
   { _id: false }
 );

@@ -8,20 +8,35 @@ import LivePrices from "../components/market/LivePrices.jsx";
 import PricePrediction from "../components/market/PricePrediction";
 import { useTranslation } from "../translations";
 
-// ── Geocode mandi name → lat/lng via Nominatim ──
+// ── Geocode mandi name → lat/lng via Nominatim (with fallback strategies) ──
 const geocodeMandi = async (mandiName, district, state) => {
-  try {
-    const query = `${mandiName}, ${district}, ${state}, India`;
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`,
-      { headers: { "Accept-Language": "en-US,en;q=0.9" } }
-    );
-    const data = await res.json();
-    if (data.length) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-    return null;
-  } catch {
-    return null;
+  // Try multiple query strategies since small Indian mandi names often don't resolve
+  const queries = [
+    `${mandiName}, ${district}, ${state}, India`,     // full: "Kuppam, Chittor, Andhra Pradesh, India"
+    `${mandiName}, ${state}, India`,                   // without district
+    `${district}, ${state}, India`,                    // fallback to district center
+  ];
+
+  for (const query of queries) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&countrycodes=in`,
+        { headers: { "Accept-Language": "en-US,en;q=0.9" }, signal: controller.signal }
+      );
+      clearTimeout(timeout);
+      const data = await res.json();
+      if (data.length) {
+        return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+      }
+      // Small delay between requests to respect Nominatim rate limits
+      await new Promise(r => setTimeout(r, 300));
+    } catch {
+      continue; // try next query
+    }
   }
+  return null;
 };
 
 const Market = () => {
@@ -67,7 +82,8 @@ const Market = () => {
           .then((d) => setFarmerAddress(d.display_name?.split(",").slice(0, 3).join(", ") || "Hyderabad"))
           .catch(() => { setFarmerAddress("Hyderabad") });
       },
-      () => {}
+      () => {},
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   }, []);
 
@@ -127,18 +143,34 @@ const Market = () => {
   };
 
   // ── Click card → geocoded pin drops on map ──
-  const handleSelectMandi = useCallback((mandi) => {
+  const handleSelectMandi = useCallback(async (mandi) => {
     setSelectedMandi(mandi);
     setRouteInfo(null);
+    // Reset route display so RoutingMachine unmounts cleanly
+    setShowRoute(false);
+
     if (mandi.lat && mandi.lng) {
       const coords = [mandi.lat, mandi.lng];
       setMandiLocation(coords);
       setFlyTarget(coords);
-      setShowRoute(true);
+      setTimeout(() => setShowRoute(true), 0);
     } else {
-      setShowRoute(false);
+      // Attempt on-the-fly geocoding for mandis that weren't resolved in background
+      const coords = await geocodeMandi(mandi.name, mandi.district, mandiForm.state);
+      if (coords) {
+        const updatedMandi = { ...mandi, lat: coords.lat, lng: coords.lng };
+        setSelectedMandi(updatedMandi);
+        setMandiLocation([coords.lat, coords.lng]);
+        setFlyTarget([coords.lat, coords.lng]);
+        setTimeout(() => setShowRoute(true), 0);
+        // Update the mandi in results so the card status refreshes
+        setMandiResults(prev => prev ? {
+          ...prev,
+          mandis: prev.mandis.map(m => m.name === mandi.name ? updatedMandi : m)
+        } : prev);
+      }
     }
-  }, []);
+  }, [mandiForm.state]);
 
   // ── Map click for manual pins ──
   const handleMapClick = useCallback((coords) => {

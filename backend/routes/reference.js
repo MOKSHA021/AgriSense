@@ -351,4 +351,75 @@ router.post("/compute-risks", (req, res) => {
   res.json({ risks });
 });
 
+const ChosenCrop = require("../models/ChosenCrop");
+const auth = require("../middleware/auth");
+
+const CROP_THRESHOLD = 15; // threshold limit of users planting the same crop in a district
+
+// POST /api/reference/choose-crop
+router.post("/choose-crop", auth, async (req, res) => {
+  try {
+    const { crop, district } = req.body;
+    if (!crop || !district) {
+      return res.status(400).json({ message: "crop and district are required" });
+    }
+
+    const normDistrict = district.trim().toLowerCase();
+
+    // Check if limit exceeded before allowing user to choose this crop
+    const counts = await ChosenCrop.countDocuments({ district: normDistrict, crop });
+    if (counts >= CROP_THRESHOLD) {
+      return res.status(400).json({ message: `Overproduction Alert: The threshold limit of ${CROP_THRESHOLD} selections for ${crop} has already been reached in ${district}. Please choose a different crop.` });
+    }
+
+    const choice = await ChosenCrop.findOneAndUpdate(
+      { user: req.user.id },
+      { crop, district: normDistrict },
+      { new: true, upsert: true }
+    );
+
+    res.json({ message: "Crop choice recorded successfully", choice });
+  } catch (err) {
+    console.error("Choose crop error:", err.message);
+    res.status(500).json({ message: "Failed to record crop choice" });
+  }
+});
+
+// GET /api/reference/district-crop-counts
+router.get("/district-crop-counts", async (req, res) => {
+  try {
+    const { district } = req.query;
+    if (!district) {
+      return res.status(400).json({ message: "district is required" });
+    }
+
+    const normDistrict = district.trim().toLowerCase();
+    const counts = await ChosenCrop.aggregate([
+      { $match: { district: normDistrict } },
+      { $group: { _id: "$crop", count: { $sum: 1 } } }
+    ]);
+
+    const countsMap = {};
+    counts.forEach((item) => {
+      countsMap[item._id] = item.count;
+    });
+
+    res.json({ district: normDistrict, counts: countsMap, threshold: CROP_THRESHOLD });
+  } catch (err) {
+    console.error("Get crop counts error:", err.message);
+    res.status(500).json({ message: "Failed to load district crop statistics" });
+  }
+});
+
+// GET /api/reference/user-chosen-crop
+router.get("/user-chosen-crop", auth, async (req, res) => {
+  try {
+    const choice = await ChosenCrop.findOne({ user: req.user.id });
+    res.json({ choice });
+  } catch (err) {
+    console.error("Get user chosen crop error:", err.message);
+    res.status(500).json({ message: "Failed to fetch user crop choice" });
+  }
+});
+
 module.exports = router;
