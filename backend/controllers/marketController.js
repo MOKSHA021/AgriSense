@@ -63,13 +63,49 @@ const getDistricts = async (req, res) => {
 // Only needs: crop + state
 // ─────────────────────────────────────
 const getLivePrices = async (req, res) => {
-  const { crop, state } = req.query;
+  const { crop, state, district } = req.query;
 
   if (!crop || !state)
     return res.status(400).json({ message: "crop and state are required" });
 
   try {
-    const scraped = await scrapeVegetablePrices(state, crop);
+    let scraped = [];
+    let source = "todaypricerates";
+
+    if (district) {
+      // Query data.gov.in for district-level live prices
+      const records = await fetchFromAPI({ State: state, District: district, Commodity: crop }, 100);
+      if (records.length > 0) {
+        // Map data.gov.in records to the expected scraped format
+        scraped = records.map((r) => {
+           const minPrice = Number(r.Min_Price) || 0;
+           const maxPrice = Number(r.Max_Price) || 0;
+           const modalPrice = Number(r.Modal_Price) || 0;
+           return {
+             commodity: r.Commodity,
+             unit: "Quintal",
+             mandiPrice: modalPrice,
+             minPrice: minPrice,
+             maxPrice: maxPrice,
+             modalPrice: modalPrice,
+             priceChange: 0,
+             trend: "stable",
+             date: r.Arrival_Date,
+             state: r.State,
+             district: r.District,
+             market: r.Market,
+             source: "data.gov.in"
+           };
+        });
+        source = "data.gov.in";
+      }
+    }
+
+    // Fallback to state-wide scraper if no district data or no district provided
+    if (!scraped.length) {
+      scraped = await scrapeVegetablePrices(state, crop);
+      source = "todaypricerates";
+    }
 
     if (!scraped.length)
       return res.status(404).json({ message: `No price found for ${crop} in ${state}` });
@@ -85,7 +121,8 @@ const getLivePrices = async (req, res) => {
       maxPrice: Math.max(...scraped.map((r) => r.maxPrice)),
       crop,
       state,
-      source: "todaypricerates",
+      district: district || null,
+      source,
     });
 
   } catch (err) {
@@ -170,13 +207,22 @@ const getBestMandis = async (req, res) => {
 // CONTROLLER 4 — POST /api/market/predict
 // ─────────────────────────────────────
 const predictPrice = async (req, res) => {
-  const { crop, state, season, year } = req.body;
+  const { crop, state, district, season, year } = req.body;
 
   if (!crop || !state || !season || !year)
     return res.status(400).json({ message: "crop, state, season and year are required" });
 
   try {
-    const records = await fetchFromAPI({ State: state, Commodity: crop }, 100);
+    let records = [];
+    if (district) {
+      records = await fetchFromAPI({ State: state, District: district, Commodity: crop }, 100);
+    }
+    
+    // Fallback to state-level if district is empty or not provided
+    if (!records.length) {
+      records = await fetchFromAPI({ State: state, Commodity: crop }, 100);
+    }
+    
     if (!records.length)
       return res.status(404).json({ message: `No historical data for ${crop} in ${state}` });
 
@@ -205,7 +251,7 @@ const predictPrice = async (req, res) => {
         Zaid:   `Zaid is a short season — ${crop} prices can be volatile. Monitor weekly.`,
       }[season] || `Based on ${prices.length} historical records from ${state}.`,
       data_points: prices.length,
-      crop, state, season, year,
+      crop, state, district: district || null, season, year,
     });
 
   } catch (err) {

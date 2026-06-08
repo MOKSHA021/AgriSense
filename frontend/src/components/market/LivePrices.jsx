@@ -9,9 +9,27 @@ const LivePrices = () => {
   const { t } = useTranslation();
   const [liveCrop, setLiveCrop] = useState("");
   const [liveState, setLiveState] = useState("");
+  const [liveDistrict, setLiveDistrict] = useState("");
   const [liveData, setLiveData] = useState(null);
   const [liveLoading, setLiveLoading] = useState(false);
   const [liveError, setLiveError] = useState("");
+  const [liveDistricts, setLiveDistricts] = useState([]);
+  const [districtLoading, setDistrictLoading] = useState(false);
+  const [districtError, setDistrictError] = useState("");
+
+  const fetchDistricts = async (state) => {
+    if (!state) return setLiveDistricts([]);
+    setDistrictLoading(true); setDistrictError("");
+    try {
+      const { data } = await API.get(`/market/districts?state=${encodeURIComponent(state)}`);
+      setLiveDistricts(data.districts || []);
+    } catch (err) {
+      setDistrictError("Failed to fetch districts");
+      setLiveDistricts([]);
+    } finally {
+      setDistrictLoading(false);
+    }
+  };
 
   const handleLiveFetch = async (e) => {
     e.preventDefault();
@@ -20,7 +38,7 @@ const LivePrices = () => {
     setLiveData(null);
     try {
       const { data } = await API.get("/market/live-prices", {
-        params: { crop: liveCrop, state: liveState },
+        params: { crop: liveCrop, state: liveState, district: liveDistrict },
       });
       setLiveData(data);
     } catch (err) {
@@ -62,7 +80,7 @@ const LivePrices = () => {
             >
               <option value="" className="bg-white text-slate-800">{t('market.selectCrop')}</option>
               {CROPS.map((c) => (
-                <option key={c.name} value={c.name} className="bg-white text-slate-800">{c.icon} {t(`crops.${c.name}`)}</option>
+                <option key={c.name} value={c.name} className="bg-white text-slate-800">{c.icon} {c.name}</option>
               ))}
             </select>
           </div>
@@ -73,15 +91,37 @@ const LivePrices = () => {
             </label>
             <select
               value={liveState}
-              onChange={(e) => setLiveState(e.target.value)}
+              onChange={(e) => {
+                setLiveState(e.target.value);
+                setLiveDistrict("");
+                fetchDistricts(e.target.value);
+              }}
               required
               className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-pink-500 bg-white/5 transition-colors appearance-none"
             >
               <option value="" className="bg-white text-slate-800">{t('market.selectState')}</option>
               {STATES.map((s) => (
-                <option key={s} value={s} className="bg-white text-slate-800">{t(`states.${s.replace(/\s+/g, '')}`)}</option>
+                <option key={s} value={s} className="bg-white text-slate-800">{s}</option>
               ))}
             </select>
+          </div>
+
+          <div>
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5" /> District
+            </label>
+            <select
+              value={liveDistrict}
+              onChange={(e) => setLiveDistrict(e.target.value)}
+              className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:border-pink-500 bg-white/5 transition-colors appearance-none disabled:opacity-30"
+              disabled={!liveState || districtLoading}
+            >
+              <option value="" className="bg-white text-slate-800">{districtLoading ? "..." : "All Districts (Optional)"}</option>
+              {liveDistricts.map((d) => (
+                <option key={d} value={d} className="bg-white text-slate-800">{d}</option>
+              ))}
+            </select>
+            {districtError && <p className="mt-1.5 text-[10px] text-red-400">{districtError}</p>}
           </div>
 
           <button
@@ -125,7 +165,7 @@ const LivePrices = () => {
                 <div>
                   <span className="text-xs font-bold tracking-widest text-pink-200 uppercase mb-1 block">{t('market.liveCommodityReport')}</span>
                   <span className="font-extrabold text-2xl tracking-tight">
-                    {t(`crops.${liveData.crop}`)} {t('market.in')} {t(`states.${liveData.state.replace(/\s+/g, '')}`)}
+                    {liveData.crop} {t('market.in')} {liveData.district ? `${liveData.district}, ` : ""}{liveData.state}
                   </span>
                 </div>
                 <div className="bg-black/20 backdrop-blur-md border border-white/20 rounded-full px-4 py-2 flex items-center gap-2">

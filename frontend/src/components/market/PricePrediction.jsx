@@ -1,7 +1,7 @@
 import { useState } from "react";
 import API from "../../services/api";
-import { CROPS } from "./constants";
-import { TrendingUp, Wheat, Calendar, Loader2 } from "lucide-react";
+import { CROPS, STATES } from "./constants";
+import { TrendingUp, Wheat, Calendar, Loader2, MapPin } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "../../translations";
 
@@ -18,11 +18,28 @@ const CROP_ICONS = Object.fromEntries(CROPS.map((c) => [c.name, c.icon]));
 
 const PricePrediction = () => {
   const { t } = useTranslation();
-  const [predForm, setPredForm] = useState({ crop: "", harvest_date: defaultHarvestDate() });
+  const [predForm, setPredForm] = useState({ crop: "", harvest_date: defaultHarvestDate(), state: "Uttar Pradesh", district: "" });
   const [prediction, setPrediction] = useState(null);
   const [predLoading, setPredLoading] = useState(false);
   const [predError, setPredError] = useState("");
   const [predSource, setPredSource] = useState(""); // "ml" | "fallback"
+  const [predDistricts, setPredDistricts] = useState([]);
+  const [districtLoading, setDistrictLoading] = useState(false);
+  const [districtError, setDistrictError] = useState("");
+
+  const fetchDistricts = async (state) => {
+    if (!state) return setPredDistricts([]);
+    setDistrictLoading(true); setDistrictError("");
+    try {
+      const { data } = await API.get(`/market/districts?state=${encodeURIComponent(state)}`);
+      setPredDistricts(data.districts || []);
+    } catch (err) {
+      setDistrictError("Failed to fetch districts");
+      setPredDistricts([]);
+    } finally {
+      setDistrictLoading(false);
+    }
+  };
 
   const handlePredict = async (e) => {
     e.preventDefault();
@@ -61,7 +78,7 @@ const PricePrediction = () => {
       const month = new Date(predForm.harvest_date).getMonth() + 1;
       const year = new Date(predForm.harvest_date).getFullYear();
       const season = month >= 6 && month <= 10 ? "Kharif" : month >= 11 || month <= 3 ? "Rabi" : "Zaid";
-      const { data } = await API.post("/market/predict", { crop: cropName, state: "Uttar Pradesh", season, year });
+      const { data } = await API.post("/market/predict", { crop: cropName, state: predForm.state, district: predForm.district, season, year });
       setPrediction({ ...data, harvest_date: predForm.harvest_date, crop: cropName });
       setPredSource("fallback");
     } catch (err) {
@@ -91,7 +108,7 @@ const PricePrediction = () => {
         <div className="flex flex-wrap gap-2 mb-8">
           {ML_SUPPORTED_CROPS.map((c) => (
             <span key={c} className="text-[10px] font-bold bg-blue-500/10 border border-blue-500/20 text-blue-400 px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
-              {t(`crops.${c}`)}
+              {c}
             </span>
           ))}
         </div>
@@ -115,10 +132,10 @@ const PricePrediction = () => {
             >
               <option value="" className="bg-white text-slate-800">{t('market.selectCrop')}</option>
               <optgroup label={t('market.prophetMLModel')} className="bg-white text-slate-800">
-                {mlCrops.map((c) => <option key={c.name} value={c.name} className="bg-white text-slate-800">{c.icon} {t(`crops.${c.name}`)}</option>)}
+                {mlCrops.map((c) => <option key={c.name} value={c.name} className="bg-white text-slate-800">{c.icon} {c.name}</option>)}
               </optgroup>
               <optgroup label={t('market.statisticalFallback')} className="bg-white text-slate-800">
-                {otherCrops.map((c) => <option key={c.name} value={c.name} className="bg-white text-slate-800">{c.icon} {t(`crops.${c.name}`)}</option>)}
+                {otherCrops.map((c) => <option key={c.name} value={c.name} className="bg-white text-slate-800">{c.icon} {c.name}</option>)}
               </optgroup>
             </select>
           </div>
@@ -137,6 +154,46 @@ const PricePrediction = () => {
               className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:border-blue-500 bg-white/5 transition-colors"
             />
             <p className="text-xs text-slate-800/30 mt-2 font-medium">{t('market.prophetForecastNote')}</p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5" /> State
+              </label>
+              <select
+                value={predForm.state}
+                onChange={(e) => {
+                  setPredForm({ ...predForm, state: e.target.value, district: "" });
+                  fetchDistricts(e.target.value);
+                }}
+                required
+                className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:border-blue-500 bg-white/5 transition-colors appearance-none"
+              >
+                <option value="" className="bg-white text-slate-800">Select State</option>
+                {STATES.map((s) => (
+                  <option key={s} value={s} className="bg-white text-slate-800">{s}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5" /> District
+              </label>
+              <select
+                value={predForm.district}
+                onChange={(e) => setPredForm({ ...predForm, district: e.target.value })}
+                required
+                disabled={!predForm.state || districtLoading}
+                className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:border-blue-500 bg-white/5 transition-colors appearance-none disabled:opacity-30"
+              >
+                <option value="" className="bg-white text-slate-800">{districtLoading ? "..." : "Select District"}</option>
+                {predDistricts.map((d) => (
+                  <option key={d} value={d} className="bg-white text-slate-800">{d}</option>
+                ))}
+              </select>
+              {districtError && <p className="mt-1.5 text-[10px] text-red-400">{districtError}</p>}
+            </div>
           </div>
 
           <button
@@ -179,7 +236,7 @@ const PricePrediction = () => {
                 <div>
                   <div className="flex items-center gap-3 mb-1">
                     <span className="text-3xl">{CROP_ICONS[prediction.crop] || "🌾"}</span>
-                    <h3 className="text-2xl font-black text-slate-800 tracking-tight">{t(`crops.${prediction.crop}`)}</h3>
+                    <h3 className="text-2xl font-black text-slate-800 tracking-tight">{prediction.crop}</h3>
                   </div>
                   <p className="text-sm font-medium text-slate-500">{t('market.harvest')} <span className="text-slate-600">{prediction.harvest_date}</span></p>
                 </div>

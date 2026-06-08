@@ -98,7 +98,7 @@ const MandiForm = ({
             </option>
             {CROPS.map((crop) => (
               <option key={crop.name} value={crop.name} className="bg-white text-slate-800">
-                {crop.icon} {t(`crops.${crop.name}`)}
+                {crop.icon} {crop.name}
               </option>
             ))}
           </select>
