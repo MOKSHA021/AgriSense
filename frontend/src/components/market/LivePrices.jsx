@@ -127,7 +127,7 @@ const LivePrices = () => {
           <button
             type="submit"
             disabled={liveLoading}
-            className="w-full mt-2 py-4 bg-gradient-to-r from-pink-600 to-rose-500 text-white font-bold rounded-xl hover:from-pink-500 hover:to-rose-400 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(244,63,94,0.3)]"
+            className="w-full mt-2 py-4 bg-gradient-to-r from-green-600 to-emerald-500 text-white font-bold rounded-xl hover:from-green-500 hover:to-emerald-400 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
           >
             {liveLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
             {liveLoading ? t('market.fetchingData') : t('market.findMarkets')}
