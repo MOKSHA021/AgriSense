@@ -135,7 +135,7 @@ def predict_price(data: PriceInput):
 
     logger.info(
         f"[price] {data.crop_name} @ {data.harvest_date} "
-        f"→ ₹{yhat:.0f} [{yhat_lower:.0f}–{yhat_upper:.0f}]"
+        f"-> INR {yhat:.0f} [{yhat_lower:.0f}-{yhat_upper:.0f}]"
     )
 
     return PriceResponse(

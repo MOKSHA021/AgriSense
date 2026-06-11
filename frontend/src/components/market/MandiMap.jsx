@@ -34,7 +34,16 @@ function RoutingMachine({ farmerPos, mandiPos, quantity, onRouteFound }) {
 
   useEffect(() => {
     if (!map || !farmerPos || !mandiPos) return;
-    if (ref.current) { map.removeControl(ref.current); ref.current = null; }
+
+    // Safely remove any previous control
+    const safeRemove = (ctrl) => {
+      try {
+        if (ctrl && map && map._loaded) map.removeControl(ctrl);
+      } catch (_) { /* map already destroyed — ignore */ }
+    };
+
+    safeRemove(ref.current);
+    ref.current = null;
 
     const control = L.Routing.control({
       waypoints: [
@@ -66,7 +75,7 @@ function RoutingMachine({ farmerPos, mandiPos, quantity, onRouteFound }) {
     control.addTo(map);
     ref.current = control;
 
-    return () => { if (ref.current) map.removeControl(ref.current); };
+    return () => { safeRemove(ref.current); ref.current = null; };
   }, [map, farmerPos, mandiPos, quantity]);
 
   return null;

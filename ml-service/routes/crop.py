@@ -23,12 +23,22 @@ _npk_path     = os.path.join(BASE_DIR, 'data',   'soil_npk.json')
 pipeline = None
 le = None
 npk = {}
+DEFAULT_NPK = {
+    "Alluvial_Soil": {"N": 90, "P": 42, "K": 43, "ph": 6.8},
+    "Black_Soil": {"N": 80, "P": 35, "K": 50, "ph": 7.5},
+    "Red_Soil": {"N": 45, "P": 30, "K": 35, "ph": 6.2},
+    "Laterite_Soil": {"N": 35, "P": 20, "K": 25, "ph": 5.5},
+    "Arid_Soil": {"N": 25, "P": 18, "K": 30, "ph": 8.0},
+    "Yellow_Soil": {"N": 50, "P": 28, "K": 32, "ph": 6.0},
+    "Mountain_Soil": {"N": 60, "P": 32, "K": 38, "ph": 5.8},
+}
 
 if os.path.exists(_npk_path):
     with open(_npk_path) as f:
         npk = json.load(f)
 else:
-    logger.warning(f"[crop] Required file not found: {_npk_path}")
+    npk = DEFAULT_NPK
+    logger.warning(f"[crop] Reference file not found: {_npk_path}. Using built-in defaults.")
 
 if os.path.exists(_model_path) and os.path.exists(_encoder_path):
     pipeline = joblib.load(_model_path)   # ← Full sklearn Pipeline (scaler + RF)
@@ -102,7 +112,7 @@ def predict_crop(data: CropInput):
 
     logger.info(
         f"[crop] soil={data.soil_type} temp={data.temperature} "
-        f"→ top={le.classes_[top5_idx[0]]} ({probs[top5_idx[0]]:.2%})"
+        f"-> top={le.classes_[top5_idx[0]]} ({probs[top5_idx[0]]:.2%})"
     )
 
     return CropResponse(

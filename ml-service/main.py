@@ -40,28 +40,30 @@ from routes.reference import router as reference_router # noqa: E402
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("=" * 55)
-    logger.info("  AgriSense ML Service — Starting Up")
+    logger.info("  AgriSense ML Service - Starting Up")
     logger.info(f"  Time    : {datetime.utcnow().isoformat()}Z")
     logger.info(f"  Base dir: {BASE_DIR}")
 
     # Verify all required model files exist before accepting traffic
-    required_models = [
-        'crop_model.pkl',
-        'label_encoder.pkl',
-        'soil_model.pt',
-    ]
+    required_models = ['crop_model.pkl', 'label_encoder.pkl']
     missing = [
         m for m in required_models
         if not os.path.exists(os.path.join(BASE_DIR, 'models', m))
     ]
+    soil_available = any(
+        os.path.exists(os.path.join(BASE_DIR, 'models', name))
+        for name in ('soil_model_best.pt', 'soil_model.pt')
+    )
+    if not soil_available:
+        missing.append('soil_model_best.pt or soil_model.pt')
     if missing:
         logger.warning(f"Missing model files (run training scripts first): {missing}")
     else:
-        logger.info("  All core model files found ✅")
+        logger.info("  All core model files found")
 
     logger.info("=" * 55)
     yield
-    logger.info("AgriSense ML Service — Shutting Down")
+    logger.info("AgriSense ML Service - Shutting Down")
 
 
 # ── App factory ───────────────────────────────────────────────────────────────
@@ -97,9 +99,9 @@ async def global_exception_handler(request: Request, exc: Exception):
 # ── Request logging middleware ────────────────────────────────────────────────
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    logger.info(f"→ {request.method} {request.url.path}")
+    logger.info(f"-> {request.method} {request.url.path}")
     response = await call_next(request)
-    logger.info(f"← {request.method} {request.url.path} | {response.status_code}")
+    logger.info(f"<- {request.method} {request.url.path} | {response.status_code}")
     return response
 
 
@@ -131,6 +133,6 @@ def models_status():
         "models_dir": models_dir,
         "files":      sorted(files),
         "crop_model":   "crop_model.pkl"   in files,
-        "soil_model":   "soil_model.pt"    in files,
+        "soil_model": any(name in files for name in ("soil_model_best.pt", "soil_model.pt")),
         "price_models": [f for f in files if f.startswith("prophet_")],
     }

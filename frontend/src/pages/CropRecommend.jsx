@@ -500,7 +500,8 @@ export default function CropRecommend() {
       }
     } catch (err) {
       console.error('Soil analysis error:', err);
-      const errorMsg = err.response?.data?.detail || err.message || 'Detection failed';
+      const rawErrorMsg = err.response?.data?.detail || err.response?.data?.message || err.message || 'Detection failed';
+      const errorMsg = rawErrorMsg.replace(/\.$/, '');
       setDetectedSoil('Detection failed');
       setImgError(`Soil analysis failed: ${errorMsg}. Please try again with a clearer soil image.`);
     } finally {

@@ -59,8 +59,26 @@ def _build_and_load_model(model_path: str) -> nn.Module:
 
 
 # ── Use best checkpoint (highest val_acc) instead of final epoch ──────────────
-_model_path = os.path.join(BASE_DIR, 'models', 'soil_model_best.pt')
-soil_model  = _build_and_load_model(_model_path)
+_model_candidates = [
+    os.path.join(BASE_DIR, 'models', 'soil_model_best.pt'),
+    os.path.join(BASE_DIR, 'models', 'soil_model.pt'),
+]
+_model_path = next((path for path in _model_candidates if os.path.exists(path)), None)
+soil_model = None
+soil_model_error = None
+
+if _model_path:
+    try:
+        soil_model = _build_and_load_model(_model_path)
+    except Exception as exc:
+        soil_model_error = str(exc)
+        logger.exception("[soil] Failed to load model")
+else:
+    soil_model_error = (
+        "No soil model checkpoint found. Expected models/soil_model_best.pt "
+        "or models/soil_model.pt. Run train/train_soil.py first."
+    )
+    logger.warning("[soil] %s", soil_model_error)
 
 # ── TTA: 5-crop test-time augmentation for better real-world robustness ───────
 # Base inference transform
@@ -91,6 +109,8 @@ class SoilPrediction(BaseModel):
 # ── Endpoint ──────────────────────────────────────────────────────────────────
 @router.post("/soil", response_model=SoilPrediction, summary="Soil type classification from image")
 async def predict_soil(file: UploadFile = File(...)):
+    if soil_model is None:
+        raise HTTPException(status_code=503, detail=soil_model_error)
 
     # ── File validation ───────────────────────────────────────────────────
     if file.content_type not in ("image/jpeg", "image/png", "image/webp"):
@@ -135,7 +155,7 @@ async def predict_soil(file: UploadFile = File(...)):
     all_scores = {cls: round(probs[i].item(), 4) for i, cls in enumerate(CLASSES)}
     low_confidence = confidence < CONFIDENCE_THRESHOLD
 
-    logger.info(f"[soil] TTA→ {CLASSES[idx]} ({confidence:.2%}) low_conf={low_confidence} | "
+    logger.info(f"[soil] TTA -> {CLASSES[idx]} ({confidence:.2%}) low_conf={low_confidence} | "
                 f"file={file.filename} size={len(raw)//1024}KB")
 
     return SoilPrediction(
