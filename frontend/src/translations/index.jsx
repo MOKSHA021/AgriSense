@@ -718,7 +718,7 @@ const translations = {
     }
   },
   te: {
-    crops: {
+    cropNames: {
     "Wheat": "గోధుమ",
     "Rice": "వరి",
     "Tomato": "టమోటా",
@@ -1526,7 +1526,7 @@ const translations = {
       classValue: '7 प्रमुख स्थानीय वर्ग समूह',
       reliabilityValue: '65% कॉन्फिडेंस वार्निंग थ्रेसहोल्ड'
     },
-    crops: {
+    cropNames: {
     "Wheat": "गेहूं",
     "Rice": "चावल",
     "Tomato": "टमाटर",

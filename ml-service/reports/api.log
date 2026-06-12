@@ -117,3 +117,13 @@
 2026-06-05 12:08:15,799 | INFO | agrisense | [price] Loading Prophet model for Wheat
 2026-06-05 12:08:16,703 | INFO | agrisense | [price] Wheat @ 2026-09-05 → ₹4451 [3549–5636]
 2026-06-05 12:08:16,705 | INFO | agrisense | ← POST /predict/price | 200
+2026-06-11 23:35:41,480 | INFO | agrisense | [soil] Loaded checkpoint from epoch 1 (val_acc=99.90%)
+2026-06-11 23:35:41,496 | INFO | agrisense | [soil] EfficientNet-B0 loaded | Classes: ['Alluvial_Soil', 'Arid_Soil', 'Black_Soil', 'Laterite_Soil', 'Mountain_Soil', 'Red_Soil', 'Yellow_Soil']
+2026-06-11 23:35:41,628 | WARNING | agrisense | [crop] Required file not found: C:\Agri\AgriSense\ml-service\data\soil_npk.json
+2026-06-11 23:35:41,629 | WARNING | agrisense | [crop] Model files not found. Using mock mode.
+2026-06-11 23:35:42,388 | INFO | agrisense | =======================================================
+2026-06-11 23:35:42,388 | INFO | agrisense |   AgriSense ML Service � Starting Up
+2026-06-11 23:35:42,388 | INFO | agrisense |   Time    : 2026-06-11T18:05:42.388890Z
+2026-06-11 23:35:42,389 | INFO | agrisense |   Base dir: C:\Agri\AgriSense\ml-service
+2026-06-11 23:35:42,389 | WARNING | agrisense | Missing model files (run training scripts first): ['crop_model.pkl', 'label_encoder.pkl']
+2026-06-11 23:35:42,389 | INFO | agrisense | =======================================================
