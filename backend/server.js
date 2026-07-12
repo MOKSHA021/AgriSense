@@ -3,14 +3,16 @@ const dotenv    = require('dotenv');
 const cors      = require('cors');
 const helmet    = require('helmet');
 const morgan    = require('morgan');
-const rateLimit = require('express-rate-limit');
+const cookieParser = require('cookie-parser');
+const { globalLimiter } = require('./middleware/rateLimiter');
 const connectDB = require('./config/db');
 const marketRoutes = require("./routes/market");
 const expenseRoutes = require("./routes/expenses");
 const inputAdvisorRoutes = require("./routes/inputAdvisor");
 const referenceRoutes = require("./routes/reference");
 const mlRoutes = require("./routes/ml");
-
+const weatherRoutes = require("./routes/weather");
+const pestRoutes = require("./routes/pest");
 
 
 dotenv.config();
@@ -27,19 +29,29 @@ app.use(cors({
 }));
 app.use(morgan('dev'));
 app.use(express.json());
+app.use(cookieParser());
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: { message: 'Too many requests, please try again after 15 minutes' }
+app.use('/api/', globalLimiter);
+
+// 🔍 DEBUG ROUTE: Let's you physically see the rate limit counter!
+app.get('/api/debug-rate-limit', (req, res) => {
+  // express-rate-limit automatically attaches this 'rateLimit' object 
+  // to the request after it checks the MemoryStore
+  res.json({
+    message: "Here is your exact status in the Rate Limiter RAM:",
+    yourIP: req.ip,
+    rateLimitData: req.rateLimit
+  });
 });
-app.use('/api/', limiter);
+
 app.use('/api/auth', require('./routes/auth'));
 app.use("/api/market", marketRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/input-advisor", inputAdvisorRoutes);
 app.use("/api/reference", referenceRoutes);
 app.use("/api/ml", mlRoutes);
+app.use("/api/weather", weatherRoutes);
+app.use("/api/pest", pestRoutes);
 
 app.get('/', (req, res) => res.json({ status: 'AgriSense Backend Running' }));
 

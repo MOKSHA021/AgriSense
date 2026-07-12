@@ -1,29 +1,46 @@
-const otpStore = new Map();
-const tempUserStore = new Map(); // ← ADD THIS
+const { createClient } = require('redis');
+require('dotenv').config();
 
-const redisClient = {
-  setEx: (key, seconds, value) => {
-    otpStore.set(key, value);
-    setTimeout(() => otpStore.delete(key), seconds * 1000);
-    return Promise.resolve();
+// 1. Connect to the real Redis server
+const client = createClient({
+  url: process.env.REDIS_URL || 'redis://127.0.0.1:6379'
+});
+
+client.on('error', (err) => console.error('Redis Client Error', err));
+client.connect().catch(console.error);
+
+// 2. Create our Wrapper so authController.js doesn't break
+const redisClientWrapper = {
+  // ── Standard Redis Methods ──
+  setEx: async (key, seconds, value) => {
+    await client.setEx(key, seconds, String(value));
   },
-  get: (key) => Promise.resolve(otpStore.get(key) || null),
-  del: (key) => {
-    otpStore.delete(key);
-    return Promise.resolve();
+  get: async (key) => {
+    return await client.get(key);
+  },
+  del: async (key) => {
+    await client.del(key);
   },
 
-  // ── Temp user storage ──
-  setTempUser: (email, userData) => {
-    tempUserStore.set(email, userData);
-    setTimeout(() => tempUserStore.delete(email), 600 * 1000); // 10 min
-    return Promise.resolve();
+  // ── Custom Temp User Storage ──
+  setTempUser: async (email, userData) => {
+    // Redis only stores strings, so we must convert the object to a JSON string!
+    const dataString = JSON.stringify(userData);
+    await client.setEx(`temp_user:${email}`, 600, dataString);
   },
-  getTempUser: (email) => Promise.resolve(tempUserStore.get(email) || null),
-  delTempUser: (email) => {
-    tempUserStore.delete(email);
-    return Promise.resolve();
+  
+  getTempUser: async (email) => {
+    const dataString = await client.get(`temp_user:${email}`);
+    if (!dataString) return null;
+    return JSON.parse(dataString);
   },
+  
+  delTempUser: async (email) => {
+    await client.del(`temp_user:${email}`);
+  },
+  
+  // ── Expose raw client for rate-limit-redis ──
+  rawClient: client
 };
 
-module.exports = redisClient;
+module.exports = redisClientWrapper;

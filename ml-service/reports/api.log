@@ -127,3 +127,14 @@
 2026-06-11 23:35:42,389 | INFO | agrisense |   Base dir: C:\Agri\AgriSense\ml-service
 2026-06-11 23:35:42,389 | WARNING | agrisense | Missing model files (run training scripts first): ['crop_model.pkl', 'label_encoder.pkl']
 2026-06-11 23:35:42,389 | INFO | agrisense | =======================================================
+2026-07-08 18:18:54,878 | INFO | agrisense | [soil] Loaded checkpoint from epoch 1 (val_acc=99.90%)
+2026-07-08 18:18:54,888 | INFO | agrisense | [soil] EfficientNet-B0 loaded | Classes: ['Alluvial_Soil', 'Arid_Soil', 'Black_Soil', 'Laterite_Soil', 'Mountain_Soil', 'Red_Soil', 'Yellow_Soil']
+2026-07-08 18:18:55,034 | WARNING | agrisense | [crop] Required file not found: C:\Agri\AgriSense\ml-service\data\soil_npk.json
+2026-07-08 18:18:55,035 | WARNING | agrisense | [crop] Model files not found. Using mock mode.
+2026-07-08 18:18:57,783 | INFO | agrisense | =======================================================
+2026-07-08 18:18:57,783 | INFO | agrisense |   AgriSense ML Service — Starting Up
+2026-07-08 18:18:57,783 | INFO | agrisense |   Time    : 2026-07-08T12:48:57.783696Z
+2026-07-08 18:18:57,784 | INFO | agrisense |   Base dir: C:\Agri\AgriSense\ml-service
+2026-07-08 18:18:57,784 | WARNING | agrisense | Missing model files (run training scripts first): ['crop_model.pkl', 'label_encoder.pkl']
+2026-07-08 18:18:57,784 | INFO | agrisense | =======================================================
+2026-07-08 18:20:41,001 | WARNING | agrisense | [price] No price model found for 'Tomato'. Using mock mode.

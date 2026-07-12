@@ -6,7 +6,7 @@ const auth = (req, res, next) => {
   if (!token) return res.status(401).json({ message: "No token, unauthorized" });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.ACCESS_SECRET);
     req.user = decoded; // { id, email }
     next();
   } catch {

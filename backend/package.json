@@ -16,6 +16,7 @@
     "axios": "^1.13.6",
     "bcryptjs": "^3.0.3",
     "cheerio": "^1.2.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^16.6.1",
     "express": "^5.2.1",
@@ -28,6 +29,8 @@
     "morgan": "^1.10.1",
     "multer": "^2.1.0",
     "puppeteer": "^24.38.0",
+    "rate-limit-redis": "^5.0.0",
+    "rate-limiter-flexible": "^11.2.0",
     "redis": "^5.11.0"
   },
   "devDependencies": {

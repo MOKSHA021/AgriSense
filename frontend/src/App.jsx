@@ -1,23 +1,23 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { LanguageProvider } from "./translations";
-import ProtectedRoute from "./components/ProtectedRoute";
-import AnimatedBackground from "./components/AnimatedBackground";
+import ProtectedRoute from "./components/core/ProtectedRoute";
+import AnimatedBackground from "./components/layout/AnimatedBackground";
 
-import LandingPage from "./pages/LandingPage";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import VerifyOTP from "./pages/VerifyOTP";
-import Dashboard from "./pages/Dashboard";
+import LandingPage from "./pages/core/LandingPage";
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
+import VerifyOTP from "./pages/auth/VerifyOTP";
+import Dashboard from "./pages/core/Dashboard";
 
-import SoilAnalysis from "./pages/SoilAnalysis";       // ← NEW: dedicated soil page
-import CropRecommend from "./pages/CropRecommend";
-import BestMandi from "./pages/BestMandi";
-import LivePricesDashboard from "./pages/LivePricesDashboard";
-import PriceForecast from "./pages/PriceForecast";
-import RiskAssessment from "./pages/RiskAssessment";
-import ExpenseTracker from "./pages/ExpenseTracker";
-import Weather from "./pages/Weather";
+import SoilAnalysis from "./pages/agriculture/SoilAnalysis";       // ← NEW: dedicated soil page
+import CropRecommend from "./pages/agriculture/CropRecommend";
+import BestMandi from "./pages/market/BestMandi";
+import LivePricesDashboard from "./pages/market/LivePricesDashboard";
+import PriceForecast from "./pages/market/PriceForecast";
+import RiskAssessment from "./pages/core/RiskAssessment";
+import ExpenseTracker from "./pages/finance/ExpenseTracker";
+import Weather from "./pages/core/Weather";
 
 function App() {
   return (
