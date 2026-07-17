@@ -217,7 +217,7 @@ The original component (`Market.jsx`) receives the resolved data. It updates the
 
 ---
 
-## 5. 🎯 Interview Cheat Sheet: Frontend API Architecture
+## 5. 🎯 Frontend API Architecture Q&A
 
 **Q: Why did you use Axios instead of the native `fetch()` API?**
 > **A:** "While `fetch()` is built into the browser, I chose Axios because it is designed for scalable applications. Axios automatically transforms JSON data (whereas `fetch` requires manual `.json()` parsing), it inherently rejects promises for 4xx and 5xx HTTP status codes (which `fetch` does not do by default), and it provides built-in support for **Interceptors**. Interceptors were critical for implementing our silent JWT refresh flow."

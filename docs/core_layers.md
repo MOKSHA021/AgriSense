@@ -6,7 +6,7 @@ The **Layered (or N-Tier) Architecture** is a fundamental software design patter
 
 ## 1. Why Layered Architecture?
 
-> **Interview Q&A: Why do we separate our backend into layers?**
+> **Why do we separate our backend into layers?**
 > **Answer:** We use a layered architecture to enforce the **Separation of Concerns (SoC)** principle. It ensures that HTTP routing logic, business logic, and database interactions are completely isolated from each other. This modularity makes the application easier to unit test, scale, and refactor (e.g., swapping MongoDB for PostgreSQL without touching the HTTP controllers).
 
 ---
@@ -47,7 +47,7 @@ Utilities are small, stateless, purely functional modules that perform common, r
 
 ## 4. Architecture in Action (Code Examples)
 
-In an interview, you may be asked to refactor a tightly coupled controller (often called a "Fat Controller"). Here is the standard architectural approach.
+You may need to refactor a tightly coupled controller (often called a "Fat Controller"). Here is the standard architectural approach.
 
 ### ❌ The Anti-Pattern: The "Fat Controller"
 This controller violates Separation of Concerns by mixing HTTP handling with database queries and business logic.
@@ -105,13 +105,13 @@ const login = async (req, res) => {
 
 ---
 
-## 5. High-Impact Interview Questions
+## 5. Key Architecture Questions
 
-> **Interviewer:** "Why shouldn't a Service function take the `req` or `res` objects as parameters?"
+> **Question:** "Why shouldn't a Service function take the `req` or `res` objects as parameters?"
 > **Answer:** "`req` and `res` are Express-specific HTTP objects. A service represents business logic and should be completely independent of the transport layer. By passing only the exact data the service needs (such as `email` and `password`), the service becomes highly reusable across different interfaces like REST, GraphQL, WebSockets, or background cron jobs. Furthermore, decoupled services are much easier to unit test, easier to maintain, and strictly follow the Separation of Concerns (SoC) principle. Controllers handle HTTP details, while services focus solely on business logic."
 
-> **Interviewer:** "What is the single responsibility of a Controller?"
+> **Question:** "What is the single responsibility of a Controller?"
 > **Answer:** "A Controller's sole responsibility is managing the transport layer. It parses incoming HTTP requests, delegates the actual processing to a Service, and formats the outbound HTTP response with the correct status codes."
 
-> **Interviewer:** "What is the difference between a Service and a Utility (Util)?"
+> **Question:** "What is the difference between a Service and a Utility (Util)?"
 > **Answer:** "A Service contains domain-specific business logic (e.g., `calculateExpenseTax()`) and often interacts with databases or external APIs. A Utility is a pure, domain-agnostic function used globally across the entire application (e.g., `formatDate()` or `hashString()`). Utilities never manage state, never talk to databases, and are never tied to a specific resource."

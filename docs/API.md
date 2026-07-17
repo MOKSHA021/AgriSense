@@ -80,7 +80,7 @@ If APIs were unprotected, anyone could simply send a `DELETE /users` request and
 *   **HTTPS Encryption:** Protecting data while it is in transit.
 *   **Rate Limiting:** Preventing abuse (like DDoS or brute force) by limiting requests per minute.
 
-> **Interview Tip:** In your AgriSense project, you have already implemented **JWT authentication** and **Rate Limiting**. Mentioning these provides concrete proof that you understand API security!
+> **Note:** In the AgriSense project, **JWT authentication** and **Rate Limiting** are implemented to provide robust API security.
 
 ---
 
@@ -88,7 +88,7 @@ If APIs were unprotected, anyone could simply send a `DELETE /users` request and
 
 An API is an interface that allows two different software applications to communicate and share data with each other.
 
-> **Interview Definition:** An API is a contract between two software systems that defines how they exchange requests and responses while hiding implementation details.
+> **Definition:** An API is a contract between two software systems that defines how they exchange requests and responses while hiding implementation details.
 
 ### Why do APIs exist? (Creating Boundaries)
 If APIs didn't exist, every system would need to know every other system's internal workings. The frontend would have to write SQL queries and handle business rules. Everything would become tightly coupled, which is a disaster for scaling.
@@ -111,7 +111,7 @@ The frontend **never** directly talks to MongoDB, Redis, or the ML Service. Ever
 * **Loose Coupling:** If the backend switches from MongoDB to PostgreSQL, the frontend doesn't change because the API contract remains the same.
 * **Independent Teams & Modularity:** Components can evolve independently. A React web app and an iOS app can use the exact same API.
 
-> **Interview Answer:** APIs enable independent systems to communicate through well-defined contracts. They reduce coupling, improve modularity, simplify integrations, and are the foundation of modern architectures like microservices.
+> **Summary:** APIs enable independent systems to communicate through well-defined contracts. They reduce coupling, improve modularity, simplify integrations, and are the foundation of modern architectures like microservices.
 
 
 
@@ -129,8 +129,8 @@ It provides:
 *   **API:** A set of related operations exposing a specific feature (e.g., the *Expense API*).
 *   **Endpoint:** A unique combination of an HTTP method and a URL path that maps to a specific backend handler or resource.
 
-> **Interview Q&A: What is an endpoint?**
-> **Answer:** An endpoint is a unique combination of an HTTP method and a URL path that maps to a specific backend handler or resource.
+> **What is an endpoint?**
+> An endpoint is a unique combination of an HTTP method and a URL path that maps to a specific backend handler or resource.
 > 
 > **Examples:**
 > *   `GET /users`
@@ -197,9 +197,7 @@ It provides:
 *   **RPC-style (Action-based):** `POST /getUsers` 
 *   **RESTful (Resource-based):** `GET /users` 
 
-**Interview Q&A: Identifying RESTful APIs**
-> **Interviewer:** Can you give examples of endpoints in your project and explain what makes them RESTful?
-> **Answer:** 
+**Identifying RESTful APIs**
 > In AgriSense, we use endpoints like:
 > *   `GET /api/weather`
 > *   `POST /api/auth/login`
@@ -227,7 +225,7 @@ To truly understand web communication, you must separate the process into three 
 
 **The Complete Request Lifecycle (React to Node.js):**
 
-For backend interviews, you must explain exactly what happens when a user clicks a button. Let's trace a request:
+Let's trace exactly what happens when a user clicks a button:
 
 1. **Step 1: The Request (Frontend)**
    * User clicks "Save Profile". React uses `axios` or `fetch` to create an HTTP Request.
@@ -255,8 +253,8 @@ graph LR
     React -.-> UI([Update UI])
 ```
 
-> **Interview Q&A: What happens when a frontend calls an API?**
-> **Strong Answer:** The frontend sends an HTTP request containing a method, URL, headers, and optionally a body. The backend router matches the endpoint, invokes the appropriate controller, executes business logic, interacts with databases or external services if required, constructs an HTTP response with a status code and data, and sends it back. The frontend processes the response and updates the UI.
+> **Summary: What happens when a frontend calls an API?**
+> The frontend sends an HTTP request containing a method, URL, headers, and optionally a body. The backend router matches the endpoint, invokes the appropriate controller, executes business logic, interacts with databases or external services if required, constructs an HTTP response with a status code and data, and sends it back. The frontend processes the response and updates the UI.
 
 ### 5.1 Calling External APIs: The Proxy Pattern
 
@@ -280,7 +278,7 @@ Most APIs require secret keys (e.g., Google Maps). If React calls them directly,
 4. **Caching & Performance:** The backend can use Redis to cache external responses. If 500 users ask for local weather, the backend hits the external API once and serves the rest from cache, reducing latency.
 5. **Validation & Rate Limiting:** The backend can validate inputs before making an external API call, and limit how many times a user can make requests to prevent abuse.
 
-**Interview Answer:** 
+**Summary:** 
 > "In AgriSense, we call Open-Meteo directly from the React frontend because it's a public API that requires no secrets. However, for APIs requiring credentials, or when we need caching, input validation, and data aggregation, we route requests through our Express backend to keep secrets secure and centralize business logic."
 
 ---
@@ -375,7 +373,7 @@ It provides:
 For a Software Engineer, understanding the trade-offs between different API architectural patterns is critical. "Architecture" defines the underlying data exchange protocol and structural constraints.
 
 ### The Communication Paradigm: Request-Response vs. Event-Driven
-A common interview question explores communication models, answering the question: *"Are APIs always synchronous?"*
+A common question explores communication models: *"Are APIs always synchronous?"*
 *   **Request-Response (Synchronous):** The client sends a request and *waits* for a direct response (e.g., a typical Login API). There is direct communication.
 *   **Event-Driven (Asynchronous):** The client fires a message (often through a message broker) and *doesn't wait*. Another service reacts to it later (e.g., an "Order Created" event).
 
@@ -425,7 +423,7 @@ mutation {
 }
 ```
 ### How GraphQL Works Internally (The Single Endpoint)
-A common interview question is: *"If every request goes to `/graphql`, how does the server know what to do?"*
+A common question is: *"If every request goes to `/graphql`, how does the server know what to do?"*
 The answer is: **The GraphQL server parses the query and routes it to resolver functions.**
 
 **Step 1: The Request**
@@ -488,7 +486,7 @@ graph TD
     end
 ```
 
-**Interview Answer:**
+**Summary:**
 > "REST exposes multiple resource-based endpoints returning fixed data structures. GraphQL exposes a single endpoint where the client specifies exactly the data it needs. This eliminates over-fetching and reduces network round-trips for complex UI dashboards. However, for straightforward CRUD operations, REST remains simpler to implement and cache."
 
 ### 10.3 WebSockets

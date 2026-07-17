@@ -33,10 +33,13 @@ const createTokenBucket = (keyPrefix, points, duration, message) => {
     }
     
     rateLimiter.consume(req.ip, 1)
-      .then(() => {
+      .then((rateLimiterRes) => {
+        res.setHeader('X-RateLimit-Remaining', rateLimiterRes.remainingPoints);
         next();
       })
-      .catch(() => {
+      .catch((rateLimiterRes) => {
+        res.setHeader('Retry-After', Math.round(rateLimiterRes.msBeforeNext / 1000));
+        res.setHeader('X-RateLimit-Remaining', 0);
         res.status(429).json({ message: message || 'Too many requests, please try again later.' });
       });
   };

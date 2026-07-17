@@ -14,8 +14,9 @@ const detectPest = async (req, res) => {
             contentType: req.file.mimetype,
         });
 
-        // ml-service runs on localhost:8000 natively
-        const pythonServiceResponse = await axios.post("http://localhost:8000/predict/pest", form, {
+        // ml-service runs on localhost:8000 natively, or ml-service:8000 in Docker
+        const ML_URL = process.env.ML_SERVICE_URL || "http://localhost:8000";
+        const pythonServiceResponse = await axios.post(`${ML_URL}/predict/pest`, form, {
             headers: {
                 ...form.getHeaders()
             }

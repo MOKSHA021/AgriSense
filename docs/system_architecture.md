@@ -25,7 +25,7 @@ graph TD
 ```
 
 > [!NOTE]
-> **Friendly Note for Interviews:** If they ask *why* you separated Node and Python, tell them it's about playing to their strengths. Node.js is incredibly fast at handling thousands of small, simultaneous network requests (I/O bound). Python is the undisputed king of heavy, mathematical Machine Learning (CPU bound). If you put them both in one server, Python's heavy math would freeze the Node.js server!
+> **Note:** If someone asks *why* you separated Node and Python, tell them it's about playing to their strengths. Node.js is incredibly fast at handling thousands of small, simultaneous network requests (I/O bound). Python is the undisputed king of heavy, mathematical Machine Learning (CPU bound). If you put them both in one server, Python's heavy math would freeze the Node.js server!
 
 ---
 
@@ -78,9 +78,9 @@ sequenceDiagram
 
 ---
 
-## 🎯 Interview Cheat Sheet: Architecture & Data Flow
+## 🎯 Architecture & Data Flow Q&A
 
-If an interviewer asks you: **"How do the frontend and backend connect?"** or **"Walk me through your system architecture."**, here is your script:
+**How do the frontend and backend connect?** or **Walk me through your system architecture.** Here is the explanation:
 
 > "My application uses a dual-backend **Microservice Architecture** over the **HTTP protocol**. 
 > 

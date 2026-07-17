@@ -72,8 +72,8 @@ Redis is more than a simple key-value store; it's a data structure server:
 
 ### Persistence & Expiration
 - **TTL (Time To Live):** Native support to automatically delete keys (e.g., expiring an OTP after 10 minutes). No cleanup code required.
-- **RDB Snapshot:** Saves RAM to disk at intervals. Fast recovery, but recent data might be lost on crash.
-- **AOF (Append Only File):** Logs every write operation. More durable, but slightly slower.
+- **RDB (Redis DataBase):** A persistence mechanism that saves the current state of the in-memory data store to disk. It creates a point-in-time snapshot of the entire Redis data set, which can then be used to restore the data in case of a crash or shutdown. It is a good option when data loss is not acceptable. However, it can cause a performance hit on the server as Redis performs disk I/O during saving.
+- **AOF (Append-Only File):** Logs every write operation received by the server, which will be played again at server startup to reconstruct the original dataset. AOF is a more complete and durable way of persistence and is recommended in production environments. But AOF can be slower than RDB for loading the data into memory, and it uses more disk space than RDB as it keeps a log of all operations.
 - **Auto-tiering (if enabled):** "Hot data" stays in RAM, "warm data" swaps to flash storage.
 
 ### Scalability & High Availability
@@ -144,7 +144,7 @@ Rich and easy to create. MongoDB Atlas's Performance Advisor even suggests new i
 
 ---
 
-## 6. Interview Questions & Answers
+## 6. Key Questions & Answers
 
 **Q: Why is Redis faster than MongoDB?**
 **A:** Redis keeps its entire working dataset in RAM and uses Hash Tables for key lookups, resulting in average O(1) access time. MongoDB reads from disk (though it caches in RAM via WiredTiger) and uses B+ Trees for queries (O(log n)), prioritizing complex query capabilities over raw lookup speed.
@@ -162,7 +162,26 @@ Rich and easy to create. MongoDB Atlas's Performance Advisor even suggests new i
 **A:** A JS `Map` is isolated to the single Node.js process it runs in and is immediately lost if the server restarts. Redis is a separate server process, meaning its data can persist through server crashes (via RDB/AOF), and it can be shared simultaneously across multiple instances of your application (like in a load-balanced cluster). Additionally, Redis provides built-in features like auto-expiring keys (TTL) and Pub/Sub messaging that a JS `Map` lacks.
 
 **Q: Redis is single-threaded. How can it handle millions of requests per second?**
-**A:** Because Redis operates entirely in RAM, its operations are extremely fast (mostly O(1)). It uses an efficient I/O multiplexing model (an event loop) to handle many concurrent connections on a single thread. This avoids the overhead of thread context switching and lock contention entirely.
+**A:** Redis does not execute millions of commands simultaneously. Instead, it processes them one at a time using a single-threaded event loop. Each command is extremely fast because data is stored in RAM and accessed through O(1) hash table lookups. The event loop uses I/O multiplexing (such as `epoll` on Linux) to efficiently monitor thousands of client connections and execute only the commands that are ready, avoiding the overhead of creating many threads, locks, and context switches.
+
+**Q: Is MongoDB single-threaded?**
+**A:** No. MongoDB is a multi-threaded database server. It handles multiple client requests concurrently using worker threads and thread pools. It uses concurrency control mechanisms such as locks, the WiredTiger storage engine, and ACID transactions to maintain data consistency. In contrast, Redis primarily executes commands on a single-threaded event loop, relying on extremely fast in-memory operations rather than parallel command execution.
+
+**Q: When would YOU choose a Single-Thread architecture?**
+**A:** Choose single-threaded architecture when:
+- Operations finish in microseconds.
+- Most work is in memory.
+- Shared state would require heavy locking.
+- Simplicity and low latency are priorities.
+*Examples: Redis, Nginx event loop, Node.js event loop.*
+
+**Q: When would YOU choose a Multi-Thread architecture?**
+**A:** Choose multi-threading when:
+- Operations take milliseconds or longer.
+- Threads spend time waiting for I/O.
+- You want to utilize multiple CPU cores.
+- Different requests are largely independent.
+*Examples: MongoDB, MySQL, PostgreSQL, Java Spring servers, Web browsers.*
 
 **Q: What happens if Redis runs out of RAM?**
 **A:** By default, Redis will return errors for new write commands (`noeviction`). However, it is usually configured with an **Eviction Policy** like **LRU (Least Recently Used)** or **LFU (Least Frequently Used)**. These policies automatically delete older or less frequently accessed keys to make room for new data.
