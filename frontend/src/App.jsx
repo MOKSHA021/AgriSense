@@ -18,6 +18,7 @@ import PriceForecast from "./pages/market/PriceForecast";
 import RiskAssessment from "./pages/core/RiskAssessment";
 import ExpenseTracker from "./pages/finance/ExpenseTracker";
 import Weather from "./pages/core/Weather";
+import NotFound from "./pages/core/NotFound";
 
 function App() {
   return (
@@ -48,6 +49,9 @@ function App() {
 
             {/* ── Finance ── */}
             <Route path="/dashboard/expenses"      element={<ProtectedRoute><ExpenseTracker /></ProtectedRoute>} />
+
+            {/* ── Catch-all ── */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
